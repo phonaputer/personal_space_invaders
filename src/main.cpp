@@ -2,27 +2,21 @@
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
-#include <iostream>
 
-// int main(int argc, char *argv[])
-// {
-//    SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "%s", "Hello, world!");
+namespace
+{
+   // Roughly 60 updates per second. 1000 / 60 = 16.66 (repeating, of course).
+   const Uint64 MS_PER_UPDATE = 17;
 
-//    if (SDL_Init(SDL_INIT_VIDEO) < 0)
-//    {
-//       std::cerr << "SDL could not initialize! SDL Error: " << SDL_GetError() << std::endl;
-//       return 1;
-//    }
+   struct AppCtx
+   {
+      SDL_Window *window;
+      SDL_Renderer *renderer;
+      Uint64 previous_now_ms;
+      Uint64 unprocessed_ms;
+   };
+}
 
-//    return 0;
-// }
-
-// The following is the example code from: https://examples.libsdl.org/SDL3/renderer/01-clear/
-
-static SDL_Window *window = NULL;
-static SDL_Renderer *renderer = NULL;
-
-/* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
    SDL_SetAppMetadata("Example Renderer Clear", "1.0", "com.example.renderer-clear");
@@ -33,14 +27,32 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
       return SDL_APP_FAILURE;
    }
 
-   if (!SDL_CreateWindowAndRenderer("examples/renderer/clear", 640, 480, SDL_WINDOW_RESIZABLE, &window, &renderer))
+   auto window = SDL_CreateWindow("Test window", 640, 480, SDL_WINDOW_RESIZABLE);
+   if (!window)
    {
-      SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
+      SDL_Log("Couldn't create window: %s", SDL_GetError());
       return SDL_APP_FAILURE;
    }
+
+   auto renderer = SDL_CreateRenderer(window, NULL);
+   if (!renderer)
+   {
+      SDL_Log("Couldn't create renderer: %s", SDL_GetError());
+      return SDL_APP_FAILURE;
+   }
+
    SDL_SetRenderLogicalPresentation(renderer, 640, 480, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
-   return SDL_APP_CONTINUE; /* carry on with the program! */
+   *appstate = new AppCtx{
+       .window = window,
+       .renderer = renderer,
+       .previous_now_ms = SDL_GetTicks(),
+       .unprocessed_ms = 0,
+   };
+
+   SDL_Log("Setup complete...");
+
+   return SDL_APP_CONTINUE;
 }
 
 /* This function runs when a new event (mouse input, keypresses, etc) occurs. */
@@ -48,32 +60,46 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 {
    if (event->type == SDL_EVENT_QUIT)
    {
-      return SDL_APP_SUCCESS; /* end the program, reporting success to the OS. */
+      return SDL_APP_SUCCESS;
    }
-   return SDL_APP_CONTINUE; /* carry on with the program! */
+
+   return SDL_APP_CONTINUE;
 }
 
 /* This function runs once per frame, and is the heart of the program. */
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
+   auto ctx = (AppCtx *)appstate;
+
+   const auto now_ms = SDL_GetTicks();
+   ctx->unprocessed_ms += now_ms - ctx->previous_now_ms;
+   ctx->previous_now_ms = now_ms;
+
+   while (ctx->unprocessed_ms > MS_PER_UPDATE)
+   {
+      // Don't actually have anything to do here now :/
+
+      ctx->unprocessed_ms -= MS_PER_UPDATE;
+   }
+
    const double now = ((double)SDL_GetTicks()) / 1000.0; /* convert from milliseconds to seconds. */
    /* choose the color for the frame we will draw. The sine wave trick makes it fade between colors smoothly. */
    const float red = (float)(0.5 + 0.5 * SDL_sin(now));
    const float green = (float)(0.5 + 0.5 * SDL_sin(now + SDL_PI_D * 2 / 3));
    const float blue = (float)(0.5 + 0.5 * SDL_sin(now + SDL_PI_D * 4 / 3));
-   SDL_SetRenderDrawColorFloat(renderer, red, green, blue, SDL_ALPHA_OPAQUE_FLOAT); /* new color, full alpha. */
+   SDL_SetRenderDrawColorFloat(ctx->renderer, red, green, blue, SDL_ALPHA_OPAQUE_FLOAT); /* new color, full alpha. */
 
    /* clear the window to the draw color. */
-   SDL_RenderClear(renderer);
+   SDL_RenderClear(ctx->renderer);
 
    /* put the newly-cleared rendering on the screen. */
-   SDL_RenderPresent(renderer);
+   SDL_RenderPresent(ctx->renderer);
 
    return SDL_APP_CONTINUE; /* carry on with the program! */
 }
 
-/* This function runs once at shutdown. */
 void SDL_AppQuit(void *appstate, SDL_AppResult result)
 {
+   SDL_Log("Quitting...");
    /* SDL will clean up the window/renderer for us. */
 }
