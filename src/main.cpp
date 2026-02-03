@@ -14,6 +14,7 @@ namespace
       SDL_Renderer *renderer;
       Uint64 previous_now_ms;
       Uint64 unprocessed_ms;
+      SDL_Texture *dat_png;
    };
 }
 
@@ -43,11 +44,30 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 
    SDL_SetRenderLogicalPresentation(renderer, 640, 480, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
+   auto png_surface = SDL_LoadPNG("./assets/knight.png");
+   if (!png_surface)
+   {
+      SDL_Log("Couldn't create png: %s", SDL_GetError());
+      return SDL_APP_FAILURE;
+   }
+
+   auto png_texture = SDL_CreateTextureFromSurface(renderer, png_surface);
+   if (!png_texture)
+   {
+      SDL_Log("Couldn't create png texture: %s", SDL_GetError());
+      return SDL_APP_FAILURE;
+   }
+
+   SDL_DestroySurface(png_surface);
+
+   SDL_SetTextureScaleMode(png_texture, SDL_SCALEMODE_PIXELART);
+
    *appstate = new AppCtx{
        .window = window,
        .renderer = renderer,
        .previous_now_ms = SDL_GetTicks(),
        .unprocessed_ms = 0,
+       .dat_png = png_texture,
    };
 
    SDL_Log("Setup complete...");
@@ -92,6 +112,11 @@ SDL_AppResult SDL_AppIterate(void *appstate)
    /* clear the window to the draw color. */
    SDL_RenderClear(ctx->renderer);
 
+   auto src_rect = SDL_FRect{0, 0, 32, 32};
+   auto dest_rect = SDL_FRect{10, 10, 128, 128};
+
+   SDL_RenderTexture(ctx->renderer, ctx->dat_png, &src_rect, &dest_rect);
+
    /* put the newly-cleared rendering on the screen. */
    SDL_RenderPresent(ctx->renderer);
 
@@ -100,6 +125,10 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
 void SDL_AppQuit(void *appstate, SDL_AppResult result)
 {
+   auto ctx = (AppCtx *)appstate;
+
+   SDL_DestroyTexture(ctx->dat_png);
+
    SDL_Log("Quitting...");
    /* SDL will clean up the window/renderer for us. */
 }
