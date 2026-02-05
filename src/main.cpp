@@ -2,93 +2,119 @@
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include <vector>
 
-struct SpritesheetArgs
+struct Frame
 {
-  SDL_Texture *texture;
+  int x;
+  int y;
+};
 
-  float src_start_x;
-  float src_start_y;
-  float src_frame_width;
-  float src_frame_height;
+std::vector<Frame> get_frames(const int y, const int start_x, const int end_x)
+{
+  std::vector<Frame> frames;
 
-  const float draw_width;
-  const float draw_height;
+  for (int i = start_x; i < end_x; i++)
+  {
+    frames.push_back(Frame{.x = i, .y = y});
+  }
 
-  int frame_count;
-  int ticks_per_frame;
+  return frames;
+}
+
+struct DrawRect
+{
+  float x;
+  float y;
+  float width;
+  float height;
 };
 
 class Spritesheet
 {
 private:
-  SDL_Texture *texture;
-
-  const float src_start_x;
-  const float src_start_y;
+  SDL_Texture *src;
   const float src_frame_width;
   const float src_frame_height;
 
-  const float draw_width;
-  const float draw_height;
+public:
+  Spritesheet(SDL_Texture *src, float src_frame_width, float src_frame_height)
+      : src{src},
+        src_frame_width{src_frame_width},
+        src_frame_height{src_frame_height}
+  {
+  }
 
-  const int frame_count;
+  void draw_frame(
+      SDL_Renderer *renderer, const Frame &frame, const DrawRect &draw_rect
+  ) const
+  {
+    auto src_rect = SDL_FRect{
+        (frame.x * src_frame_width),
+        (frame.y * src_frame_height),
+        src_frame_width,
+        src_frame_height,
+    };
+    auto dest_rect = SDL_FRect{
+        draw_rect.x,
+        draw_rect.y,
+        draw_rect.width,
+        draw_rect.height,
+    };
+
+    SDL_RenderTexture(renderer, src, &src_rect, &dest_rect);
+  }
+};
+
+class Animation
+{
+private:
+  const Spritesheet *spritesheet;
   const int ticks_per_frame;
-
-  int tick_counter = 0;
-  int current_frame = 0;
+  const std::vector<Frame> frames;
+  int tick_counter;
+  size_t cur_frame;
 
 public:
-  Spritesheet(SpritesheetArgs args)
-      : texture{args.texture},
-        src_start_x{args.src_start_x},
-        src_start_y{args.src_start_y},
-        src_frame_width{args.src_frame_width},
-        src_frame_height{args.src_frame_height},
-        draw_width{args.draw_width},
-        draw_height{args.draw_height},
-        frame_count{args.frame_count},
-        ticks_per_frame{args.ticks_per_frame}
+  Animation(
+      Spritesheet *spritesheet, int ticks_per_frame, std::vector<Frame> frames
+  )
+      : spritesheet{spritesheet},
+        ticks_per_frame{ticks_per_frame},
+        frames{frames}
   {
+    tick_counter = 0;
+    cur_frame = 0;
   }
 
   void update()
   {
     tick_counter++;
-
     if (tick_counter >= ticks_per_frame)
     {
-      current_frame++;
       tick_counter = 0;
+      cur_frame++;
 
-      if (current_frame >= frame_count)
+      if (cur_frame >= frames.size())
       {
-        current_frame = 0;
+        cur_frame = 0;
       }
     }
   }
 
-  void draw(SDL_Renderer *renderer, float x, float y)
+  void draw(SDL_Renderer *renderer, const DrawRect &draw_rect) const
   {
-    auto src_rect = SDL_FRect{
-        src_start_x + (current_frame * src_frame_width),
-        src_start_y,
-        src_frame_width,
-        src_frame_height,
-    };
-    auto dest_rect = SDL_FRect{
-        x,
-        y,
-        x + draw_width,
-        y + draw_height,
-    };
+    auto frame = frames.at(cur_frame);
 
-    SDL_RenderTexture(renderer, texture, &src_rect, &dest_rect);
+    spritesheet->draw_frame(renderer, frame, draw_rect);
   }
 };
 
 // Roughly 60 updates per second. 1000 / 60 = 16.66 (repeating, of course).
 const Uint64 MS_PER_UPDATE = 17;
+
+const int WINDOW_WIDTH = 1200;
+const int WINDOW_HEIGHT = 600;
 
 struct AppCtx
 {
@@ -98,6 +124,7 @@ struct AppCtx
   Uint64 unprocessed_ms;
   SDL_Texture *test_texture;
   Spritesheet *test_spritesheet;
+  Animation *test_animation;
 };
 
 SDL_AppResult SDL_AppInit(
@@ -125,7 +152,7 @@ SDL_AppResult SDL_AppInit(
   }
 
   SDL_SetRenderLogicalPresentation(
-      renderer, 640, 480, SDL_LOGICAL_PRESENTATION_LETTERBOX
+      renderer, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX
   );
 
   auto png_surface = SDL_LoadPNG("./assets/knight.png");
@@ -146,19 +173,8 @@ SDL_AppResult SDL_AppInit(
 
   SDL_SetTextureScaleMode(png_texture, SDL_SCALEMODE_PIXELART);
 
-  Spritesheet *spritesheet = new Spritesheet(
-      SpritesheetArgs{
-          .texture = png_texture,
-          .src_start_x = 0,
-          .src_start_y = 0,
-          .src_frame_width = 32,
-          .src_frame_height = 32,
-          .draw_width = 128,
-          .draw_height = 128,
-          .frame_count = 4,
-          .ticks_per_frame = 7,
-      }
-  );
+  Spritesheet *spritesheet = new Spritesheet(png_texture, 32, 32);
+  Animation *animation = new Animation(spritesheet, 7, get_frames(0, 0, 3));
 
   *appstate = new AppCtx{
       .window = window,
@@ -167,6 +183,7 @@ SDL_AppResult SDL_AppInit(
       .unprocessed_ms = 0,
       .test_texture = png_texture,
       .test_spritesheet = spritesheet,
+      .test_animation = animation,
   };
 
   SDL_Log("Setup complete...");
@@ -196,7 +213,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
   while (ctx->unprocessed_ms > MS_PER_UPDATE)
   {
-    ctx->test_spritesheet->update();
+    ctx->test_animation->update();
 
     ctx->unprocessed_ms -= MS_PER_UPDATE;
   }
@@ -215,7 +232,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
   /* clear the window to the draw color. */
   SDL_RenderClear(ctx->renderer);
 
-  ctx->test_spritesheet->draw(ctx->renderer, 10, 10);
+  ctx->test_animation->draw(ctx->renderer, DrawRect{10, 10, 500, 500});
 
   /* put the newly-cleared rendering on the screen. */
   SDL_RenderPresent(ctx->renderer);
@@ -228,9 +245,8 @@ void SDL_AppQuit(void *appstate, [[maybe_unused]] SDL_AppResult result)
   auto ctx = (AppCtx *)appstate;
 
   SDL_DestroyTexture(ctx->test_texture);
-  SDL_DestroyRenderer(ctx->renderer);
-  SDL_DestroyWindow(ctx->window);
 
+  delete ctx->test_animation;
   delete ctx->test_spritesheet;
   delete ctx;
 
