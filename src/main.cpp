@@ -113,8 +113,8 @@ public:
 // Roughly 60 updates per second. 1000 / 60 = 16.66 (repeating, of course).
 const Uint64 MS_PER_UPDATE = 17;
 
-const int WINDOW_WIDTH = 1200;
-const int WINDOW_HEIGHT = 600;
+const int WINDOW_WIDTH = 600;
+const int WINDOW_HEIGHT = 800;
 
 struct AppCtx
 {
@@ -151,11 +151,14 @@ SDL_AppResult SDL_AppInit(
     return SDL_APP_FAILURE;
   }
 
+  SDL_SetWindowSize(window, WINDOW_WIDTH, WINDOW_HEIGHT);
+  SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+
   SDL_SetRenderLogicalPresentation(
       renderer, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX
   );
 
-  auto png_surface = SDL_LoadPNG("./assets/knight.png");
+  auto png_surface = SDL_LoadPNG("./assets/space_invaders.png");
   if (!png_surface)
   {
     SDL_Log("Couldn't create png: %s", SDL_GetError());
@@ -173,8 +176,8 @@ SDL_AppResult SDL_AppInit(
 
   SDL_SetTextureScaleMode(png_texture, SDL_SCALEMODE_PIXELART);
 
-  Spritesheet *spritesheet = new Spritesheet(png_texture, 32, 32);
-  Animation *animation = new Animation(spritesheet, 7, get_frames(0, 0, 3));
+  Spritesheet *spritesheet = new Spritesheet(png_texture, 16, 16);
+  Animation *animation = new Animation(spritesheet, 14, get_frames(0, 0, 3));
 
   *appstate = new AppCtx{
       .window = window,
@@ -191,7 +194,6 @@ SDL_AppResult SDL_AppInit(
   return SDL_APP_CONTINUE;
 }
 
-/* This function runs when a new event (mouse input, keypresses, etc) occurs. */
 SDL_AppResult SDL_AppEvent([[maybe_unused]] void *appstate, SDL_Event *event)
 {
   if (event->type == SDL_EVENT_QUIT)
@@ -202,7 +204,6 @@ SDL_AppResult SDL_AppEvent([[maybe_unused]] void *appstate, SDL_Event *event)
   return SDL_APP_CONTINUE;
 }
 
-/* This function runs once per frame, and is the heart of the program. */
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
   auto ctx = (AppCtx *)appstate;
@@ -218,26 +219,14 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     ctx->unprocessed_ms -= MS_PER_UPDATE;
   }
 
-  const double now = ((double)SDL_GetTicks()) /
-                     1000.0; /* convert from milliseconds to seconds. */
-  /* choose the color for the frame we will draw. The sine wave trick makes it
-   * fade between colors smoothly. */
-  const float red = (float)(0.5 + 0.5 * SDL_sin(now));
-  const float green = (float)(0.5 + 0.5 * SDL_sin(now + SDL_PI_D * 2 / 3));
-  const float blue = (float)(0.5 + 0.5 * SDL_sin(now + SDL_PI_D * 4 / 3));
-  SDL_SetRenderDrawColorFloat(
-      ctx->renderer, red, green, blue, SDL_ALPHA_OPAQUE_FLOAT
-  ); /* new color, full alpha. */
-
-  /* clear the window to the draw color. */
+  SDL_SetRenderDrawColorFloat(ctx->renderer, 0, 0, 0, SDL_ALPHA_OPAQUE_FLOAT);
   SDL_RenderClear(ctx->renderer);
 
-  ctx->test_animation->draw(ctx->renderer, DrawRect{10, 10, 500, 500});
+  ctx->test_animation->draw(ctx->renderer, DrawRect{10, 10, 250, 250});
 
-  /* put the newly-cleared rendering on the screen. */
   SDL_RenderPresent(ctx->renderer);
 
-  return SDL_APP_CONTINUE; /* carry on with the program! */
+  return SDL_APP_CONTINUE;
 }
 
 void SDL_AppQuit(void *appstate, [[maybe_unused]] SDL_AppResult result)
@@ -251,5 +240,4 @@ void SDL_AppQuit(void *appstate, [[maybe_unused]] SDL_AppResult result)
   delete ctx;
 
   SDL_Log("Quitting...");
-  /* SDL will clean up the window/renderer for us. */
 }
