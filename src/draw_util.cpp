@@ -1,5 +1,6 @@
-#include "util.hpp"
+#include "draw_util.hpp"
 #include <SDL3/SDL.h>
+#include <memory>
 #include <vector>
 
 std::vector<Frame> get_frames(const int y, const int start_x, const int end_x)
@@ -14,14 +15,12 @@ std::vector<Frame> get_frames(const int y, const int start_x, const int end_x)
   return frames;
 }
 
-Spritesheet::Spritesheet(SDL_Texture *src, float src_frame_width, float src_frame_height)
+Spritesheet::Spritesheet(std::shared_ptr<SDL_Texture> src, float src_frame_width, float src_frame_height)
     : src{src}, src_frame_width{src_frame_width}, src_frame_height{src_frame_height}
 {
 }
 
-void Spritesheet::draw_frame(
-    SDL_Renderer *renderer, const Frame &frame, const DrawRect &draw_rect
-) const
+void Spritesheet::draw_frame(SDL_Renderer *renderer, const Frame &frame, const DrawRect &draw_rect) const
 {
   auto src_rect = SDL_FRect{
       (frame.x * src_frame_width),
@@ -36,10 +35,10 @@ void Spritesheet::draw_frame(
       draw_rect.height,
   };
 
-  SDL_RenderTexture(renderer, src, &src_rect, &dest_rect);
+  SDL_RenderTexture(renderer, src.get(), &src_rect, &dest_rect);
 }
 
-Animation::Animation(Spritesheet *spritesheet, int ticks_per_frame, std::vector<Frame> frames)
+Animation::Animation(Spritesheet spritesheet, int ticks_per_frame, std::vector<Frame> frames)
     : spritesheet{spritesheet}, ticks_per_frame{ticks_per_frame}, frames{frames}
 {
   tick_counter = 0;
@@ -65,5 +64,5 @@ void Animation::draw(SDL_Renderer *renderer, const DrawRect &draw_rect) const
 {
   auto frame = frames.at(cur_frame);
 
-  spritesheet->draw_frame(renderer, frame, draw_rect);
+  spritesheet.draw_frame(renderer, frame, draw_rect);
 }

@@ -1,6 +1,7 @@
 AlignAfterOpenBracket: BlockIndent
-BreakBeforeBraces: Allman
+BinPackParameters: OnePerLine
 BinPackArguments: false
-BinPackParameters: false
+BreakBeforeBraces: Allman
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
-ColumnLimit: 100
+ColumnLimit: 120
+AllowShortFunctionsOnASingleLine: None

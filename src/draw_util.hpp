@@ -1,6 +1,8 @@
 #pragma once
 
+#include "sdl_util.hpp"
 #include <SDL3/SDL.h>
+#include <memory>
 #include <vector>
 
 struct Frame
@@ -22,26 +24,26 @@ struct DrawRect
 class Spritesheet
 {
 private:
-  SDL_Texture *src;
+  std::shared_ptr<SDL_Texture> src;
   const float src_frame_width;
   const float src_frame_height;
 
 public:
-  Spritesheet(SDL_Texture *src, float src_frame_width, float src_frame_height);
+  Spritesheet(std::shared_ptr<SDL_Texture> src, float src_frame_width, float src_frame_height);
   void draw_frame(SDL_Renderer *renderer, const Frame &frame, const DrawRect &draw_rect) const;
 };
 
 class Animation
 {
 private:
-  const Spritesheet *spritesheet;
+  const Spritesheet spritesheet;
   const int ticks_per_frame;
   const std::vector<Frame> frames;
   int tick_counter;
   size_t cur_frame;
 
 public:
-  Animation(Spritesheet *spritesheet, int ticks_per_frame, std::vector<Frame> frames);
+  Animation(Spritesheet spritesheet, int ticks_per_frame, std::vector<Frame> frames);
   void update();
   void draw(SDL_Renderer *renderer, const DrawRect &draw_rect) const;
 };
