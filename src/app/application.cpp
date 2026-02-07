@@ -1,6 +1,6 @@
 #include "application.hpp"
+#include "../util/draw_util.hpp"
 #include "asset_manager.hpp"
-#include "sdl_util.hpp"
 #include <SDL3/SDL.h>
 #include <format>
 #include <memory>
@@ -29,7 +29,7 @@ Application::Application() {
 
   asset_manager = std::make_unique<AssetManager>(renderer);
 
-  auto spritesheet = Spritesheet(asset_manager.get()->get_texture("example"), 16, 16);
+  auto spritesheet = Spritesheet(asset_manager.get()->get_texture("space_invaders"), 16, 16);
 
   animation = std::make_unique<Animation>(spritesheet, 17, get_frames(0, 0, 3));
 

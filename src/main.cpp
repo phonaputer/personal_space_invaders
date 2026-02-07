@@ -1,7 +1,7 @@
 #define SDL_MAIN_USE_CALLBACKS
 
-#include "application.hpp"
-#include "draw_util.hpp"
+#include "app/application.hpp"
+#include "util/draw_util.hpp"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <vector>
