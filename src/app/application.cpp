@@ -31,7 +31,7 @@ Application::Application() {
 
   auto spritesheet = Spritesheet(asset_manager.get()->get_texture("space_invaders"), 16, 16);
 
-  animation = std::make_unique<Animation>(spritesheet, 17, get_frames(0, 0, 3));
+  animation = std::make_unique<Animation>(spritesheet, 17, get_frames(0, 0, 4));
 
   previous_now_ms = SDL_GetTicks();
   unprocessed_ms = 0;
