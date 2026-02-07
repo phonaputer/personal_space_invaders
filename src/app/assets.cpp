@@ -1,4 +1,4 @@
-#include "asset_manager.hpp"
+#include "assets.hpp"
 #include "../util/sdl_util.hpp"
 #include <SDL3/SDL.h>
 #include <format>
@@ -7,8 +7,10 @@
 #include <string>
 #include <unordered_map>
 
-std::shared_ptr<SDL_Texture> load_texture(SDL_Renderer *renderer) {
-  auto png_surface = std::unique_ptr<SDL_Surface, SDLDeleter>(SDL_LoadPNG("./assets/space_invaders.png"));
+Assets::Assets(SDL_Renderer *renderer) : renderer{renderer} {};
+
+void Assets::load_png_texture(std::string name, std::string path) {
+  auto png_surface = std::unique_ptr<SDL_Surface, SDLDeleter>(SDL_LoadPNG(path.c_str()));
   if (!png_surface.get()) {
     throw std::runtime_error(std::format("Failed to create PNG surface '{}': {}", "", SDL_GetError()));
   }
@@ -21,13 +23,9 @@ std::shared_ptr<SDL_Texture> load_texture(SDL_Renderer *renderer) {
 
   SDL_SetTextureScaleMode(png_texture.get(), SDL_SCALEMODE_PIXELART);
 
-  return png_texture;
+  textures.insert({name, png_texture});
 }
 
-AssetManager::AssetManager(SDL_Renderer *renderer) {
-  textures.insert({"space_invaders", load_texture(renderer)});
-};
-
-std::shared_ptr<SDL_Texture> AssetManager::get_texture(std::string name) {
+std::shared_ptr<SDL_Texture> Assets::get_texture(std::string name) {
   return textures.at(name);
 }

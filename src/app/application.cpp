@@ -1,6 +1,6 @@
 #include "application.hpp"
 #include "../util/draw_util.hpp"
-#include "asset_manager.hpp"
+#include "assets.hpp"
 #include <SDL3/SDL.h>
 #include <format>
 #include <memory>
@@ -27,33 +27,54 @@ Application::Application() {
     throw std::runtime_error(std::format("Couldn't create renderer: {}", SDL_GetError()));
   }
 
-  asset_manager = std::make_unique<AssetManager>(renderer);
-
-  auto spritesheet = Spritesheet(asset_manager.get()->get_texture("space_invaders"), 16, 16);
-
-  animation = std::make_unique<Animation>(spritesheet, 17, get_frames(0, 0, 4));
-
   previous_now_ms = SDL_GetTicks();
   unprocessed_ms = 0;
 }
 
 void Application::update() {
+  if (!active_scene.has_value()) {
+    return;
+  }
+
   const auto now_ms = SDL_GetTicks();
   unprocessed_ms += now_ms - previous_now_ms;
   previous_now_ms = now_ms;
 
   while (unprocessed_ms > MS_PER_UPDATE) {
-    animation->update();
+    active_scene.value().entities->update();
 
     unprocessed_ms -= MS_PER_UPDATE;
   }
 }
 
 void Application::draw() {
+  if (!active_scene.has_value()) {
+    return;
+  }
+
   SDL_SetRenderDrawColorFloat(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE_FLOAT);
   SDL_RenderClear(renderer);
 
-  animation->draw(renderer, DrawRect{10, 10, 150, 150});
+  active_scene.value().entities->draw(renderer);
 
   SDL_RenderPresent(renderer);
 }
+
+void Application::set_scene(std::unique_ptr<Scene> scene) {
+  auto assets = std::make_shared<Assets>(renderer);
+  auto entities = std::make_shared<Entities>();
+
+  scene->preload_assets(std::make_unique<PreloadAssetsCtx>(PreloadAssetsCtx{.assets = assets}));
+  scene->initialize(
+      std::make_unique<SceneCtx>(SceneCtx{
+          .assets = assets,
+          .entities = entities,
+      })
+  );
+
+  active_scene = SceneHarness{
+      .scene = std::move(scene),
+      .assets = assets,
+      .entities = entities,
+  };
+};

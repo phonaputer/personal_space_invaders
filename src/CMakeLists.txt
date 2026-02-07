@@ -17,4 +17,10 @@ add_subdirectory(util)
 add_subdirectory(app)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3)
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(
+  ${PROJECT_NAME} 
+  PRIVATE 
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/app
+  ${CMAKE_CURRENT_SOURCE_DIR}/util
+)

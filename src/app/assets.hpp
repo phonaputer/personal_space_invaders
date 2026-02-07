@@ -5,11 +5,14 @@
 #include <string>
 #include <unordered_map>
 
-class AssetManager {
+class Assets {
   private:
+    // Renderer is cleaned up automatically by SDL, so it doesn't need to be a smart pointer.
+    SDL_Renderer *renderer;
     std::unordered_map<std::string, std::shared_ptr<SDL_Texture>> textures;
 
   public:
-    AssetManager(SDL_Renderer *renderer);
+    Assets(SDL_Renderer *renderer);
+    void load_png_texture(std::string name, std::string path);
     std::shared_ptr<SDL_Texture> get_texture(std::string name);
 };
