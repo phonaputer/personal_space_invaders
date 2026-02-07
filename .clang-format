@@ -1,7 +1,8 @@
 AlignAfterOpenBracket: BlockIndent
 BinPackParameters: OnePerLine
 BinPackArguments: false
-BreakBeforeBraces: Allman
+BreakBeforeBraces: Attach
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 ColumnLimit: 120
 AllowShortFunctionsOnASingleLine: None
+IndentAccessModifiers: true

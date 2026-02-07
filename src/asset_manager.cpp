@@ -7,19 +7,15 @@
 #include <string>
 #include <unordered_map>
 
-AssetManager::AssetManager(SDL_Renderer *renderer)
-{
-
+AssetManager::AssetManager(SDL_Renderer *renderer) {
   auto png_surface = std::unique_ptr<SDL_Surface, SDLDeleter>(SDL_LoadPNG("./assets/space_invaders.png"));
-  if (!png_surface.get())
-  {
+  if (!png_surface.get()) {
     throw std::runtime_error(std::format("Failed to create PNG surface: {}", SDL_GetError()));
   }
 
   auto png_texture =
       std::shared_ptr<SDL_Texture>(SDL_CreateTextureFromSurface(renderer, png_surface.get()), SDLDeleter());
-  if (!png_texture.get())
-  {
+  if (!png_texture.get()) {
     throw std::runtime_error(std::format("Failed to create PNG texture from surface: {}", SDL_GetError()));
   }
 
@@ -28,7 +24,6 @@ AssetManager::AssetManager(SDL_Renderer *renderer)
   textures.insert({"example", png_texture});
 };
 
-std::shared_ptr<SDL_Texture> AssetManager::get_texture(std::string name)
-{
+std::shared_ptr<SDL_Texture> AssetManager::get_texture(std::string name) {
   return textures.at(name);
 }

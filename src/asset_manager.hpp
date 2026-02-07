@@ -5,12 +5,11 @@
 #include <string>
 #include <unordered_map>
 
-class AssetManager
-{
-private:
-  std::unordered_map<std::string, std::shared_ptr<SDL_Texture>> textures;
+class AssetManager {
+  private:
+    std::unordered_map<std::string, std::shared_ptr<SDL_Texture>> textures;
 
-public:
-  AssetManager(SDL_Renderer *renderer);
-  std::shared_ptr<SDL_Texture> get_texture(std::string name);
+  public:
+    AssetManager(SDL_Renderer *renderer);
+    std::shared_ptr<SDL_Texture> get_texture(std::string name);
 };
