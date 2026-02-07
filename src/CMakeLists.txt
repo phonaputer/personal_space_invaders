@@ -11,5 +11,7 @@ FetchContent_MakeAvailable(SDL3)
 add_executable(
   ${PROJECT_NAME} 
   main.cpp
+  util.cpp
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

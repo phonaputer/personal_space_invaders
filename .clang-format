@@ -3,3 +3,4 @@ BreakBeforeBraces: Allman
 BinPackArguments: false
 BinPackParameters: false
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
+ColumnLimit: 100

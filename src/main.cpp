@@ -1,114 +1,9 @@
 #define SDL_MAIN_USE_CALLBACKS
 
+#include "util.hpp"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <vector>
-
-struct Frame
-{
-  int x;
-  int y;
-};
-
-std::vector<Frame> get_frames(const int y, const int start_x, const int end_x)
-{
-  std::vector<Frame> frames;
-
-  for (int i = start_x; i < end_x; i++)
-  {
-    frames.push_back(Frame{.x = i, .y = y});
-  }
-
-  return frames;
-}
-
-struct DrawRect
-{
-  float x;
-  float y;
-  float width;
-  float height;
-};
-
-class Spritesheet
-{
-private:
-  SDL_Texture *src;
-  const float src_frame_width;
-  const float src_frame_height;
-
-public:
-  Spritesheet(SDL_Texture *src, float src_frame_width, float src_frame_height)
-      : src{src},
-        src_frame_width{src_frame_width},
-        src_frame_height{src_frame_height}
-  {
-  }
-
-  void draw_frame(
-      SDL_Renderer *renderer, const Frame &frame, const DrawRect &draw_rect
-  ) const
-  {
-    auto src_rect = SDL_FRect{
-        (frame.x * src_frame_width),
-        (frame.y * src_frame_height),
-        src_frame_width,
-        src_frame_height,
-    };
-    auto dest_rect = SDL_FRect{
-        draw_rect.x,
-        draw_rect.y,
-        draw_rect.width,
-        draw_rect.height,
-    };
-
-    SDL_RenderTexture(renderer, src, &src_rect, &dest_rect);
-  }
-};
-
-class Animation
-{
-private:
-  const Spritesheet *spritesheet;
-  const int ticks_per_frame;
-  const std::vector<Frame> frames;
-  int tick_counter;
-  size_t cur_frame;
-
-public:
-  Animation(
-      Spritesheet *spritesheet, int ticks_per_frame, std::vector<Frame> frames
-  )
-      : spritesheet{spritesheet},
-        ticks_per_frame{ticks_per_frame},
-        frames{frames}
-  {
-    tick_counter = 0;
-    cur_frame = 0;
-  }
-
-  void update()
-  {
-    tick_counter++;
-    if (tick_counter >= ticks_per_frame)
-    {
-      tick_counter = 0;
-      cur_frame++;
-
-      if (cur_frame >= frames.size())
-      {
-        cur_frame = 0;
-      }
-    }
-  }
-
-  void draw(SDL_Renderer *renderer, const DrawRect &draw_rect) const
-  {
-    auto frame = frames.at(cur_frame);
-
-    spritesheet->draw_frame(renderer, frame, draw_rect);
-  }
-};
 
 // Roughly 60 updates per second. 1000 / 60 = 16.66 (repeating, of course).
 const Uint64 MS_PER_UPDATE = 17;
@@ -127,13 +22,9 @@ struct AppCtx
   Animation *test_animation;
 };
 
-SDL_AppResult SDL_AppInit(
-    void **appstate, [[maybe_unused]] int argc, [[maybe_unused]] char *argv[]
-)
+SDL_AppResult SDL_AppInit(void **appstate, [[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 {
-  SDL_SetAppMetadata(
-      "Example Renderer Clear", "1.0", "com.example.renderer-clear"
-  );
+  SDL_SetAppMetadata("Example Renderer Clear", "1.0", "com.example.renderer-clear");
 
   if (!SDL_Init(SDL_INIT_VIDEO))
   {
