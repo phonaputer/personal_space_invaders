@@ -1,9 +1,5 @@
 #include "scene.hpp"
 
-// TODO list
-// * order drawables by Z axis
-// * consider entities that either don't update or don't draw
-
 void Entities::add(std::unique_ptr<Entity> entity) {
   entities.push_back(std::move(entity));
 }

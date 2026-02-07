@@ -8,6 +8,24 @@
 #include <memory>
 #include <vector>
 
+// ----[  TODO
+// * Add bad guys
+// * Have bad guys move around
+// * Add player character
+// * Have player character move in response to WASD
+// * Have player character shoot with Space
+// * Have bullets delete bad guys
+// * Have bad guys explode upon deletion
+// * Sound effects
+// * BGM (space invaders style where it speeds up along with the aliens)
+// * Have bad guys shoot lazers
+// * Have lazers damage player
+// * Have a system of "lives" for the player
+// * Reset board upon destroying all bad guys
+// * Track score
+// * Throw in the mystery ship for bonus points
+// * Maybe some powerups?
+
 SDL_AppResult SDL_AppInit(void **appstate, [[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
 
   Application *application = nullptr;
