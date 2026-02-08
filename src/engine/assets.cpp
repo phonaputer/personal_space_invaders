@@ -1,5 +1,5 @@
 #include "assets.hpp"
-#include "../util/sdl_util.hpp"
+#include "sdl_util.hpp"
 #include <SDL3/SDL.h>
 #include <format>
 #include <memory>

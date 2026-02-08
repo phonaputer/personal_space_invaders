@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../util/draw_util.hpp"
 #include "assets.hpp"
 #include "scene.hpp"
+#include "sprites.hpp"
 #include <SDL3/SDL.h>
 #include <memory>
 #include <optional>
@@ -13,7 +13,7 @@ struct SceneHarness {
     std::shared_ptr<Entities> entities;
 };
 
-class Application {
+class Engine {
   private:
     // Window and Renderer aren't unique ptrs since SDL cleans them up automatically on aplication exit.
     SDL_Window *window;
@@ -25,7 +25,7 @@ class Application {
     Uint64 unprocessed_ms;
 
   public:
-    Application();
+    Engine();
     void set_scene(std::unique_ptr<Scene> scene);
     void update();
     void draw();

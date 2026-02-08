@@ -13,8 +13,8 @@ add_executable(
   main.cpp
 )
 
-add_subdirectory(util)
-add_subdirectory(app)
+add_subdirectory(engine)
+add_subdirectory(game)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3)
 target_include_directories(
@@ -23,4 +23,5 @@ target_include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/app
   ${CMAKE_CURRENT_SOURCE_DIR}/util
+  ${CMAKE_CURRENT_SOURCE_DIR}/game/scenes/invasion
 )

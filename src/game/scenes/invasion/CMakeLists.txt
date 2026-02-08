@@ -1,5 +1,6 @@
 target_sources(
   ${PROJECT_NAME} 
   PRIVATE
-  draw_util.cpp
+  invasion_scene.cpp
+  invasion_entities.cpp
 )

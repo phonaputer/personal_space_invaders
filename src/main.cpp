@@ -1,8 +1,7 @@
 #define SDL_MAIN_USE_CALLBACKS
 
-#include "app/application.hpp"
-#include "test_scene.hpp"
-#include "util/draw_util.hpp"
+#include "engine/engine.hpp"
+#include "game/scenes/invasion/invasion_scene.hpp"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <memory>
@@ -28,15 +27,15 @@
 
 SDL_AppResult SDL_AppInit(void **appstate, [[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
 
-  Application *application = nullptr;
+  Engine *game = nullptr;
   try {
-    application = new Application();
-    *appstate = application;
+    game = new Engine();
+    *appstate = game;
   } catch (const std::exception &e) {
     return SDL_APP_FAILURE;
   }
 
-  application->set_scene(std::make_unique<TestScene>());
+  game->set_scene(std::make_unique<InvasionScene>());
 
   SDL_Log("Setup complete...");
 
@@ -52,18 +51,18 @@ SDL_AppResult SDL_AppEvent([[maybe_unused]] void *appstate, SDL_Event *event) {
 }
 
 SDL_AppResult SDL_AppIterate(void *appstate) {
-  auto app = (Application *)appstate;
+  auto game = (Engine *)appstate;
 
-  app->update();
-  app->draw();
+  game->update();
+  game->draw();
 
   return SDL_APP_CONTINUE;
 }
 
 void SDL_AppQuit(void *appstate, [[maybe_unused]] SDL_AppResult result) {
-  auto app = (Application *)appstate;
+  auto game = (Engine *)appstate;
 
-  delete app;
+  delete game;
 
   SDL_Log("Quitting...");
 }

@@ -1,7 +1,8 @@
 target_sources(
   ${PROJECT_NAME} 
   PRIVATE
-  application.cpp
+  engine.cpp
   assets.cpp
   scene.cpp
+  sprites.cpp
 )

@@ -1,6 +1,6 @@
-#include "application.hpp"
-#include "../util/draw_util.hpp"
+#include "engine.hpp"
 #include "assets.hpp"
+#include "sprites.hpp"
 #include <SDL3/SDL.h>
 #include <format>
 #include <memory>
@@ -9,10 +9,10 @@
 // Roughly 60 updates per second. 1000 / 60 = 16.66 (repeating, of course).
 const Uint64 MS_PER_UPDATE = 17;
 
-const int WINDOW_WIDTH = 600;
+const int WINDOW_WIDTH = 1100;
 const int WINDOW_HEIGHT = 800;
 
-Application::Application() {
+Engine::Engine() {
   if (!SDL_Init(SDL_INIT_VIDEO)) {
     throw std::runtime_error(std::format("Failed to initialize SDL: {}", SDL_GetError()));
   }
@@ -31,7 +31,7 @@ Application::Application() {
   unprocessed_ms = 0;
 }
 
-void Application::update() {
+void Engine::update() {
   if (!active_scene.has_value()) {
     return;
   }
@@ -47,7 +47,7 @@ void Application::update() {
   }
 }
 
-void Application::draw() {
+void Engine::draw() {
   if (!active_scene.has_value()) {
     return;
   }
@@ -60,7 +60,7 @@ void Application::draw() {
   SDL_RenderPresent(renderer);
 }
 
-void Application::set_scene(std::unique_ptr<Scene> scene) {
+void Engine::set_scene(std::unique_ptr<Scene> scene) {
   auto assets = std::make_shared<Assets>(renderer);
   auto entities = std::make_shared<Entities>();
 
