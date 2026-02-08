@@ -3,16 +3,6 @@
 #include <memory>
 #include <vector>
 
-std::vector<Frame> get_frames(const int y, const int start_x, const int end_x) {
-  std::vector<Frame> frames;
-
-  for (int i = start_x; i < end_x; i++) {
-    frames.push_back(Frame{.x = i, .y = y});
-  }
-
-  return frames;
-}
-
 Spritesheet::Spritesheet(std::shared_ptr<SDL_Texture> src, float src_frame_width, float src_frame_height)
     : src{src}, src_frame_width{src_frame_width}, src_frame_height{src_frame_height} {
 }

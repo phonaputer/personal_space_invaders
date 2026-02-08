@@ -10,8 +10,6 @@ struct Frame {
     int y;
 };
 
-std::vector<Frame> get_frames(const int y, const int start_x, const int end_x);
-
 struct DrawRect {
     float x;
     float y;
