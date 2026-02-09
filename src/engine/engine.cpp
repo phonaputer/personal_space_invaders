@@ -1,5 +1,6 @@
 #include "engine.hpp"
 #include "assets.hpp"
+#include "input.hpp"
 #include "sprites.hpp"
 #include <SDL3/SDL.h>
 #include <format>
@@ -29,6 +30,7 @@ Engine::Engine() {
 
   previous_now_ms = SDL_GetTicks();
   unprocessed_ms = 0;
+  user_inputs = std::make_unique<UserInputs>();
 }
 
 void Engine::update() {
@@ -61,20 +63,25 @@ void Engine::draw() {
 }
 
 void Engine::set_scene(std::unique_ptr<Scene> scene) {
-  auto assets = std::make_shared<Assets>(renderer);
-  auto entities = std::make_shared<Entities>();
+  auto assets = std::make_unique<Assets>(renderer);
+  auto entities = std::make_unique<Entities>();
 
-  scene->preload_assets(std::make_unique<PreloadAssetsCtx>(PreloadAssetsCtx{.assets = assets}));
+  scene->preload_assets(PreloadAssetsCtx{.assets = *assets});
   scene->initialize(
-      std::make_unique<SceneCtx>(SceneCtx{
-          .assets = assets,
-          .entities = entities,
-      })
+      SceneCtx{
+          .assets = *assets,
+          .entities = *entities,
+          .user_inputs = *user_inputs,
+      }
   );
 
   active_scene = SceneHarness{
       .scene = std::move(scene),
-      .assets = assets,
-      .entities = entities,
+      .assets = std::move(assets),
+      .entities = std::move(entities),
   };
 };
+
+UserInputs &Engine::get_user_inputs() {
+  return *user_inputs;
+}

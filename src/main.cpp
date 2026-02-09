@@ -43,8 +43,43 @@ SDL_AppResult SDL_AppInit(void **appstate, [[maybe_unused]] int argc, [[maybe_un
 }
 
 SDL_AppResult SDL_AppEvent([[maybe_unused]] void *appstate, SDL_Event *event) {
-  if (event->type == SDL_EVENT_QUIT) {
-    return SDL_APP_SUCCESS;
+  auto game = (Engine *)appstate;
+
+  switch (event->type) {
+    case SDL_EVENT_QUIT:
+      return SDL_APP_SUCCESS;
+
+    case SDL_EVENT_KEY_DOWN:
+      switch (event->key.scancode) {
+        case SDL_SCANCODE_A:
+          game->get_user_inputs().engage(PlayerInput::LEFT);
+          break;
+        case SDL_SCANCODE_D:
+          game->get_user_inputs().engage(PlayerInput::RIGHT);
+          break;
+        case SDL_SCANCODE_SPACE:
+          game->get_user_inputs().engage(PlayerInput::FIRE);
+          break;
+        default:
+          // do nothing
+      }
+      break;
+
+    case SDL_EVENT_KEY_UP:
+      switch (event->key.scancode) {
+        case SDL_SCANCODE_A:
+          game->get_user_inputs().disengage(PlayerInput::LEFT);
+          break;
+        case SDL_SCANCODE_D:
+          game->get_user_inputs().disengage(PlayerInput::RIGHT);
+          break;
+        case SDL_SCANCODE_SPACE:
+          game->get_user_inputs().disengage(PlayerInput::FIRE);
+          break;
+        default:
+          // do nothing
+      }
+      break;
   }
 
   return SDL_APP_CONTINUE;

@@ -5,4 +5,5 @@ target_sources(
   assets.cpp
   scene.cpp
   sprites.cpp
+  input.cpp
 )

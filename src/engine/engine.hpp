@@ -1,6 +1,7 @@
 #pragma once
 
 #include "assets.hpp"
+#include "input.hpp"
 #include "scene.hpp"
 #include "sprites.hpp"
 #include <SDL3/SDL.h>
@@ -9,8 +10,8 @@
 
 struct SceneHarness {
     std::unique_ptr<Scene> scene;
-    std::shared_ptr<Assets> assets;
-    std::shared_ptr<Entities> entities;
+    std::unique_ptr<Assets> assets;
+    std::unique_ptr<Entities> entities;
 };
 
 class Engine {
@@ -19,6 +20,7 @@ class Engine {
     SDL_Window *window;
     SDL_Renderer *renderer;
 
+    std::unique_ptr<UserInputs> user_inputs;
     std::optional<SceneHarness> active_scene;
 
     Uint64 previous_now_ms;
@@ -29,4 +31,5 @@ class Engine {
     void set_scene(std::unique_ptr<Scene> scene);
     void update();
     void draw();
+    UserInputs &get_user_inputs();
 };

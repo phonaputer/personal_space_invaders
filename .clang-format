@@ -6,3 +6,4 @@ ConstructorInitializerAllOnOneLineOrOnePerLine: true
 ColumnLimit: 120
 AllowShortFunctionsOnASingleLine: None
 IndentAccessModifiers: true
+IndentCaseLabels: true

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "engine/scene.hpp"
 #include "engine/sprites.hpp"
 #include <SDL3/SDL.h>
