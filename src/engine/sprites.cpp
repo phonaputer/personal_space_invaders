@@ -60,3 +60,44 @@ void Animation::draw(SDL_Renderer *renderer, const DrawRect &draw_rect) const {
 
   spritesheet.draw_frame(renderer, frame, draw_rect);
 }
+
+OnceAnimation::OnceAnimation(Spritesheet spritesheet, int ticks_per_frame, std::vector<Frame> frames)
+    : spritesheet{spritesheet},
+      ticks_per_frame{ticks_per_frame},
+      frames{frames},
+      tick_counter{0},
+      cur_frame{0},
+      playing{false} {
+}
+
+void OnceAnimation::update() {
+  if (!playing) {
+    return;
+  }
+
+  tick_counter++;
+  if (tick_counter >= ticks_per_frame) {
+    tick_counter = 0;
+    cur_frame++;
+
+    if (cur_frame >= frames.size()) {
+      cur_frame = 0;
+      playing = false;
+    }
+  }
+}
+
+void OnceAnimation::play() {
+  playing = true;
+  cur_frame = 0;
+}
+
+void OnceAnimation::draw(SDL_Renderer *renderer, const DrawRect &draw_rect) const {
+  if (!playing) {
+    return;
+  }
+
+  auto frame = frames.at(cur_frame);
+
+  spritesheet.draw_frame(renderer, frame, draw_rect);
+}

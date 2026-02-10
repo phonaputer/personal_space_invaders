@@ -14,9 +14,14 @@ PlayerEntity::PlayerEntity(
       y{starting_position.y},
       draw_width{60},
       draw_height{60},
-      speed{4} {
+      speed{4},
+      ticks_per_shot{50},
+      shot_clock{0} {
   std::vector<Frame> frames = {{0, 5}, {1, 5}, {2, 5}};
   animation = std::make_unique<Animation>(Spritesheet(texture, 16, 16), 5, frames);
+
+  std::vector<Frame> muzzle_flash_frames = {{3, 5}, {4, 5}};
+  muzzle_flash_animation = std::make_unique<OnceAnimation>(Spritesheet(texture, 16, 16), 10, muzzle_flash_frames);
 }
 
 void PlayerEntity::update() {
@@ -27,8 +32,17 @@ void PlayerEntity::update() {
     x += speed;
     animation->update_backwards();
   }
+
+  shot_clock++;
+  if (user_inputs.is_engaged(PlayerInput::FIRE) && shot_clock >= ticks_per_shot) {
+    shot_clock = 0;
+    muzzle_flash_animation->play();
+  }
+  muzzle_flash_animation->update();
 }
 
 void PlayerEntity::draw(SDL_Renderer *renderer) {
-  animation->draw(renderer, {x, y, draw_width, draw_height});
+  DrawRect rect = {x, y, draw_width, draw_height};
+  animation->draw(renderer, rect);
+  muzzle_flash_animation->draw(renderer, rect);
 }

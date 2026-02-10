@@ -42,3 +42,19 @@ class Animation {
     void update_backwards();
     void draw(SDL_Renderer *renderer, const DrawRect &draw_rect) const;
 };
+
+class OnceAnimation {
+  private:
+    const Spritesheet spritesheet;
+    const int ticks_per_frame;
+    const std::vector<Frame> frames;
+    int tick_counter;
+    size_t cur_frame;
+    bool playing;
+
+  public:
+    OnceAnimation(Spritesheet spritesheet, int ticks_per_frame, std::vector<Frame> frames);
+    void play();
+    void update();
+    void draw(SDL_Renderer *renderer, const DrawRect &draw_rect) const;
+};

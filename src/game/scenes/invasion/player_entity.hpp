@@ -10,12 +10,15 @@
 class PlayerEntity : public Entity {
   private:
     std::unique_ptr<Animation> animation;
+    std::unique_ptr<OnceAnimation> muzzle_flash_animation;
     UserInputs const &user_inputs;
     float x;
     float y;
-    float draw_width;
-    float draw_height;
+    const float draw_width;
+    const float draw_height;
     float speed;
+    const int ticks_per_shot;
+    int shot_clock;
 
   public:
     PlayerEntity(std::shared_ptr<SDL_Texture> texture, UserInputs const &user_inputs, Position starting_position);
