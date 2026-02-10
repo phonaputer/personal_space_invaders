@@ -10,7 +10,7 @@ void InvasionScene::preload_assets(PreloadAssetsCtx const &ctx) {
   ctx.assets.load_png_texture("space_invaders", "./assets/space_invaders.png");
 }
 
-void InvasionScene::initialize(SceneCtx const &ctx) {
+void InvasionScene::initialize(SceneCtx ctx) {
   // TODO can the preload be removed and the texture loading added here instead?
   auto space_invaders_texture = ctx.assets.get_texture("space_invaders");
 
@@ -53,5 +53,5 @@ void InvasionScene::initialize(SceneCtx const &ctx) {
     x_pos += alien_width + 5;
   }
 
-  ctx.entities.add(std::make_unique<PlayerEntity>(space_invaders_texture, ctx.user_inputs, Position{500, 700}));
+  ctx.entities.add(std::make_unique<PlayerEntity>(ctx, space_invaders_texture, Position{500, 700}));
 }

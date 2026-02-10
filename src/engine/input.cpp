@@ -1,5 +1,4 @@
 #include "input.hpp"
-#include <iostream>
 #include <set>
 
 bool UserInputs::is_engaged(PlayerInput input) const {

@@ -6,9 +6,12 @@
 
 class Entity {
   public:
+    virtual ~Entity() = default;
     virtual void update() = 0;
     virtual void draw(SDL_Renderer *renderer) = 0;
-    virtual ~Entity() = default;
+    virtual bool is_deleted() {
+      return false;
+    }
 };
 
 class EntityAdder {
@@ -20,6 +23,7 @@ class EntityAdder {
 class Entities : public EntityAdder {
   private:
     std::vector<std::unique_ptr<Entity>> entities;
+    std::vector<std::unique_ptr<Entity>> entities_to_add;
 
   public:
     void add(std::unique_ptr<Entity> entity);

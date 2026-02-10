@@ -7,5 +7,5 @@ class InvasionScene : public Scene {
   public:
     InvasionScene();
     void preload_assets(PreloadAssetsCtx const &ctx);
-    void initialize(SceneCtx const &ctx);
+    void initialize(SceneCtx ctx);
 };
