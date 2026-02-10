@@ -53,5 +53,5 @@ void InvasionScene::initialize(SceneCtx const &ctx) {
     x_pos += alien_width + 5;
   }
 
-  ctx.entities.add(std::make_unique<PlayerEntity>(space_invaders_texture, Position{500, 700}));
+  ctx.entities.add(std::make_unique<PlayerEntity>(space_invaders_texture, ctx.user_inputs, Position{500, 700}));
 }

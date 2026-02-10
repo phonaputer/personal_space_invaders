@@ -39,5 +39,6 @@ class Animation {
   public:
     Animation(Spritesheet spritesheet, int ticks_per_frame, std::vector<Frame> frames);
     void update();
+    void update_backwards();
     void draw(SDL_Renderer *renderer, const DrawRect &draw_rect) const;
 };

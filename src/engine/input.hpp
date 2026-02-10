@@ -9,7 +9,7 @@ class UserInputs {
     std::set<PlayerInput> current_inputs;
 
   public:
-    bool is_engaged(PlayerInput input);
+    bool is_engaged(PlayerInput input) const;
     void engage(PlayerInput input);
     void disengage(PlayerInput input);
 };

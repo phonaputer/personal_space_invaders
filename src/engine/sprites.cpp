@@ -42,6 +42,19 @@ void Animation::update() {
   }
 }
 
+void Animation::update_backwards() {
+  tick_counter++;
+  if (tick_counter >= ticks_per_frame) {
+    tick_counter = 0;
+
+    if (cur_frame <= 0) {
+      cur_frame = frames.size() - 1;
+    } else {
+      cur_frame--;
+    }
+  }
+}
+
 void Animation::draw(SDL_Renderer *renderer, const DrawRect &draw_rect) const {
   auto frame = frames.at(cur_frame);
 

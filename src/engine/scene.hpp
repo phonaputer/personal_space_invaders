@@ -1,32 +1,13 @@
 #pragma once
 
 #include "assets.hpp"
+#include "entity.hpp"
 #include "input.hpp"
-#include <SDL3/SDL.h>
-#include <memory>
-#include <vector>
-
-class Entity {
-  public:
-    virtual void update() = 0;
-    virtual void draw(SDL_Renderer *renderer) = 0;
-    virtual ~Entity() = default;
-};
-
-class Entities {
-  private:
-    std::vector<std::unique_ptr<Entity>> entities;
-
-  public:
-    void add(std::unique_ptr<Entity> entity);
-    void update();
-    void draw(SDL_Renderer *renderer);
-};
 
 struct SceneCtx {
     Assets &assets;
-    Entities &entities;
-    UserInputs &user_inputs;
+    EntityAdder &entities;
+    UserInputs const &user_inputs;
 };
 
 struct PreloadAssetsCtx {

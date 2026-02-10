@@ -3,7 +3,7 @@ target_sources(
   PRIVATE
   engine.cpp
   assets.cpp
-  scene.cpp
+  entity.cpp
   sprites.cpp
   input.cpp
 )

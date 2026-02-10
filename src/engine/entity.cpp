@@ -1,4 +1,7 @@
-#include "scene.hpp"
+#include "entity.hpp"
+#include <SDL3/SDL.h>
+#include <memory>
+#include <vector>
 
 void Entities::add(std::unique_ptr<Entity> entity) {
   entities.push_back(std::move(entity));
