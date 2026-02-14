@@ -3,10 +3,11 @@
 #include "assets.hpp"
 #include "entity.hpp"
 #include "input.hpp"
+#include <SDL3/SDL.h>
 
 struct SceneCtx {
-    Assets &assets;
-    EntityAdder &entities;
+    Assets const &assets;
+    Entities &entities;
     UserInputs const &user_inputs;
 };
 

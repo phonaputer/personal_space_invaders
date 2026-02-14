@@ -8,11 +8,11 @@
 #include <vector>
 
 // ----[  TODO
-// * Add bad guys
-// * Have bad guys move around
-// * Add player character
-// * Have player character move in response to WASD
-// * Have player character shoot with Space
+// X * Add bad guys
+// X * Have bad guys move around
+// X * Add player character
+// X * Have player character move in response to WASD
+// X * Have player character shoot with Space
 // * Have bullets delete bad guys
 // * Have bad guys explode upon deletion
 // * Sound effects

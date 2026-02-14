@@ -14,5 +14,5 @@ class Assets {
   public:
     Assets(SDL_Renderer *renderer);
     void load_png_texture(std::string name, std::string path);
-    std::shared_ptr<SDL_Texture> get_texture(std::string name);
+    std::shared_ptr<SDL_Texture> get_texture(std::string name) const;
 };

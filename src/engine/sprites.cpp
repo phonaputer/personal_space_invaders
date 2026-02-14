@@ -1,4 +1,5 @@
 #include "sprites.hpp"
+#include "core.hpp"
 #include <SDL3/SDL.h>
 #include <memory>
 #include <vector>
@@ -7,7 +8,7 @@ Spritesheet::Spritesheet(std::shared_ptr<SDL_Texture> src, float src_frame_width
     : src{src}, src_frame_width{src_frame_width}, src_frame_height{src_frame_height} {
 }
 
-void Spritesheet::draw_frame(SDL_Renderer *renderer, const Frame &frame, const DrawRect &draw_rect) const {
+void Spritesheet::draw_frame(SDL_Renderer *renderer, const Frame &frame, const core::Rect &draw_rect) const {
   auto src_rect = SDL_FRect{
       (frame.x * src_frame_width),
       (frame.y * src_frame_height),
@@ -55,7 +56,15 @@ void Animation::update_backwards() {
   }
 }
 
-void Animation::draw(SDL_Renderer *renderer, const DrawRect &draw_rect) const {
+void Animation::next_frame() {
+  cur_frame++;
+
+  if (cur_frame >= frames.size()) {
+    cur_frame = 0;
+  }
+}
+
+void Animation::draw(SDL_Renderer *renderer, const core::Rect &draw_rect) const {
   auto frame = frames.at(cur_frame);
 
   spritesheet.draw_frame(renderer, frame, draw_rect);
@@ -92,7 +101,7 @@ void OnceAnimation::play() {
   cur_frame = 0;
 }
 
-void OnceAnimation::draw(SDL_Renderer *renderer, const DrawRect &draw_rect) const {
+void OnceAnimation::draw(SDL_Renderer *renderer, const core::Rect &draw_rect) const {
   if (!playing) {
     return;
   }

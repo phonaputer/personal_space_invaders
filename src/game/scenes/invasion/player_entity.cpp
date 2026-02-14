@@ -1,12 +1,12 @@
 #include "player_entity.hpp"
+#include "engine/core.hpp"
 #include "engine/scene.hpp"
 #include "engine/sprites.hpp"
-#include "invader_entities.hpp"
 #include <SDL3/SDL.h>
 #include <memory>
 #include <vector>
 
-PlayerLazerEntity::PlayerLazerEntity(std::shared_ptr<SDL_Texture> texture, Position starting_position)
+PlayerLazerEntity::PlayerLazerEntity(std::shared_ptr<SDL_Texture> texture, core::Point starting_position)
     : spritesheet(texture, 16, 16),
       x{starting_position.x},
       y{starting_position.y},
@@ -15,7 +15,7 @@ PlayerLazerEntity::PlayerLazerEntity(std::shared_ptr<SDL_Texture> texture, Posit
       speed{5} {
 }
 
-void PlayerLazerEntity::update() {
+void PlayerLazerEntity::update([[maybe_unused]] UpdateCtx const &ctx) {
   y -= speed;
 }
 
@@ -27,16 +27,8 @@ bool PlayerLazerEntity::is_deleted() {
   return y <= 0;
 }
 
-PlayerEntity::PlayerEntity(SceneCtx ctx, std::shared_ptr<SDL_Texture> texture, Position starting_position)
-    : ctx{ctx},
-      texture{texture},
-      x{starting_position.x},
-      y{starting_position.y},
-      draw_width{60},
-      draw_height{60},
-      speed{4},
-      ticks_per_shot{50},
-      shot_clock{0} {
+PlayerEntity::PlayerEntity(std::shared_ptr<SDL_Texture> texture, core::Point starting_position)
+    : x{starting_position.x}, y{starting_position.y}, shot_clock{0} {
   std::vector<Frame> frames = {{0, 5}, {1, 5}, {2, 5}};
   animation = std::make_unique<Animation>(Spritesheet(texture, 16, 16), 5, frames);
 
@@ -44,26 +36,28 @@ PlayerEntity::PlayerEntity(SceneCtx ctx, std::shared_ptr<SDL_Texture> texture, P
   muzzle_flash_animation = std::make_unique<OnceAnimation>(Spritesheet(texture, 16, 16), 10, muzzle_flash_frames);
 }
 
-void PlayerEntity::update() {
+void PlayerEntity::update(UpdateCtx const &ctx) {
   if (ctx.user_inputs.is_engaged(PlayerInput::LEFT)) {
-    x -= speed;
+    x -= SPEED;
     animation->update();
   } else if (ctx.user_inputs.is_engaged(PlayerInput::RIGHT)) {
-    x += speed;
+    x += SPEED;
     animation->update_backwards();
   }
 
   shot_clock++;
-  if (ctx.user_inputs.is_engaged(PlayerInput::FIRE) && shot_clock >= ticks_per_shot) {
+  if (ctx.user_inputs.is_engaged(PlayerInput::FIRE) && shot_clock >= TICKS_PER_SHOT) {
     shot_clock = 0;
     muzzle_flash_animation->play();
-    ctx.entities.add(std::make_unique<PlayerLazerEntity>(texture, Position{x - 7, y - 20}));
+    ctx.entities.add(
+        std::make_unique<PlayerLazerEntity>(ctx.assets.get_texture("space_invaders"), core::Point{x - 7, y - 20})
+    );
   }
   muzzle_flash_animation->update();
 }
 
 void PlayerEntity::draw(SDL_Renderer *renderer) {
-  DrawRect rect = {x, y, draw_width, draw_height};
+  core::Rect rect = {x, y, DRAW_WIDTH, DRAW_HEIGHT};
   animation->draw(renderer, rect);
   muzzle_flash_animation->draw(renderer, rect);
 }

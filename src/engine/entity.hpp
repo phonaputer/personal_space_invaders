@@ -1,13 +1,23 @@
 #pragma once
 
+#include "assets.hpp"
+#include "input.hpp"
 #include <SDL3/SDL.h>
 #include <memory>
 #include <vector>
 
+class Entities;
+
+struct UpdateCtx {
+    Assets const &assets;
+    Entities &entities;
+    UserInputs const &user_inputs;
+};
+
 class Entity {
   public:
     virtual ~Entity() = default;
-    virtual void update() = 0;
+    virtual void update(UpdateCtx const &ctx) = 0;
     virtual void draw(SDL_Renderer *renderer) = 0;
     virtual bool is_deleted() {
       return false;
@@ -27,6 +37,6 @@ class Entities : public EntityAdder {
 
   public:
     void add(std::unique_ptr<Entity> entity);
-    void update();
+    void update(UpdateCtx const &ctx);
     void draw(SDL_Renderer *renderer);
 };

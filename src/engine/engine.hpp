@@ -1,6 +1,7 @@
 #pragma once
 
 #include "assets.hpp"
+#include "entity.hpp"
 #include "input.hpp"
 #include "scene.hpp"
 #include "sprites.hpp"

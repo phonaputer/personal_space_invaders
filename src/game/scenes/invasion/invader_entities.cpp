@@ -4,64 +4,100 @@
 #include <SDL3/SDL.h>
 #include <memory>
 
-std::unique_ptr<Animation> animation;
-float x;
-float y;
-float draw_width;
-float draw_height;
+AlienOrchestrator::AlienOrchestrator() : tick_counter{0} {
+}
 
-AlienEntity::AlienEntity(AlienEntityParams params) {
-  x = params.starting_position.x;
-  y = params.starting_position.y;
-  draw_width = 60;
-  draw_height = 60;
+void AlienOrchestrator::add_alien(std::unique_ptr<Alien> alien) {
+  aliens.push_back(std::move(alien));
+}
+
+void AlienOrchestrator::update([[maybe_unused]] UpdateCtx const &ctx) {
+  tick_counter++;
+  if (tick_counter < TICKS_PER_MOVE) {
+    return;
+  }
+
+  tick_counter = 0;
+
+  for (auto &alien : aliens) {
+    if (alien->has_reached_edge()) {
+      for (auto &alien : aliens) {
+        alien->descend_and_turn(60);
+      }
+      break;
+    }
+  }
+
+  for (auto &alien : aliens) {
+    alien->move(15);
+  }
+}
+
+void AlienOrchestrator::draw(SDL_Renderer *renderer) {
+  for (auto &alien : aliens) {
+    alien->draw(renderer);
+  }
+}
+
+AlienFactory::AlienFactory(std::shared_ptr<SDL_Texture> texture) : texture{texture} {
+}
+
+std::unique_ptr<Alien> AlienFactory::new_jellyfish(core::Point starting_position) {
+  return std::make_unique<Alien>(AlienParams{
+      .texture = texture,
+      .starting_position = starting_position,
+      .frames = {{0, 0}, {1, 0}, {2, 0}, {3, 0}},
+  });
+}
+
+std::unique_ptr<Alien> AlienFactory::new_tadpole(core::Point starting_position) {
+  return std::make_unique<Alien>(AlienParams{
+      .texture = texture,
+      .starting_position = starting_position,
+      .frames = {{1, 1}, {0, 1}, {1, 1}, {2, 1}},
+  });
+}
+
+std::unique_ptr<Alien> AlienFactory::new_octopus(core::Point starting_position) {
+  return std::make_unique<Alien>(AlienParams{
+      .texture = texture,
+      .starting_position = starting_position,
+      .frames = {{0, 2}, {1, 2}},
+  });
+}
+
+std::unique_ptr<Alien> AlienFactory::new_crab(core::Point starting_position) {
+  return std::make_unique<Alien>(AlienParams{
+      .texture = texture,
+      .starting_position = starting_position,
+      .frames = {{1, 4}, {0, 4}, {1, 4}, {2, 4}},
+  });
+}
+
+Alien::Alien(AlienParams params) : x{params.starting_position.x}, y{params.starting_position.y} {
+  move_right = true;
   animation = std::make_unique<Animation>(Spritesheet(params.texture, 16, 16), 17, params.frames);
 }
 
-void AlienEntity::update() {
-  animation->update();
+void Alien::move(float speed) {
+  animation->next_frame();
+
+  if (move_right) {
+    x += speed;
+  } else {
+    x -= speed;
+  }
 }
 
-void AlienEntity::draw(SDL_Renderer *renderer) {
-  animation->draw(renderer, DrawRect{x, y, draw_width, draw_height});
+void Alien::draw(SDL_Renderer *renderer) {
+  animation->draw(renderer, {x, y, DRAW_WIDTH, DRAW_HEIGHT});
 }
 
-JellyfishEntity::JellyfishEntity(std::shared_ptr<SDL_Texture> texture, Position starting_position)
-    : AlienEntity(
-          AlienEntityParams{
-              .texture = texture,
-              .starting_position = starting_position,
-              .frames = {{0, 0}, {1, 0}, {2, 0}, {3, 0}},
-          }
-      ) {
+void Alien::descend_and_turn(float descend_speed) {
+  move_right = !move_right;
+  y += descend_speed;
 }
 
-TadpoleEntity::TadpoleEntity(std::shared_ptr<SDL_Texture> texture, Position starting_position)
-    : AlienEntity(
-          AlienEntityParams{
-              .texture = texture,
-              .starting_position = starting_position,
-              .frames = {{1, 1}, {0, 1}, {1, 1}, {2, 1}},
-          }
-      ) {
-}
-
-OctopusEntity::OctopusEntity(std::shared_ptr<SDL_Texture> texture, Position starting_position)
-    : AlienEntity(
-          AlienEntityParams{
-              .texture = texture,
-              .starting_position = starting_position,
-              .frames = {{0, 2}, {1, 2}},
-          }
-      ) {
-}
-
-CrabEntity::CrabEntity(std::shared_ptr<SDL_Texture> texture, Position starting_position)
-    : AlienEntity(
-          AlienEntityParams{
-              .texture = texture,
-              .starting_position = starting_position,
-              .frames = {{1, 4}, {0, 4}, {1, 4}, {2, 4}},
-          }
-      ) {
+bool Alien::has_reached_edge() {
+  return x <= 60 || x + DRAW_WIDTH >= core::WINDOW_WIDTH - 60;
 }

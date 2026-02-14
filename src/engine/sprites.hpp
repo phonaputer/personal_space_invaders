@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core.hpp"
 #include "sdl_util.hpp"
 #include <SDL3/SDL.h>
 #include <memory>
@@ -10,13 +11,6 @@ struct Frame {
     int y;
 };
 
-struct DrawRect {
-    float x;
-    float y;
-    float width;
-    float height;
-};
-
 class Spritesheet {
   private:
     std::shared_ptr<SDL_Texture> src;
@@ -25,7 +19,7 @@ class Spritesheet {
 
   public:
     Spritesheet(std::shared_ptr<SDL_Texture> src, float src_frame_width, float src_frame_height);
-    void draw_frame(SDL_Renderer *renderer, const Frame &frame, const DrawRect &draw_rect) const;
+    void draw_frame(SDL_Renderer *renderer, const Frame &frame, const core::Rect &draw_rect) const;
 };
 
 class Animation {
@@ -40,7 +34,8 @@ class Animation {
     Animation(Spritesheet spritesheet, int ticks_per_frame, std::vector<Frame> frames);
     void update();
     void update_backwards();
-    void draw(SDL_Renderer *renderer, const DrawRect &draw_rect) const;
+    void next_frame();
+    void draw(SDL_Renderer *renderer, const core::Rect &draw_rect) const;
 };
 
 class OnceAnimation {
@@ -56,5 +51,5 @@ class OnceAnimation {
     OnceAnimation(Spritesheet spritesheet, int ticks_per_frame, std::vector<Frame> frames);
     void play();
     void update();
-    void draw(SDL_Renderer *renderer, const DrawRect &draw_rect) const;
+    void draw(SDL_Renderer *renderer, const core::Rect &draw_rect) const;
 };

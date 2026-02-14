@@ -1,9 +1,9 @@
 #pragma once
 
+#include "engine/core.hpp"
 #include "engine/input.hpp"
 #include "engine/scene.hpp"
 #include "engine/sprites.hpp"
-#include "invader_entities.hpp"
 #include <SDL3/SDL.h>
 #include <memory>
 
@@ -17,28 +17,27 @@ class PlayerLazerEntity : public Entity {
     float speed;
 
   public:
-    PlayerLazerEntity(std::shared_ptr<SDL_Texture> texture, Position starting_position);
-    void update();
-    void draw(SDL_Renderer *renderer);
-    bool is_deleted();
+    PlayerLazerEntity(std::shared_ptr<SDL_Texture> texture, core::Point starting_position);
+    void update(UpdateCtx const &ctx) override;
+    void draw(SDL_Renderer *renderer) override;
+    bool is_deleted() override;
 };
 
 class PlayerEntity : public Entity {
   private:
-    SceneCtx ctx;
-    std::shared_ptr<SDL_Texture> texture;
+    static constexpr float DRAW_WIDTH = 60;
+    static constexpr float DRAW_HEIGHT = 60;
+    static constexpr float SPEED = 4;
+    static constexpr const int TICKS_PER_SHOT = 50;
+
     std::unique_ptr<Animation> animation;
     std::unique_ptr<OnceAnimation> muzzle_flash_animation;
     float x;
     float y;
-    const float draw_width;
-    const float draw_height;
-    float speed;
-    const int ticks_per_shot;
     int shot_clock;
 
   public:
-    PlayerEntity(SceneCtx ctx, std::shared_ptr<SDL_Texture> texture, Position starting_position);
-    void update();
-    void draw(SDL_Renderer *renderer);
+    PlayerEntity(std::shared_ptr<SDL_Texture> texture, core::Point starting_position);
+    void update(UpdateCtx const &ctx) override;
+    void draw(SDL_Renderer *renderer) override;
 };

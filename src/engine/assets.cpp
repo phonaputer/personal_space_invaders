@@ -26,6 +26,6 @@ void Assets::load_png_texture(std::string name, std::string path) {
   textures.insert({name, png_texture});
 }
 
-std::shared_ptr<SDL_Texture> Assets::get_texture(std::string name) {
+std::shared_ptr<SDL_Texture> Assets::get_texture(std::string name) const {
   return textures.at(name);
 }

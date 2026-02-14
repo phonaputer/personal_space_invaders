@@ -1,5 +1,6 @@
 #include "engine.hpp"
 #include "assets.hpp"
+#include "core.hpp"
 #include "input.hpp"
 #include "sprites.hpp"
 #include <SDL3/SDL.h>
@@ -10,15 +11,12 @@
 // Roughly 60 updates per second. 1000 / 60 = 16.66 (repeating, of course).
 const Uint64 MS_PER_UPDATE = 17;
 
-const int WINDOW_WIDTH = 1100;
-const int WINDOW_HEIGHT = 800;
-
 Engine::Engine() {
   if (!SDL_Init(SDL_INIT_VIDEO)) {
     throw std::runtime_error(std::format("Failed to initialize SDL: {}", SDL_GetError()));
   }
 
-  window = SDL_CreateWindow("Personal Space Invaders", WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_RESIZABLE);
+  window = SDL_CreateWindow("Personal Space Invaders", core::WINDOW_WIDTH, core::WINDOW_HEIGHT, 0);
   if (!window) {
     throw std::runtime_error(std::format("Couldn't create window: {}", SDL_GetError()));
   }
@@ -37,13 +35,20 @@ void Engine::update() {
   if (!active_scene.has_value()) {
     return;
   }
+  auto &scene = active_scene.value();
 
   const auto now_ms = SDL_GetTicks();
   unprocessed_ms += now_ms - previous_now_ms;
   previous_now_ms = now_ms;
 
   while (unprocessed_ms > MS_PER_UPDATE) {
-    active_scene.value().entities->update();
+    scene.entities->update(
+        UpdateCtx{
+            .assets = *scene.assets,
+            .entities = *scene.entities,
+            .user_inputs = *user_inputs,
+        }
+    );
 
     unprocessed_ms -= MS_PER_UPDATE;
   }
