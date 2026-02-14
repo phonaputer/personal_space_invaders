@@ -1,6 +1,7 @@
 #pragma once
 
 #include "assets.hpp"
+#include "core.hpp"
 #include "input.hpp"
 #include <SDL3/SDL.h>
 #include <memory>
@@ -18,8 +19,8 @@ class Entity {
   public:
     virtual ~Entity() = default;
     virtual void update(UpdateCtx const &ctx) = 0;
-    virtual void draw(SDL_Renderer *renderer) = 0;
-    virtual bool is_deleted() {
+    virtual void draw(SDL_Renderer *renderer) const = 0;
+    virtual bool is_deleted() const {
       return false;
     }
 };

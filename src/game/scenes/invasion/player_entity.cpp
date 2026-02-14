@@ -7,24 +7,35 @@
 #include <vector>
 
 PlayerLazerEntity::PlayerLazerEntity(std::shared_ptr<SDL_Texture> texture, core::Point starting_position)
-    : spritesheet(texture, 16, 16),
-      x{starting_position.x},
-      y{starting_position.y},
-      draw_width{60},
-      draw_height{60},
-      speed{5} {
+    : spritesheet(texture, 16, 16), x{starting_position.x}, y{starting_position.y} {
 }
 
 void PlayerLazerEntity::update([[maybe_unused]] UpdateCtx const &ctx) {
-  y -= speed;
+  y -= SPEED;
 }
 
-void PlayerLazerEntity::draw(SDL_Renderer *renderer) {
-  spritesheet.draw_frame(renderer, {0, 6}, {x, y, draw_width, draw_height});
+void PlayerLazerEntity::draw(SDL_Renderer *renderer) const {
+  spritesheet.draw_frame(renderer, {0, 6}, {x, y, DRAW_WIDTH, DRAW_HEIGHT});
+
+#ifndef NDEBUG
+  auto hitbox = get_hitbox();
+  auto sdl_hitbox = SDL_FRect{hitbox.x, hitbox.y, hitbox.width, hitbox.height};
+  SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+  SDL_RenderRect(renderer, &sdl_hitbox);
+#endif
 }
 
-bool PlayerLazerEntity::is_deleted() {
+bool PlayerLazerEntity::is_deleted() const {
   return y <= 0;
+}
+
+core::Rect PlayerLazerEntity::get_hitbox() const {
+  return {
+      .x = x + 25,
+      .y = y + 25,
+      .width = 6,
+      .height = 12,
+  };
 }
 
 PlayerEntity::PlayerEntity(std::shared_ptr<SDL_Texture> texture, core::Point starting_position)
@@ -56,8 +67,24 @@ void PlayerEntity::update(UpdateCtx const &ctx) {
   muzzle_flash_animation->update();
 }
 
-void PlayerEntity::draw(SDL_Renderer *renderer) {
+void PlayerEntity::draw(SDL_Renderer *renderer) const {
   core::Rect rect = {x, y, DRAW_WIDTH, DRAW_HEIGHT};
   animation->draw(renderer, rect);
   muzzle_flash_animation->draw(renderer, rect);
+
+#ifndef NDEBUG
+  auto hitbox = get_hitbox();
+  auto sdl_hitbox = SDL_FRect{hitbox.x, hitbox.y, hitbox.width, hitbox.height};
+  SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+  SDL_RenderRect(renderer, &sdl_hitbox);
+#endif
+}
+
+core::Rect PlayerEntity::get_hitbox() const {
+  return {
+      .x = x,
+      .y = y + 23,
+      .width = DRAW_WIDTH - 2,
+      .height = DRAW_HEIGHT - 38,
+  };
 }

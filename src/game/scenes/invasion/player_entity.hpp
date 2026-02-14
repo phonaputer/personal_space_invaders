@@ -1,5 +1,6 @@
 #pragma once
 
+#include "engine/collision.hpp"
 #include "engine/core.hpp"
 #include "engine/input.hpp"
 #include "engine/scene.hpp"
@@ -7,23 +8,25 @@
 #include <SDL3/SDL.h>
 #include <memory>
 
-class PlayerLazerEntity : public Entity {
+class PlayerLazerEntity : public Entity, public Collidable {
   private:
+    static constexpr float DRAW_WIDTH = 60;
+    static constexpr float DRAW_HEIGHT = 60;
+    static constexpr float SPEED = 5;
+
     Spritesheet spritesheet;
     float x;
     float y;
-    float draw_width;
-    float draw_height;
-    float speed;
 
   public:
     PlayerLazerEntity(std::shared_ptr<SDL_Texture> texture, core::Point starting_position);
     void update(UpdateCtx const &ctx) override;
-    void draw(SDL_Renderer *renderer) override;
-    bool is_deleted() override;
+    void draw(SDL_Renderer *renderer) const override;
+    bool is_deleted() const override;
+    core::Rect get_hitbox() const override;
 };
 
-class PlayerEntity : public Entity {
+class PlayerEntity : public Entity, public Collidable {
   private:
     static constexpr float DRAW_WIDTH = 60;
     static constexpr float DRAW_HEIGHT = 60;
@@ -39,5 +42,6 @@ class PlayerEntity : public Entity {
   public:
     PlayerEntity(std::shared_ptr<SDL_Texture> texture, core::Point starting_position);
     void update(UpdateCtx const &ctx) override;
-    void draw(SDL_Renderer *renderer) override;
+    void draw(SDL_Renderer *renderer) const override;
+    core::Rect get_hitbox() const override;
 };

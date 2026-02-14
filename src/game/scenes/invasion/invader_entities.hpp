@@ -45,7 +45,7 @@ class AlienOrchestrator : public Entity {
     AlienOrchestrator();
     void add_alien(std::unique_ptr<Alien> alien);
     void update(UpdateCtx const &ctx) override;
-    void draw(SDL_Renderer *renderer) override;
+    void draw(SDL_Renderer *renderer) const override;
 };
 
 class AlienFactory {

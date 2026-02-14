@@ -1,6 +1,7 @@
 #pragma once
 
 #include "assets.hpp"
+#include "collision.hpp"
 #include "entity.hpp"
 #include "input.hpp"
 #include "scene.hpp"
@@ -13,6 +14,7 @@ struct SceneHarness {
     std::unique_ptr<Scene> scene;
     std::unique_ptr<Assets> assets;
     std::unique_ptr<Entities> entities;
+    std::unique_ptr<Collidables> collidables;
 };
 
 class Engine {

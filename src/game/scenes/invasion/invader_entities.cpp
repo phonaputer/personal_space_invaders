@@ -33,7 +33,7 @@ void AlienOrchestrator::update([[maybe_unused]] UpdateCtx const &ctx) {
   }
 }
 
-void AlienOrchestrator::draw(SDL_Renderer *renderer) {
+void AlienOrchestrator::draw(SDL_Renderer *renderer) const {
   for (auto &alien : aliens) {
     alien->draw(renderer);
   }
