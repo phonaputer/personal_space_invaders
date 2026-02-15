@@ -56,5 +56,5 @@ void InvasionScene::initialize(SceneCtx ctx) {
 
   ctx.entities.add(std::move(alien_orchestrator));
 
-  ctx.entities.add(std::make_unique<PlayerEntity>(ctx.assets.get_texture("space_invaders"), core::Point{500, 700}));
+  ctx.entities.add(std::make_unique<Player>(ctx.assets.get_texture("space_invaders"), core::Point{500, 700}));
 }

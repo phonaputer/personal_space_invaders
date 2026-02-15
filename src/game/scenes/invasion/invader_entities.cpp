@@ -3,6 +3,34 @@
 #include "engine/sprites.hpp"
 #include <SDL3/SDL.h>
 #include <memory>
+#include <vector>
+
+AlienExplosion::AlienExplosion(std::shared_ptr<SDL_Texture> texture, core::Point position)
+    : tick_counter{0}, x{position.x}, y{position.y} {
+  std::vector<Frame> frames = {{0, 3}, {1, 3}, {2, 3}, {3, 3}};
+  animation = std::make_unique<Animation>(Spritesheet(texture, 16, 16), 5, frames);
+}
+
+void AlienExplosion::draw(SDL_Renderer *renderer) const {
+  animation->draw(renderer, {x, y, DRAW_WIDTH, DRAW_HEIGHT});
+}
+
+bool AlienExplosion::is_deleted() const {
+  return tick_counter >= LIFETIME_TICKS;
+}
+
+std::optional<std::reference_wrapper<Drawable>> AlienExplosion::as_drawable() {
+  return std::ref<Drawable>(*this);
+}
+
+void AlienExplosion::update([[maybe_unused]] UpdateCtx const &ctx) {
+  tick_counter++;
+  animation->update();
+}
+
+std::optional<std::reference_wrapper<Updateable>> AlienExplosion::as_updateable() {
+  return std::ref<Updateable>(*this);
+}
 
 AlienOrchestrator::AlienOrchestrator() : tick_counter{0} {
 }
@@ -135,9 +163,10 @@ bool Alien::has_reached_edge() {
   return x <= 60 || x + DRAW_WIDTH >= core::WINDOW_WIDTH - 60;
 }
 
-void Alien::receive_collision(CollideAction action) {
+void Alien::receive_collision(CollideCtx const &ctx, CollideAction action) {
   if (action == CollideAction::DAMAGE) {
     deactivated = true;
+    ctx.entities.add(std::make_shared<AlienExplosion>(ctx.assets.get_texture("space_invaders"), core::Point{x, y}));
   }
 }
 
@@ -155,5 +184,9 @@ std::optional<std::reference_wrapper<Drawable>> Alien::as_drawable() {
 }
 
 std::optional<std::reference_wrapper<Collidable>> Alien::as_collidable() {
+  if (deactivated) {
+    return std::nullopt;
+  }
+
   return std::ref<Collidable>(*this);
 }

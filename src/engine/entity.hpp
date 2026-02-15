@@ -16,6 +16,11 @@ enum CollideAction {
   DAMAGE,
 };
 
+struct CollideCtx {
+    Assets const &assets;
+    Entities &entities;
+};
+
 class Collidable {
   public:
     virtual core::Rect get_hitbox() const = 0;
@@ -24,7 +29,7 @@ class Collidable {
       return CollideAction::NONE;
     };
 
-    virtual void receive_collision([[maybe_unused]] CollideAction action) {};
+    virtual void receive_collision([[maybe_unused]] CollideCtx const &ctx, [[maybe_unused]] CollideAction action) {};
 };
 
 class Drawable {
@@ -74,6 +79,8 @@ class Entities : public EntityAdder {
   private:
     std::vector<std::shared_ptr<Entity>> entities;
     std::vector<std::shared_ptr<Entity>> entities_to_add;
+
+    void check_collisions(CollideCtx const &ctx);
 
   public:
     void add(std::shared_ptr<Entity> entity);

@@ -8,34 +8,36 @@
 #include <functional>
 #include <memory>
 
-class PlayerLazerEntity : public Entity, public Collidable, public Updateable, public Drawable {
+class PlayerProjectile : public Entity, public Collidable, public Updateable, public Drawable {
   private:
     static constexpr float DRAW_WIDTH = 60;
     static constexpr float DRAW_HEIGHT = 60;
-    static constexpr float SPEED = 5;
+    static constexpr float SPEED = 10;
 
     Spritesheet spritesheet;
     float x;
     float y;
+    bool deleted;
 
   public:
-    PlayerLazerEntity(std::shared_ptr<SDL_Texture> texture, core::Point starting_position);
+    PlayerProjectile(std::shared_ptr<SDL_Texture> texture, core::Point starting_position);
     void update(UpdateCtx const &ctx) override;
     void draw(SDL_Renderer *renderer) const override;
     bool is_deleted() const override;
     core::Rect get_hitbox() const override;
     CollideAction get_collide_action() override;
+    void receive_collision(CollideCtx const &ctx, CollideAction action) override;
     std::optional<std::reference_wrapper<Collidable>> as_collidable() override;
     std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
     std::optional<std::reference_wrapper<Updateable>> as_updateable() override;
 };
 
-class PlayerEntity : public Entity, public Collidable, public Updateable, public Drawable {
+class Player : public Entity, public Collidable, public Updateable, public Drawable {
   private:
     static constexpr float DRAW_WIDTH = 60;
     static constexpr float DRAW_HEIGHT = 60;
     static constexpr float SPEED = 4;
-    static constexpr const int TICKS_PER_SHOT = 50;
+    static constexpr const int TICKS_PER_SHOT = 35;
 
     std::unique_ptr<Animation> animation;
     std::unique_ptr<OnceAnimation> muzzle_flash_animation;
@@ -44,7 +46,7 @@ class PlayerEntity : public Entity, public Collidable, public Updateable, public
     int shot_clock;
 
   public:
-    PlayerEntity(std::shared_ptr<SDL_Texture> texture, core::Point starting_position);
+    Player(std::shared_ptr<SDL_Texture> texture, core::Point starting_position);
     void update(UpdateCtx const &ctx) override;
     void draw(SDL_Renderer *renderer) const override;
     core::Rect get_hitbox() const override;

@@ -9,6 +9,25 @@
 #include <memory>
 #include <vector>
 
+class AlienExplosion : public Entity, public Drawable, public Updateable {
+  private:
+    static constexpr int LIFETIME_TICKS = 20;
+    static constexpr float DRAW_WIDTH = 60;
+    static constexpr float DRAW_HEIGHT = 60;
+    int tick_counter;
+    std::unique_ptr<Animation> animation;
+    float x;
+    float y;
+
+  public:
+    AlienExplosion(std::shared_ptr<SDL_Texture> texture, core::Point position);
+    void draw(SDL_Renderer *renderer) const override;
+    bool is_deleted() const override;
+    std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
+    void update(UpdateCtx const &ctx) override;
+    std::optional<std::reference_wrapper<Updateable>> as_updateable() override;
+};
+
 class AlienOrchestrator;
 
 struct AlienParams {
@@ -38,7 +57,7 @@ class Alien : public Entity, public Drawable, public Collidable {
     void draw(SDL_Renderer *renderer) const override;
     std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
     core::Rect get_hitbox() const override;
-    void receive_collision(CollideAction action) override;
+    void receive_collision(CollideCtx const &ctx, CollideAction action) override;
     std::optional<std::reference_wrapper<Collidable>> as_collidable() override;
 };
 

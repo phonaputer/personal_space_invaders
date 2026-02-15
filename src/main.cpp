@@ -13,12 +13,12 @@
 // X * Add player character
 // X * Have player character move in response to WASD
 // X * Have player character shoot with Space
-// * Have bullets delete bad guys
-// * Have bad guys explode upon deletion
-// * Sound effects
-// * BGM (space invaders style where it speeds up along with the aliens)
+// X * Have bullets delete bad guys
+// X * Have bad guys explode upon deletion
 // * Have bad guys shoot lazers
 // * Have lazers damage player
+// * Sound effects
+// * BGM (space invaders style where it speeds up along with the aliens)
 // * Have a system of "lives" for the player
 // * Reset board upon destroying all bad guys
 // * Track score
