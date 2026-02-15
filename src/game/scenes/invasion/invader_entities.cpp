@@ -45,6 +45,7 @@ std::shared_ptr<Alien> AlienFactory::new_jellyfish(core::Point starting_position
       .texture = texture,
       .starting_position = starting_position,
       .frames = {{0, 0}, {1, 0}, {2, 0}, {3, 0}},
+      .hitbox = {5, 12, 50, 35},
   });
 
   ctx.entities.add(entity);
@@ -57,6 +58,7 @@ std::shared_ptr<Alien> AlienFactory::new_tadpole(core::Point starting_position) 
       .texture = texture,
       .starting_position = starting_position,
       .frames = {{1, 1}, {0, 1}, {1, 1}, {2, 1}},
+      .hitbox = {17, 11, 23, 35},
   });
 
   ctx.entities.add(entity);
@@ -69,6 +71,7 @@ std::shared_ptr<Alien> AlienFactory::new_octopus(core::Point starting_position) 
       .texture = texture,
       .starting_position = starting_position,
       .frames = {{0, 2}, {1, 2}},
+      .hitbox = {0, 15, 60, 32},
   });
 
   ctx.entities.add(entity);
@@ -81,6 +84,7 @@ std::shared_ptr<Alien> AlienFactory::new_crab(core::Point starting_position) {
       .texture = texture,
       .starting_position = starting_position,
       .frames = {{1, 4}, {0, 4}, {1, 4}, {2, 4}},
+      .hitbox = {5, 14, 50, 31},
   });
 
   ctx.entities.add(entity);
@@ -88,7 +92,7 @@ std::shared_ptr<Alien> AlienFactory::new_crab(core::Point starting_position) {
   return entity;
 }
 
-Alien::Alien(AlienParams params) : x{params.starting_position.x}, y{params.starting_position.y} {
+Alien::Alien(AlienParams params) : x{params.starting_position.x}, y{params.starting_position.y}, hitbox{params.hitbox} {
   move_right = true;
   animation = std::make_unique<Animation>(Spritesheet(params.texture, 16, 16), 17, params.frames);
 }
@@ -105,6 +109,13 @@ void Alien::move(float speed) {
 
 void Alien::draw(SDL_Renderer *renderer) const {
   animation->draw(renderer, {x, y, DRAW_WIDTH, DRAW_HEIGHT});
+
+#ifndef NDEBUG
+  auto hitbox = get_hitbox();
+  auto sdl_hitbox = SDL_FRect{hitbox.x, hitbox.y, hitbox.width, hitbox.height};
+  SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+  SDL_RenderRect(renderer, &sdl_hitbox);
+#endif
 }
 
 void Alien::descend_and_turn(float descend_speed) {
@@ -116,6 +127,19 @@ bool Alien::has_reached_edge() {
   return x <= 60 || x + DRAW_WIDTH >= core::WINDOW_WIDTH - 60;
 }
 
+core::Rect Alien::get_hitbox() const {
+  return {
+      .x = x + hitbox.x,
+      .y = y + hitbox.y,
+      .width = hitbox.width,
+      .height = hitbox.height,
+  };
+};
+
 std::optional<std::reference_wrapper<Drawable>> Alien::as_drawable() {
   return std::ref<Drawable>(*this);
+}
+
+std::optional<std::reference_wrapper<Collidable>> Alien::as_collidable() {
+  return std::ref<Collidable>(*this);
 }

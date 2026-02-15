@@ -15,9 +15,10 @@ struct AlienParams {
     std::shared_ptr<SDL_Texture> texture;
     core::Point starting_position;
     std::vector<Frame> frames;
+    core::Rect hitbox;
 };
 
-class Alien : public Entity, public Drawable {
+class Alien : public Entity, public Drawable, public Collidable {
   private:
     static constexpr float DRAW_WIDTH = 60;
     static constexpr float DRAW_HEIGHT = 60;
@@ -26,6 +27,7 @@ class Alien : public Entity, public Drawable {
     float x;
     float y;
     bool move_right;
+    const core::Rect hitbox;
 
   public:
     Alien(AlienParams params);
@@ -33,7 +35,9 @@ class Alien : public Entity, public Drawable {
     void draw(SDL_Renderer *renderer) const override;
     void descend_and_turn(float descend_speed);
     bool has_reached_edge();
+    core::Rect get_hitbox() const override;
     std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
+    std::optional<std::reference_wrapper<Collidable>> as_collidable() override;
 };
 
 class AlienOrchestrator : public Entity, Updateable {
