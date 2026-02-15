@@ -24,6 +24,7 @@ class PlayerLazerEntity : public Entity, public Collidable, public Updateable, p
     void draw(SDL_Renderer *renderer) const override;
     bool is_deleted() const override;
     core::Rect get_hitbox() const override;
+    CollideAction get_collide_action() override;
     std::optional<std::reference_wrapper<Collidable>> as_collidable() override;
     std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
     std::optional<std::reference_wrapper<Updateable>> as_updateable() override;

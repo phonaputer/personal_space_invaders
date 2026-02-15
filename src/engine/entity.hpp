@@ -11,10 +11,20 @@
 
 class Entities;
 
+enum CollideAction {
+  NONE,
+  DAMAGE,
+};
+
 class Collidable {
   public:
     virtual core::Rect get_hitbox() const = 0;
-    virtual void collide_with([[maybe_unused]] Collidable &other) {};
+
+    virtual CollideAction get_collide_action() {
+      return CollideAction::NONE;
+    };
+
+    virtual void receive_collision([[maybe_unused]] CollideAction action) {};
 };
 
 class Drawable {

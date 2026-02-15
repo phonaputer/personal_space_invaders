@@ -92,8 +92,12 @@ std::shared_ptr<Alien> AlienFactory::new_crab(core::Point starting_position) {
   return entity;
 }
 
-Alien::Alien(AlienParams params) : x{params.starting_position.x}, y{params.starting_position.y}, hitbox{params.hitbox} {
-  move_right = true;
+Alien::Alien(AlienParams params)
+    : x{params.starting_position.x},
+      y{params.starting_position.y},
+      move_right{true},
+      hitbox{params.hitbox},
+      deactivated{false} {
   animation = std::make_unique<Animation>(Spritesheet(params.texture, 16, 16), 17, params.frames);
 }
 
@@ -108,6 +112,10 @@ void Alien::move(float speed) {
 }
 
 void Alien::draw(SDL_Renderer *renderer) const {
+  if (deactivated) {
+    return;
+  }
+
   animation->draw(renderer, {x, y, DRAW_WIDTH, DRAW_HEIGHT});
 
 #ifndef NDEBUG
@@ -125,6 +133,12 @@ void Alien::descend_and_turn(float descend_speed) {
 
 bool Alien::has_reached_edge() {
   return x <= 60 || x + DRAW_WIDTH >= core::WINDOW_WIDTH - 60;
+}
+
+void Alien::receive_collision(CollideAction action) {
+  if (action == CollideAction::DAMAGE) {
+    deactivated = true;
+  }
 }
 
 core::Rect Alien::get_hitbox() const {

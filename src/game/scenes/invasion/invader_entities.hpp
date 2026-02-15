@@ -28,15 +28,17 @@ class Alien : public Entity, public Drawable, public Collidable {
     float y;
     bool move_right;
     const core::Rect hitbox;
+    bool deactivated;
 
   public:
     Alien(AlienParams params);
     void move(float speed);
-    void draw(SDL_Renderer *renderer) const override;
     void descend_and_turn(float descend_speed);
     bool has_reached_edge();
-    core::Rect get_hitbox() const override;
+    void draw(SDL_Renderer *renderer) const override;
     std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
+    core::Rect get_hitbox() const override;
+    void receive_collision(CollideAction action) override;
     std::optional<std::reference_wrapper<Collidable>> as_collidable() override;
 };
 

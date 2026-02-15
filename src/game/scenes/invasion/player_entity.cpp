@@ -2,6 +2,7 @@
 #include "engine/core.hpp"
 #include "engine/scene.hpp"
 #include "engine/sprites.hpp"
+#include "invader_entities.hpp"
 #include <SDL3/SDL.h>
 #include <memory>
 #include <vector>
@@ -36,6 +37,10 @@ core::Rect PlayerLazerEntity::get_hitbox() const {
       .width = 6,
       .height = 12,
   };
+}
+
+CollideAction PlayerLazerEntity::get_collide_action() {
+  return CollideAction::DAMAGE;
 }
 
 std::optional<std::reference_wrapper<Collidable>> PlayerLazerEntity::as_collidable() {
