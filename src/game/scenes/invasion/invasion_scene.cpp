@@ -13,7 +13,7 @@ void InvasionScene::initialize(SceneCtx ctx) {
   auto alien_orchestrator = std::make_unique<AlienOrchestrator>();
 
   // TODO can the preload be removed and the texture loading added here instead?
-  auto alien_factory = AlienFactory(ctx.assets.get_texture("space_invaders"));
+  auto alien_factory = AlienFactory(ctx, ctx.assets.get_texture("space_invaders"));
 
   const float starting_x_pos = 200;
   float x_pos = starting_x_pos;

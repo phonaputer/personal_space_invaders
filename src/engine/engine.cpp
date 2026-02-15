@@ -70,7 +70,6 @@ void Engine::draw() {
 void Engine::set_scene(std::unique_ptr<Scene> scene) {
   auto assets = std::make_unique<Assets>(renderer);
   auto entities = std::make_unique<Entities>();
-  auto collidables = std::make_unique<Collidables>();
 
   scene->preload_assets(PreloadAssetsCtx{.assets = *assets});
   scene->initialize(
@@ -78,7 +77,6 @@ void Engine::set_scene(std::unique_ptr<Scene> scene) {
           .assets = *assets,
           .entities = *entities,
           .user_inputs = *user_inputs,
-          .collidables = *collidables,
       }
   );
 
@@ -86,7 +84,6 @@ void Engine::set_scene(std::unique_ptr<Scene> scene) {
       .scene = std::move(scene),
       .assets = std::move(assets),
       .entities = std::move(entities),
-      .collidables = std::move(collidables),
   };
 };
 

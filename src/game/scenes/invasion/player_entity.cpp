@@ -38,6 +38,18 @@ core::Rect PlayerLazerEntity::get_hitbox() const {
   };
 }
 
+std::optional<std::reference_wrapper<Collidable>> PlayerLazerEntity::as_collidable() {
+  return std::ref<Collidable>(*this);
+}
+
+std::optional<std::reference_wrapper<Drawable>> PlayerLazerEntity::as_drawable() {
+  return std::ref<Drawable>(*this);
+}
+
+std::optional<std::reference_wrapper<Updateable>> PlayerLazerEntity::as_updateable() {
+  return std::ref<Updateable>(*this);
+}
+
 PlayerEntity::PlayerEntity(std::shared_ptr<SDL_Texture> texture, core::Point starting_position)
     : x{starting_position.x}, y{starting_position.y}, shot_clock{0} {
   std::vector<Frame> frames = {{0, 5}, {1, 5}, {2, 5}};
@@ -87,4 +99,16 @@ core::Rect PlayerEntity::get_hitbox() const {
       .width = DRAW_WIDTH - 2,
       .height = DRAW_HEIGHT - 38,
   };
+}
+
+std::optional<std::reference_wrapper<Collidable>> PlayerEntity::as_collidable() {
+  return std::ref<Collidable>(*this);
+}
+
+std::optional<std::reference_wrapper<Drawable>> PlayerEntity::as_drawable() {
+  return std::ref<Drawable>(*this);
+}
+
+std::optional<std::reference_wrapper<Updateable>> PlayerEntity::as_updateable() {
+  return std::ref<Updateable>(*this);
 }

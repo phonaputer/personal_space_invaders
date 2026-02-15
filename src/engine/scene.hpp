@@ -1,7 +1,6 @@
 #pragma once
 
 #include "assets.hpp"
-#include "collision.hpp"
 #include "entity.hpp"
 #include "input.hpp"
 #include <SDL3/SDL.h>
@@ -10,7 +9,6 @@ struct SceneCtx {
     Assets const &assets;
     Entities &entities;
     UserInputs const &user_inputs;
-    Collidables &collidables;
 };
 
 struct PreloadAssetsCtx {

@@ -1,14 +1,14 @@
 #pragma once
 
-#include "engine/collision.hpp"
 #include "engine/core.hpp"
 #include "engine/input.hpp"
 #include "engine/scene.hpp"
 #include "engine/sprites.hpp"
 #include <SDL3/SDL.h>
+#include <functional>
 #include <memory>
 
-class PlayerLazerEntity : public Entity, public Collidable {
+class PlayerLazerEntity : public Entity, public Collidable, public Updateable, public Drawable {
   private:
     static constexpr float DRAW_WIDTH = 60;
     static constexpr float DRAW_HEIGHT = 60;
@@ -24,9 +24,12 @@ class PlayerLazerEntity : public Entity, public Collidable {
     void draw(SDL_Renderer *renderer) const override;
     bool is_deleted() const override;
     core::Rect get_hitbox() const override;
+    std::optional<std::reference_wrapper<Collidable>> as_collidable() override;
+    std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
+    std::optional<std::reference_wrapper<Updateable>> as_updateable() override;
 };
 
-class PlayerEntity : public Entity, public Collidable {
+class PlayerEntity : public Entity, public Collidable, public Updateable, public Drawable {
   private:
     static constexpr float DRAW_WIDTH = 60;
     static constexpr float DRAW_HEIGHT = 60;
@@ -44,4 +47,7 @@ class PlayerEntity : public Entity, public Collidable {
     void update(UpdateCtx const &ctx) override;
     void draw(SDL_Renderer *renderer) const override;
     core::Rect get_hitbox() const override;
+    std::optional<std::reference_wrapper<Collidable>> as_collidable() override;
+    std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
+    std::optional<std::reference_wrapper<Updateable>> as_updateable() override;
 };

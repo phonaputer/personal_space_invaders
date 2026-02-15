@@ -5,6 +5,7 @@
 #include "engine/scene.hpp"
 #include "engine/sprites.hpp"
 #include <SDL3/SDL.h>
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -16,7 +17,7 @@ struct AlienParams {
     std::vector<Frame> frames;
 };
 
-class Alien {
+class Alien : public Entity, public Drawable {
   private:
     static constexpr float DRAW_WIDTH = 60;
     static constexpr float DRAW_HEIGHT = 60;
@@ -29,33 +30,35 @@ class Alien {
   public:
     Alien(AlienParams params);
     void move(float speed);
-    void draw(SDL_Renderer *renderer);
+    void draw(SDL_Renderer *renderer) const override;
     void descend_and_turn(float descend_speed);
     bool has_reached_edge();
+    std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
 };
 
-class AlienOrchestrator : public Entity {
+class AlienOrchestrator : public Entity, Updateable {
   private:
     static constexpr int TICKS_PER_MOVE = 30;
 
     int tick_counter;
-    std::vector<std::unique_ptr<Alien>> aliens;
+    std::vector<std::shared_ptr<Alien>> aliens;
 
   public:
     AlienOrchestrator();
-    void add_alien(std::unique_ptr<Alien> alien);
+    void add_alien(std::shared_ptr<Alien> alien);
     void update(UpdateCtx const &ctx) override;
-    void draw(SDL_Renderer *renderer) const override;
+    std::optional<std::reference_wrapper<Updateable>> as_updateable() override;
 };
 
 class AlienFactory {
   private:
+    SceneCtx ctx;
     std::shared_ptr<SDL_Texture> texture;
 
   public:
-    AlienFactory(std::shared_ptr<SDL_Texture> texture);
-    std::unique_ptr<Alien> new_jellyfish(core::Point starting_position);
-    std::unique_ptr<Alien> new_tadpole(core::Point starting_position);
-    std::unique_ptr<Alien> new_octopus(core::Point starting_position);
-    std::unique_ptr<Alien> new_crab(core::Point starting_position);
+    AlienFactory(SceneCtx ctx, std::shared_ptr<SDL_Texture> texture);
+    std::shared_ptr<Alien> new_jellyfish(core::Point starting_position);
+    std::shared_ptr<Alien> new_tadpole(core::Point starting_position);
+    std::shared_ptr<Alien> new_octopus(core::Point starting_position);
+    std::shared_ptr<Alien> new_crab(core::Point starting_position);
 };

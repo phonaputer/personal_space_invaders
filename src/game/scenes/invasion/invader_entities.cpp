@@ -7,8 +7,8 @@
 AlienOrchestrator::AlienOrchestrator() : tick_counter{0} {
 }
 
-void AlienOrchestrator::add_alien(std::unique_ptr<Alien> alien) {
-  aliens.push_back(std::move(alien));
+void AlienOrchestrator::add_alien(std::shared_ptr<Alien> alien) {
+  aliens.push_back(alien);
 }
 
 void AlienOrchestrator::update([[maybe_unused]] UpdateCtx const &ctx) {
@@ -33,45 +33,59 @@ void AlienOrchestrator::update([[maybe_unused]] UpdateCtx const &ctx) {
   }
 }
 
-void AlienOrchestrator::draw(SDL_Renderer *renderer) const {
-  for (auto &alien : aliens) {
-    alien->draw(renderer);
-  }
+std::optional<std::reference_wrapper<Updateable>> AlienOrchestrator::as_updateable() {
+  return std::ref<Updateable>(*this);
 }
 
-AlienFactory::AlienFactory(std::shared_ptr<SDL_Texture> texture) : texture{texture} {
+AlienFactory::AlienFactory(SceneCtx ctx, std::shared_ptr<SDL_Texture> texture) : ctx{ctx}, texture{texture} {
 }
 
-std::unique_ptr<Alien> AlienFactory::new_jellyfish(core::Point starting_position) {
-  return std::make_unique<Alien>(AlienParams{
+std::shared_ptr<Alien> AlienFactory::new_jellyfish(core::Point starting_position) {
+  auto entity = std::make_shared<Alien>(AlienParams{
       .texture = texture,
       .starting_position = starting_position,
       .frames = {{0, 0}, {1, 0}, {2, 0}, {3, 0}},
   });
+
+  ctx.entities.add(entity);
+
+  return entity;
 }
 
-std::unique_ptr<Alien> AlienFactory::new_tadpole(core::Point starting_position) {
-  return std::make_unique<Alien>(AlienParams{
+std::shared_ptr<Alien> AlienFactory::new_tadpole(core::Point starting_position) {
+  auto entity = std::make_shared<Alien>(AlienParams{
       .texture = texture,
       .starting_position = starting_position,
       .frames = {{1, 1}, {0, 1}, {1, 1}, {2, 1}},
   });
+
+  ctx.entities.add(entity);
+
+  return entity;
 }
 
-std::unique_ptr<Alien> AlienFactory::new_octopus(core::Point starting_position) {
-  return std::make_unique<Alien>(AlienParams{
+std::shared_ptr<Alien> AlienFactory::new_octopus(core::Point starting_position) {
+  auto entity = std::make_shared<Alien>(AlienParams{
       .texture = texture,
       .starting_position = starting_position,
       .frames = {{0, 2}, {1, 2}},
   });
+
+  ctx.entities.add(entity);
+
+  return entity;
 }
 
-std::unique_ptr<Alien> AlienFactory::new_crab(core::Point starting_position) {
-  return std::make_unique<Alien>(AlienParams{
+std::shared_ptr<Alien> AlienFactory::new_crab(core::Point starting_position) {
+  auto entity = std::make_shared<Alien>(AlienParams{
       .texture = texture,
       .starting_position = starting_position,
       .frames = {{1, 4}, {0, 4}, {1, 4}, {2, 4}},
   });
+
+  ctx.entities.add(entity);
+
+  return entity;
 }
 
 Alien::Alien(AlienParams params) : x{params.starting_position.x}, y{params.starting_position.y} {
@@ -89,7 +103,7 @@ void Alien::move(float speed) {
   }
 }
 
-void Alien::draw(SDL_Renderer *renderer) {
+void Alien::draw(SDL_Renderer *renderer) const {
   animation->draw(renderer, {x, y, DRAW_WIDTH, DRAW_HEIGHT});
 }
 
@@ -100,4 +114,8 @@ void Alien::descend_and_turn(float descend_speed) {
 
 bool Alien::has_reached_edge() {
   return x <= 60 || x + DRAW_WIDTH >= core::WINDOW_WIDTH - 60;
+}
+
+std::optional<std::reference_wrapper<Drawable>> Alien::as_drawable() {
+  return std::ref<Drawable>(*this);
 }
