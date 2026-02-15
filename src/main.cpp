@@ -15,8 +15,9 @@
 // X * Have player character shoot with Space
 // X * Have bullets delete bad guys
 // X * Have bad guys explode upon deletion
-// * Have bad guys shoot lazers
+// X * Have bad guys shoot lazers
 // * Have lazers damage player
+// * Have lazers not damage bad guys
 // * Sound effects
 // * BGM (space invaders style where it speeds up along with the aliens)
 // * Have a system of "lives" for the player

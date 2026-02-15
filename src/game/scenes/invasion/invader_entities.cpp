@@ -2,8 +2,65 @@
 #include "engine/scene.hpp"
 #include "engine/sprites.hpp"
 #include <SDL3/SDL.h>
+#include <cstdlib>
 #include <memory>
 #include <vector>
+
+AlienProjectile::AlienProjectile(std::shared_ptr<SDL_Texture> texture, core::Point starting_position)
+    : x{starting_position.x}, y{starting_position.y}, deleted{false} {
+  std::vector<Frame> frames = {{1, 6}, {2, 6}};
+  animation = std::make_unique<Animation>(Spritesheet(texture, 16, 16), 10, frames);
+}
+
+void AlienProjectile::update([[maybe_unused]] UpdateCtx const &ctx) {
+  y += SPEED;
+  animation->update();
+}
+
+void AlienProjectile::draw(SDL_Renderer *renderer) const {
+  animation->draw(renderer, {x, y, DRAW_WIDTH, DRAW_HEIGHT});
+
+#ifndef NDEBUG
+  auto hitbox = get_hitbox();
+  auto sdl_hitbox = SDL_FRect{hitbox.x, hitbox.y, hitbox.width, hitbox.height};
+  SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+  SDL_RenderRect(renderer, &sdl_hitbox);
+#endif
+}
+
+bool AlienProjectile::is_deleted() const {
+  return deleted == true || y >= core::WINDOW_HEIGHT;
+}
+
+core::Rect AlienProjectile::get_hitbox() const {
+  return {
+      .x = x + 22,
+      .y = y + 13,
+      .width = 12,
+      .height = 24,
+  };
+}
+
+CollideAction AlienProjectile::get_collide_action() {
+  return CollideAction::DAMAGE_PLAYER;
+}
+
+void AlienProjectile::receive_collision([[maybe_unused]] CollideCtx const &ctx, [[maybe_unused]] CollideAction action) {
+  // FIXME
+  // deleted = true;
+}
+
+std::optional<std::reference_wrapper<Collidable>> AlienProjectile::as_collidable() {
+  return std::ref<Collidable>(*this);
+}
+
+std::optional<std::reference_wrapper<Drawable>> AlienProjectile::as_drawable() {
+  return std::ref<Drawable>(*this);
+}
+
+std::optional<std::reference_wrapper<Updateable>> AlienProjectile::as_updateable() {
+  return std::ref<Updateable>(*this);
+}
 
 AlienExplosion::AlienExplosion(std::shared_ptr<SDL_Texture> texture, core::Point position)
     : tick_counter{0}, x{position.x}, y{position.y} {
@@ -48,7 +105,7 @@ void AlienOrchestrator::update([[maybe_unused]] UpdateCtx const &ctx) {
   tick_counter = 0;
 
   for (auto &alien : aliens) {
-    if (alien->has_reached_edge()) {
+    if (alien->is_active() && alien->has_reached_edge()) {
       for (auto &alien : aliens) {
         alien->descend_and_turn(60);
       }
@@ -58,6 +115,23 @@ void AlienOrchestrator::update([[maybe_unused]] UpdateCtx const &ctx) {
 
   for (auto &alien : aliens) {
     alien->move(15);
+  }
+
+  std::vector<std::shared_ptr<Alien>> active_aliens;
+  for (const auto &a : aliens) {
+    if (a->is_active()) {
+      active_aliens.push_back(a);
+    }
+  }
+
+  if (rand() % 5 == 0) {
+    size_t selected_alien = rand() % active_aliens.size();
+    auto position = active_aliens.at(selected_alien)->get_position();
+    ctx.entities.add(
+        std::make_shared<AlienProjectile>(
+            ctx.assets.get_texture("space_invaders"), core::Point{position.x, position.y + 30}
+        )
+    );
   }
 }
 
@@ -163,8 +237,16 @@ bool Alien::has_reached_edge() {
   return x <= 60 || x + DRAW_WIDTH >= core::WINDOW_WIDTH - 60;
 }
 
+core::Point Alien::get_position() const {
+  return {x, y};
+}
+
+bool Alien::is_active() const {
+  return !deactivated;
+}
+
 void Alien::receive_collision(CollideCtx const &ctx, CollideAction action) {
-  if (action == CollideAction::DAMAGE) {
+  if (action == CollideAction::DAMAGE_ALIENS) {
     deactivated = true;
     ctx.entities.add(std::make_shared<AlienExplosion>(ctx.assets.get_texture("space_invaders"), core::Point{x, y}));
   }

@@ -9,6 +9,30 @@
 #include <memory>
 #include <vector>
 
+class AlienProjectile : public Entity, public Collidable, public Updateable, public Drawable {
+  private:
+    static constexpr float DRAW_WIDTH = 60;
+    static constexpr float DRAW_HEIGHT = 60;
+    static constexpr float SPEED = 3;
+
+    std::unique_ptr<Animation> animation;
+    float x;
+    float y;
+    bool deleted;
+
+  public:
+    AlienProjectile(std::shared_ptr<SDL_Texture> texture, core::Point starting_position);
+    void update(UpdateCtx const &ctx) override;
+    void draw(SDL_Renderer *renderer) const override;
+    bool is_deleted() const override;
+    core::Rect get_hitbox() const override;
+    CollideAction get_collide_action() override;
+    void receive_collision(CollideCtx const &ctx, CollideAction action) override;
+    std::optional<std::reference_wrapper<Collidable>> as_collidable() override;
+    std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
+    std::optional<std::reference_wrapper<Updateable>> as_updateable() override;
+};
+
 class AlienExplosion : public Entity, public Drawable, public Updateable {
   private:
     static constexpr int LIFETIME_TICKS = 20;
@@ -54,8 +78,12 @@ class Alien : public Entity, public Drawable, public Collidable {
     void move(float speed);
     void descend_and_turn(float descend_speed);
     bool has_reached_edge();
+    core::Point get_position() const;
+    bool is_active() const;
+
     void draw(SDL_Renderer *renderer) const override;
     std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
+
     core::Rect get_hitbox() const override;
     void receive_collision(CollideCtx const &ctx, CollideAction action) override;
     std::optional<std::reference_wrapper<Collidable>> as_collidable() override;

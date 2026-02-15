@@ -40,7 +40,7 @@ core::Rect PlayerProjectile::get_hitbox() const {
 }
 
 CollideAction PlayerProjectile::get_collide_action() {
-  return CollideAction::DAMAGE;
+  return CollideAction::DAMAGE_ALIENS;
 }
 
 void PlayerProjectile::receive_collision(

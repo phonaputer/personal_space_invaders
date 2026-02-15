@@ -13,7 +13,8 @@ class Entities;
 
 enum CollideAction {
   NONE,
-  DAMAGE,
+  DAMAGE_ALIENS,
+  DAMAGE_PLAYER,
 };
 
 struct CollideCtx {
