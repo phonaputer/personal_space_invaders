@@ -15,7 +15,7 @@ struct SceneHarness {
     std::unique_ptr<Entities> entities;
 };
 
-class Engine {
+class Game {
   private:
     // Window and Renderer aren't unique ptrs since SDL cleans them up automatically on aplication exit.
     SDL_Window *window;
@@ -28,7 +28,7 @@ class Engine {
     Uint64 unprocessed_ms;
 
   public:
-    Engine();
+    Game();
     void set_scene(std::unique_ptr<Scene> scene);
     void update();
     void draw();

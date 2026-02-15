@@ -1,6 +1,6 @@
 #define SDL_MAIN_USE_CALLBACKS
 
-#include "engine/engine.hpp"
+#include "engine/game.hpp"
 #include "game/scenes/invasion/invasion_scene.hpp"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
@@ -27,9 +27,9 @@
 
 SDL_AppResult SDL_AppInit(void **appstate, [[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
 
-  Engine *game = nullptr;
+  Game *game = nullptr;
   try {
-    game = new Engine();
+    game = new Game();
     *appstate = game;
   } catch (const std::exception &e) {
     return SDL_APP_FAILURE;
@@ -43,7 +43,7 @@ SDL_AppResult SDL_AppInit(void **appstate, [[maybe_unused]] int argc, [[maybe_un
 }
 
 SDL_AppResult SDL_AppEvent([[maybe_unused]] void *appstate, SDL_Event *event) {
-  auto game = (Engine *)appstate;
+  auto game = (Game *)appstate;
 
   switch (event->type) {
     case SDL_EVENT_QUIT:
@@ -86,7 +86,7 @@ SDL_AppResult SDL_AppEvent([[maybe_unused]] void *appstate, SDL_Event *event) {
 }
 
 SDL_AppResult SDL_AppIterate(void *appstate) {
-  auto game = (Engine *)appstate;
+  auto game = (Game *)appstate;
 
   game->update();
   game->draw();
@@ -95,7 +95,7 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 }
 
 void SDL_AppQuit(void *appstate, [[maybe_unused]] SDL_AppResult result) {
-  auto game = (Engine *)appstate;
+  auto game = (Game *)appstate;
 
   delete game;
 

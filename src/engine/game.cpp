@@ -1,4 +1,4 @@
-#include "engine.hpp"
+#include "game.hpp"
 #include "assets.hpp"
 #include "core.hpp"
 #include "input.hpp"
@@ -11,7 +11,7 @@
 // Roughly 60 updates per second. 1000 / 60 = 16.66 (repeating, of course).
 const Uint64 MS_PER_UPDATE = 17;
 
-Engine::Engine() {
+Game::Game() {
   if (!SDL_Init(SDL_INIT_VIDEO)) {
     throw std::runtime_error(std::format("Failed to initialize SDL: {}", SDL_GetError()));
   }
@@ -31,7 +31,7 @@ Engine::Engine() {
   user_inputs = std::make_unique<UserInputs>();
 }
 
-void Engine::update() {
+void Game::update() {
   if (!active_scene.has_value()) {
     return;
   }
@@ -54,7 +54,7 @@ void Engine::update() {
   }
 }
 
-void Engine::draw() {
+void Game::draw() {
   if (!active_scene.has_value()) {
     return;
   }
@@ -67,7 +67,7 @@ void Engine::draw() {
   SDL_RenderPresent(renderer);
 }
 
-void Engine::set_scene(std::unique_ptr<Scene> scene) {
+void Game::set_scene(std::unique_ptr<Scene> scene) {
   auto assets = std::make_unique<Assets>(renderer);
   auto entities = std::make_unique<Entities>();
 
@@ -87,6 +87,6 @@ void Engine::set_scene(std::unique_ptr<Scene> scene) {
   };
 };
 
-UserInputs &Engine::get_user_inputs() {
+UserInputs &Game::get_user_inputs() {
   return *user_inputs;
 }
