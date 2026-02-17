@@ -1,15 +1,21 @@
 #include "invader_entities.hpp"
 #include "engine/scene.hpp"
 #include "engine/sprites.hpp"
+#include "invasion_constants.hpp"
 #include <SDL3/SDL.h>
 #include <cstdlib>
 #include <memory>
+#include <string>
 #include <vector>
 
 AlienProjectile::AlienProjectile(std::shared_ptr<SDL_Texture> texture, core::Point starting_position)
     : x{starting_position.x}, y{starting_position.y}, deleted{false} {
   std::vector<Frame> frames = {{1, 6}, {2, 6}};
   animation = std::make_unique<Animation>(Spritesheet(texture, 16, 16), 10, frames);
+}
+
+std::string AlienProjectile::get_type() const {
+  return entityType::ALIEN_PROJECTILE;
 }
 
 void AlienProjectile::update([[maybe_unused]] UpdateCtx const &ctx) {
@@ -41,13 +47,17 @@ core::Rect AlienProjectile::get_hitbox() const {
   };
 }
 
-CollideAction AlienProjectile::get_collide_action() {
-  return CollideAction::DAMAGE_PLAYER;
-}
+void AlienProjectile::collide_with([[maybe_unused]] CollideCtx const &ctx, Collidable &other) {
+  if (other.get_type() == entityType::PLAYER) {
+    deleted = true;
+  }
 
-void AlienProjectile::receive_collision([[maybe_unused]] CollideCtx const &ctx, [[maybe_unused]] CollideAction action) {
-  // FIXME
-  // deleted = true;
+  if (other.get_type() == entityType::PLAYER_PROJECTILE) {
+    deleted = true;
+    ctx.entities.add(
+        std::make_shared<AlienExplosion>(ctx.assets.get_texture(asset::PRIMARY_SPRITESHEET), core::Point{x, y})
+    );
+  }
 }
 
 std::optional<std::reference_wrapper<Collidable>> AlienProjectile::as_collidable() {
@@ -66,6 +76,10 @@ AlienExplosion::AlienExplosion(std::shared_ptr<SDL_Texture> texture, core::Point
     : tick_counter{0}, x{position.x}, y{position.y} {
   std::vector<Frame> frames = {{0, 3}, {1, 3}, {2, 3}, {3, 3}};
   animation = std::make_unique<Animation>(Spritesheet(texture, 16, 16), 5, frames);
+}
+
+std::string AlienExplosion::get_type() const {
+  return entityType::ALIEN_EXPLOSION;
 }
 
 void AlienExplosion::draw(SDL_Renderer *renderer) const {
@@ -90,6 +104,10 @@ std::optional<std::reference_wrapper<Updateable>> AlienExplosion::as_updateable(
 }
 
 AlienOrchestrator::AlienOrchestrator() : tick_counter{0} {
+}
+
+std::string AlienOrchestrator::get_type() const {
+  return entityType::ALIEN_ORCHESTRATOR;
 }
 
 void AlienOrchestrator::add_alien(std::shared_ptr<Alien> alien) {
@@ -124,12 +142,12 @@ void AlienOrchestrator::update([[maybe_unused]] UpdateCtx const &ctx) {
     }
   }
 
-  if (rand() % 5 == 0) {
+  if (active_aliens.size() > 0 && rand() % ALIEN_SHOOT_CHANCE == 0) {
     size_t selected_alien = rand() % active_aliens.size();
     auto position = active_aliens.at(selected_alien)->get_position();
     ctx.entities.add(
         std::make_shared<AlienProjectile>(
-            ctx.assets.get_texture("space_invaders"), core::Point{position.x, position.y + 30}
+            ctx.assets.get_texture(asset::PRIMARY_SPRITESHEET), core::Point{position.x, position.y + 30}
         )
     );
   }
@@ -203,6 +221,10 @@ Alien::Alien(AlienParams params)
   animation = std::make_unique<Animation>(Spritesheet(params.texture, 16, 16), 17, params.frames);
 }
 
+std::string Alien::get_type() const {
+  return entityType::ALIEN;
+}
+
 void Alien::move(float speed) {
   animation->next_frame();
 
@@ -245,10 +267,12 @@ bool Alien::is_active() const {
   return !deactivated;
 }
 
-void Alien::receive_collision(CollideCtx const &ctx, CollideAction action) {
-  if (action == CollideAction::DAMAGE_ALIENS) {
+void Alien::collide_with(CollideCtx const &ctx, Collidable &other) {
+  if (other.get_type() == entityType::PLAYER_PROJECTILE) {
     deactivated = true;
-    ctx.entities.add(std::make_shared<AlienExplosion>(ctx.assets.get_texture("space_invaders"), core::Point{x, y}));
+    ctx.entities.add(
+        std::make_shared<AlienExplosion>(ctx.assets.get_texture(asset::PRIMARY_SPRITESHEET), core::Point{x, y})
+    );
   }
 }
 

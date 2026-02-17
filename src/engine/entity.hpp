@@ -7,15 +7,10 @@
 #include <functional>
 #include <memory>
 #include <optional>
+#include <string>
 #include <vector>
 
 class Entities;
-
-enum CollideAction {
-  NONE,
-  DAMAGE_ALIENS,
-  DAMAGE_PLAYER,
-};
 
 struct CollideCtx {
     Assets const &assets;
@@ -24,13 +19,9 @@ struct CollideCtx {
 
 class Collidable {
   public:
+    virtual std::string get_type() const = 0;
     virtual core::Rect get_hitbox() const = 0;
-
-    virtual CollideAction get_collide_action() {
-      return CollideAction::NONE;
-    };
-
-    virtual void receive_collision([[maybe_unused]] CollideCtx const &ctx, [[maybe_unused]] CollideAction action) {};
+    virtual void collide_with([[maybe_unused]] CollideCtx const &ctx, [[maybe_unused]] Collidable &other) {};
 };
 
 class Drawable {
@@ -52,6 +43,8 @@ class Updateable {
 class Entity {
   public:
     virtual ~Entity() = default;
+
+    virtual std::string get_type() const = 0;
 
     virtual std::optional<std::reference_wrapper<Collidable>> as_collidable() {
       return std::nullopt;

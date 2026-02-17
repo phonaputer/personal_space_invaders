@@ -61,8 +61,8 @@ void Entities::check_collisions(CollideCtx const &ctx) {
       auto &b = collidables.at(j).get();
 
       if (are_touching(a.get_hitbox(), b.get_hitbox())) {
-        a.receive_collision(ctx, b.get_collide_action());
-        b.receive_collision(ctx, a.get_collide_action());
+        a.collide_with(ctx, b);
+        b.collide_with(ctx, a);
       }
     }
   }

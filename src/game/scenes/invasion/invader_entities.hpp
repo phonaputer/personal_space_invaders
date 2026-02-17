@@ -22,15 +22,16 @@ class AlienProjectile : public Entity, public Collidable, public Updateable, pub
 
   public:
     AlienProjectile(std::shared_ptr<SDL_Texture> texture, core::Point starting_position);
-    void update(UpdateCtx const &ctx) override;
-    void draw(SDL_Renderer *renderer) const override;
+    std::string get_type() const override;
     bool is_deleted() const override;
-    core::Rect get_hitbox() const override;
-    CollideAction get_collide_action() override;
-    void receive_collision(CollideCtx const &ctx, CollideAction action) override;
+
     std::optional<std::reference_wrapper<Collidable>> as_collidable() override;
+    core::Rect get_hitbox() const override;
+    void collide_with(CollideCtx const &ctx, Collidable &other) override;
     std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
+    void draw(SDL_Renderer *renderer) const override;
     std::optional<std::reference_wrapper<Updateable>> as_updateable() override;
+    void update(UpdateCtx const &ctx) override;
 };
 
 class AlienExplosion : public Entity, public Drawable, public Updateable {
@@ -45,11 +46,13 @@ class AlienExplosion : public Entity, public Drawable, public Updateable {
 
   public:
     AlienExplosion(std::shared_ptr<SDL_Texture> texture, core::Point position);
-    void draw(SDL_Renderer *renderer) const override;
+    std::string get_type() const override;
     bool is_deleted() const override;
+
     std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
-    void update(UpdateCtx const &ctx) override;
+    void draw(SDL_Renderer *renderer) const override;
     std::optional<std::reference_wrapper<Updateable>> as_updateable() override;
+    void update(UpdateCtx const &ctx) override;
 };
 
 class AlienOrchestrator;
@@ -75,32 +78,35 @@ class Alien : public Entity, public Drawable, public Collidable {
 
   public:
     Alien(AlienParams params);
+    std::string get_type() const override;
     void move(float speed);
     void descend_and_turn(float descend_speed);
     bool has_reached_edge();
     core::Point get_position() const;
     bool is_active() const;
 
-    void draw(SDL_Renderer *renderer) const override;
     std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
-
-    core::Rect get_hitbox() const override;
-    void receive_collision(CollideCtx const &ctx, CollideAction action) override;
+    void draw(SDL_Renderer *renderer) const override;
     std::optional<std::reference_wrapper<Collidable>> as_collidable() override;
+    core::Rect get_hitbox() const override;
+    void collide_with(CollideCtx const &ctx, Collidable &other) override;
 };
 
 class AlienOrchestrator : public Entity, Updateable {
   private:
     static constexpr int TICKS_PER_MOVE = 30;
+    static constexpr int ALIEN_SHOOT_CHANCE = 5; // The chance is the reciprocal of this number
 
     int tick_counter;
     std::vector<std::shared_ptr<Alien>> aliens;
 
   public:
     AlienOrchestrator();
+    std::string get_type() const override;
     void add_alien(std::shared_ptr<Alien> alien);
-    void update(UpdateCtx const &ctx) override;
+
     std::optional<std::reference_wrapper<Updateable>> as_updateable() override;
+    void update(UpdateCtx const &ctx) override;
 };
 
 class AlienFactory {

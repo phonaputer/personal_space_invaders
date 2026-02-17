@@ -3,12 +3,17 @@
 #include "engine/scene.hpp"
 #include "engine/sprites.hpp"
 #include "invader_entities.hpp"
+#include "invasion_constants.hpp"
 #include <SDL3/SDL.h>
 #include <memory>
 #include <vector>
 
 PlayerProjectile::PlayerProjectile(std::shared_ptr<SDL_Texture> texture, core::Point starting_position)
     : spritesheet(texture, 16, 16), x{starting_position.x}, y{starting_position.y}, deleted{false} {
+}
+
+std::string PlayerProjectile::get_type() const {
+  return entityType::PLAYER_PROJECTILE;
 }
 
 void PlayerProjectile::update([[maybe_unused]] UpdateCtx const &ctx) {
@@ -39,14 +44,10 @@ core::Rect PlayerProjectile::get_hitbox() const {
   };
 }
 
-CollideAction PlayerProjectile::get_collide_action() {
-  return CollideAction::DAMAGE_ALIENS;
-}
-
-void PlayerProjectile::receive_collision(
-    [[maybe_unused]] CollideCtx const &ctx, [[maybe_unused]] CollideAction action
-) {
-  deleted = true;
+void PlayerProjectile::collide_with([[maybe_unused]] CollideCtx const &ctx, Collidable &other) {
+  if (other.get_type() == entityType::ALIEN || other.get_type() == entityType::ALIEN_PROJECTILE) {
+    deleted = true;
+  }
 }
 
 std::optional<std::reference_wrapper<Collidable>> PlayerProjectile::as_collidable() {
@@ -70,6 +71,10 @@ Player::Player(std::shared_ptr<SDL_Texture> texture, core::Point starting_positi
   muzzle_flash_animation = std::make_unique<OnceAnimation>(Spritesheet(texture, 16, 16), 10, muzzle_flash_frames);
 }
 
+std::string Player::get_type() const {
+  return entityType::PLAYER;
+}
+
 void Player::update(UpdateCtx const &ctx) {
   if (ctx.user_inputs.is_engaged(PlayerInput::LEFT)) {
     x -= SPEED;
@@ -84,7 +89,9 @@ void Player::update(UpdateCtx const &ctx) {
     shot_clock = 0;
     muzzle_flash_animation->play();
     ctx.entities.add(
-        std::make_unique<PlayerProjectile>(ctx.assets.get_texture("space_invaders"), core::Point{x - 7, y - 20})
+        std::make_unique<PlayerProjectile>(
+            ctx.assets.get_texture(asset::PRIMARY_SPRITESHEET), core::Point{x - 7, y - 20}
+        )
     );
   }
   muzzle_flash_animation->update();

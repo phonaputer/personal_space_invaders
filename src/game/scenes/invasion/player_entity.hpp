@@ -21,15 +21,16 @@ class PlayerProjectile : public Entity, public Collidable, public Updateable, pu
 
   public:
     PlayerProjectile(std::shared_ptr<SDL_Texture> texture, core::Point starting_position);
-    void update(UpdateCtx const &ctx) override;
-    void draw(SDL_Renderer *renderer) const override;
+    std::string get_type() const override;
     bool is_deleted() const override;
-    core::Rect get_hitbox() const override;
-    CollideAction get_collide_action() override;
-    void receive_collision(CollideCtx const &ctx, CollideAction action) override;
+
     std::optional<std::reference_wrapper<Collidable>> as_collidable() override;
+    core::Rect get_hitbox() const override;
+    void collide_with(CollideCtx const &ctx, Collidable &other) override;
     std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
+    void draw(SDL_Renderer *renderer) const override;
     std::optional<std::reference_wrapper<Updateable>> as_updateable() override;
+    void update(UpdateCtx const &ctx) override;
 };
 
 class Player : public Entity, public Collidable, public Updateable, public Drawable {
@@ -47,10 +48,12 @@ class Player : public Entity, public Collidable, public Updateable, public Drawa
 
   public:
     Player(std::shared_ptr<SDL_Texture> texture, core::Point starting_position);
-    void update(UpdateCtx const &ctx) override;
-    void draw(SDL_Renderer *renderer) const override;
-    core::Rect get_hitbox() const override;
+    std::string get_type() const override;
+
     std::optional<std::reference_wrapper<Collidable>> as_collidable() override;
+    core::Rect get_hitbox() const override;
     std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
+    void draw(SDL_Renderer *renderer) const override;
     std::optional<std::reference_wrapper<Updateable>> as_updateable() override;
+    void update(UpdateCtx const &ctx) override;
 };
