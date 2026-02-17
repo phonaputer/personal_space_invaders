@@ -21,7 +21,7 @@ void PlayerProjectile::update([[maybe_unused]] UpdateCtx const &ctx) {
 }
 
 void PlayerProjectile::draw(SDL_Renderer *renderer) const {
-  spritesheet.draw_frame(renderer, {0, 6}, {x, y, DRAW_WIDTH, DRAW_HEIGHT});
+  spritesheet.draw_frame(renderer, {7, 1}, {x, y, DRAW_WIDTH, DRAW_HEIGHT});
 
 #ifndef NDEBUG
   auto hitbox = get_hitbox();
@@ -64,10 +64,10 @@ std::optional<std::reference_wrapper<Updateable>> PlayerProjectile::as_updateabl
 
 Player::Player(std::shared_ptr<SDL_Texture> texture, core::Point starting_position)
     : x{starting_position.x}, y{starting_position.y}, shot_clock{0} {
-  std::vector<Frame> frames = {{0, 5}, {1, 5}, {2, 5}};
+  std::vector<Frame> frames = {{0, 2}, {1, 2}, {2, 2}};
   animation = std::make_unique<Animation>(Spritesheet(texture, 16, 16), 5, frames);
 
-  std::vector<Frame> muzzle_flash_frames = {{3, 5}, {4, 5}};
+  std::vector<Frame> muzzle_flash_frames = {{3, 2}, {4, 2}};
   muzzle_flash_animation = std::make_unique<OnceAnimation>(Spritesheet(texture, 16, 16), 10, muzzle_flash_frames);
 }
 

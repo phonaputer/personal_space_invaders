@@ -10,7 +10,7 @@
 
 AlienProjectile::AlienProjectile(std::shared_ptr<SDL_Texture> texture, core::Point starting_position)
     : x{starting_position.x}, y{starting_position.y}, deleted{false} {
-  std::vector<Frame> frames = {{1, 6}, {2, 6}};
+  std::vector<Frame> frames = {{5, 2}, {6, 2}};
   animation = std::make_unique<Animation>(Spritesheet(texture, 16, 16), 10, frames);
 }
 
@@ -74,7 +74,7 @@ std::optional<std::reference_wrapper<Updateable>> AlienProjectile::as_updateable
 
 AlienExplosion::AlienExplosion(std::shared_ptr<SDL_Texture> texture, core::Point position)
     : tick_counter{0}, x{position.x}, y{position.y} {
-  std::vector<Frame> frames = {{0, 3}, {1, 3}, {2, 3}, {3, 3}};
+  std::vector<Frame> frames = {{3, 1}, {4, 1}, {5, 1}, {6, 1}};
   animation = std::make_unique<Animation>(Spritesheet(texture, 16, 16), 5, frames);
 }
 
@@ -110,7 +110,7 @@ std::shared_ptr<Alien> AlienFactory::new_jellyfish(core::Point starting_position
   auto entity = std::make_shared<Alien>(AlienParams{
       .texture = texture,
       .starting_position = starting_position,
-      .frames = {{0, 0}, {1, 0}, {2, 0}, {3, 0}},
+      .frames = {{1, 0}, {0, 0}, {1, 0}, {2, 0}},
       .hitbox = {5, 12, 50, 35},
   });
 
@@ -123,7 +123,7 @@ std::shared_ptr<Alien> AlienFactory::new_tadpole(core::Point starting_position) 
   auto entity = std::make_shared<Alien>(AlienParams{
       .texture = texture,
       .starting_position = starting_position,
-      .frames = {{1, 1}, {0, 1}, {1, 1}, {2, 1}},
+      .frames = {{4, 0}, {3, 0}, {4, 0}, {5, 0}},
       .hitbox = {17, 11, 23, 35},
   });
 
@@ -136,7 +136,7 @@ std::shared_ptr<Alien> AlienFactory::new_octopus(core::Point starting_position) 
   auto entity = std::make_shared<Alien>(AlienParams{
       .texture = texture,
       .starting_position = starting_position,
-      .frames = {{0, 2}, {1, 2}},
+      .frames = {{6, 0}, {7, 0}},
       .hitbox = {0, 15, 60, 32},
   });
 
@@ -149,7 +149,7 @@ std::shared_ptr<Alien> AlienFactory::new_crab(core::Point starting_position) {
   auto entity = std::make_shared<Alien>(AlienParams{
       .texture = texture,
       .starting_position = starting_position,
-      .frames = {{1, 4}, {0, 4}, {1, 4}, {2, 4}},
+      .frames = {{1, 1}, {0, 1}, {1, 1}, {2, 1}},
       .hitbox = {5, 14, 50, 31},
   });
 
