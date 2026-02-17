@@ -69,6 +69,7 @@ class Alien : public Entity, public Drawable, public Collidable {
     static constexpr float DRAW_WIDTH = 60;
     static constexpr float DRAW_HEIGHT = 60;
 
+    const core::Point starting_position;
     std::unique_ptr<Animation> animation;
     float x;
     float y;
@@ -81,8 +82,9 @@ class Alien : public Entity, public Drawable, public Collidable {
     std::string get_type() const override;
     void move(float speed);
     void descend_and_turn(float descend_speed);
-    bool has_reached_edge();
+    bool has_reached_edge() const;
     core::Point get_position() const;
+    void rerack();
     bool is_active() const;
 
     std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
