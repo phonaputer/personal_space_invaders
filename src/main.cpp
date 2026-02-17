@@ -16,13 +16,15 @@
 // X * Have bullets delete bad guys
 // X * Have bad guys explode upon deletion
 // X * Have bad guys shoot lazers
-// * Have lazers damage player
-// * Have lazers not damage bad guys
+// X * Have lazers not damage bad guys
+// X * Reset board upon destroying all bad guys
+// * Track score
+// * Have bad guy lazers damage player
+// * Have a system of "lives" for the player
 // * Sound effects
 // * BGM (space invaders style where it speeds up along with the aliens)
-// * Have a system of "lives" for the player
-// * Reset board upon destroying all bad guys
-// * Track score
+// * Start menu
+// * Escape menu
 // * Throw in the mystery ship for bonus points
 // * Maybe some powerups?
 
