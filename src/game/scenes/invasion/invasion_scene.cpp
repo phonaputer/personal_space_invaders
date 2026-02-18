@@ -4,6 +4,7 @@
 #include "invaders.hpp"
 #include "invasion_constants.hpp"
 #include "player.hpp"
+#include "scoreboard.hpp"
 #include <memory>
 
 void InvasionScene::preload_assets(PreloadAssetsCtx const &ctx) {
@@ -11,10 +12,16 @@ void InvasionScene::preload_assets(PreloadAssetsCtx const &ctx) {
 }
 
 void InvasionScene::initialize(SceneCtx ctx) {
-  auto alien_orchestrator = std::make_unique<AlienOrchestrator>();
+  auto spritesheet_texture = ctx.assets.get_texture(asset::PRIMARY_SPRITESHEET);
+
+  auto scoreboard = std::make_shared<Scoreboard>(spritesheet_texture, core::Point{10, 10});
+  ctx.entities.add(scoreboard);
+
+  auto alien_orchestrator = std::make_shared<AlienOrchestrator>();
+  ctx.entities.add(alien_orchestrator);
 
   // TODO can the preload be removed and the texture loading added here instead?
-  auto alien_factory = AlienFactory(ctx, ctx.assets.get_texture(asset::PRIMARY_SPRITESHEET));
+  auto alien_factory = AlienFactory(ctx, spritesheet_texture, scoreboard);
 
   const float starting_x_pos = 200;
   float x_pos = starting_x_pos;
@@ -57,7 +64,5 @@ void InvasionScene::initialize(SceneCtx ctx) {
     x_pos += alien_width + col_spacing;
   }
 
-  ctx.entities.add(std::move(alien_orchestrator));
-
-  ctx.entities.add(std::make_unique<Player>(ctx.assets.get_texture(asset::PRIMARY_SPRITESHEET), core::Point{500, 700}));
+  ctx.entities.add(std::make_unique<Player>(spritesheet_texture, core::Point{500, 700}));
 }

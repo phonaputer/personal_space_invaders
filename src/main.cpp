@@ -18,7 +18,7 @@
 // X * Have bad guys shoot lazers
 // X * Have lazers not damage bad guys
 // X * Reset board upon destroying all bad guys
-// * Track score
+// X * Track score
 // * Have bad guy lazers damage player
 // * Have a system of "lives" for the player
 // * Sound effects

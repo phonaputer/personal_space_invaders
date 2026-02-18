@@ -107,9 +107,12 @@ std::optional<std::reference_wrapper<Updateable>> AlienExplosion::as_updateable(
   return std::ref<Updateable>(*this);
 }
 
-AlienFactory::AlienFactory(SceneCtx ctx, std::shared_ptr<SDL_Texture> texture)
+AlienFactory::AlienFactory(
+    SceneCtx ctx, std::shared_ptr<SDL_Texture> texture, std::shared_ptr<ScoreNotifier> score_notifier
+)
     : ctx{ctx},
-      texture{texture} {
+      texture{texture},
+      score_notifier{score_notifier} {
 }
 
 std::shared_ptr<Alien> AlienFactory::new_jellyfish(core::Point starting_position) {
@@ -118,6 +121,8 @@ std::shared_ptr<Alien> AlienFactory::new_jellyfish(core::Point starting_position
       .starting_position = starting_position,
       .frames = {{1, 0}, {0, 0}, {1, 0}, {2, 0}},
       .hitbox = {5, 12, 50, 35},
+      .score_notifier = score_notifier,
+      .score = 30,
   });
 
   ctx.entities.add(entity);
@@ -131,6 +136,8 @@ std::shared_ptr<Alien> AlienFactory::new_tadpole(core::Point starting_position) 
       .starting_position = starting_position,
       .frames = {{4, 0}, {3, 0}, {4, 0}, {5, 0}},
       .hitbox = {17, 11, 23, 35},
+      .score_notifier = score_notifier,
+      .score = 10,
   });
 
   ctx.entities.add(entity);
@@ -144,6 +151,8 @@ std::shared_ptr<Alien> AlienFactory::new_octopus(core::Point starting_position) 
       .starting_position = starting_position,
       .frames = {{6, 0}, {7, 0}},
       .hitbox = {0, 15, 60, 32},
+      .score_notifier = score_notifier,
+      .score = 40,
   });
 
   ctx.entities.add(entity);
@@ -157,6 +166,8 @@ std::shared_ptr<Alien> AlienFactory::new_crab(core::Point starting_position) {
       .starting_position = starting_position,
       .frames = {{1, 1}, {0, 1}, {1, 1}, {2, 1}},
       .hitbox = {5, 14, 50, 31},
+      .score_notifier = score_notifier,
+      .score = 20,
   });
 
   ctx.entities.add(entity);
@@ -170,7 +181,9 @@ Alien::Alien(AlienParams params)
       y{params.starting_position.y},
       move_right{true},
       hitbox{params.hitbox},
-      deactivated{false} {
+      deactivated{false},
+      score_notifier{params.score_notifier},
+      score{params.score} {
   animation = std::make_unique<Animation>(Spritesheet(params.texture, 16, 16), 17, params.frames);
 }
 
@@ -233,6 +246,7 @@ void Alien::collide_with(CollideCtx const &ctx, Collidable &other) {
     ctx.entities.add(
         std::make_shared<AlienExplosion>(ctx.assets.get_texture(asset::PRIMARY_SPRITESHEET), core::Point{x, y})
     );
+    score_notifier->notify_player_scored(score);
   }
 }
 

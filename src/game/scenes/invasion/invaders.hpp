@@ -55,6 +55,11 @@ class AlienExplosion : public Entity, public Drawable, public Updateable {
     void update(UpdateCtx const &ctx) override;
 };
 
+class ScoreNotifier {
+  public:
+    virtual void notify_player_scored(unsigned int amount) = 0;
+};
+
 class AlienOrchestrator;
 
 struct AlienParams {
@@ -62,6 +67,8 @@ struct AlienParams {
     core::Point starting_position;
     std::vector<Frame> frames;
     core::Rect hitbox;
+    std::shared_ptr<ScoreNotifier> score_notifier;
+    unsigned int score;
 };
 
 class Alien : public Entity, public Drawable, public Collidable {
@@ -76,6 +83,8 @@ class Alien : public Entity, public Drawable, public Collidable {
     bool move_right;
     const core::Rect hitbox;
     bool deactivated;
+    std::shared_ptr<ScoreNotifier> score_notifier;
+    const unsigned int score;
 
   public:
     Alien(AlienParams params);
@@ -115,9 +124,10 @@ class AlienFactory {
   private:
     SceneCtx ctx;
     std::shared_ptr<SDL_Texture> texture;
+    std::shared_ptr<ScoreNotifier> score_notifier;
 
   public:
-    AlienFactory(SceneCtx ctx, std::shared_ptr<SDL_Texture> texture);
+    AlienFactory(SceneCtx ctx, std::shared_ptr<SDL_Texture> texture, std::shared_ptr<ScoreNotifier> score_notifier);
     std::shared_ptr<Alien> new_jellyfish(core::Point starting_position);
     std::shared_ptr<Alien> new_tadpole(core::Point starting_position);
     std::shared_ptr<Alien> new_octopus(core::Point starting_position);
