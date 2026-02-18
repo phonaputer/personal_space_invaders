@@ -42,9 +42,11 @@ class Player : public Entity, public Collidable, public Updateable, public Drawa
 
     std::unique_ptr<Animation> animation;
     std::unique_ptr<OnceAnimation> muzzle_flash_animation;
+    std::unique_ptr<Animation> explosion_animation;
     float x;
     float y;
     int shot_clock;
+    bool exploding;
 
   public:
     Player(std::shared_ptr<SDL_Texture> texture, core::Point starting_position);
@@ -52,6 +54,7 @@ class Player : public Entity, public Collidable, public Updateable, public Drawa
 
     std::optional<std::reference_wrapper<Collidable>> as_collidable() override;
     core::Rect get_hitbox() const override;
+    void collide_with(CollideCtx const &ctx, Collidable &other) override;
     std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
     void draw(SDL_Renderer *renderer) const override;
     std::optional<std::reference_wrapper<Updateable>> as_updateable() override;

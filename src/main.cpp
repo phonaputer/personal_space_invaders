@@ -19,7 +19,8 @@
 // X * Have lazers not damage bad guys
 // X * Reset board upon destroying all bad guys
 // X * Track score
-// * Have bad guy lazers damage player
+// X * Have bad guy lazers damage player
+// * Have game reset after player blows up
 // * Have a system of "lives" for the player
 // * Sound effects
 // * BGM (space invaders style where it speeds up along with the aliens)

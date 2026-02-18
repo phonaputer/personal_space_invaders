@@ -68,12 +68,16 @@ std::optional<std::reference_wrapper<Updateable>> PlayerProjectile::as_updateabl
 Player::Player(std::shared_ptr<SDL_Texture> texture, core::Point starting_position)
     : x{starting_position.x},
       y{starting_position.y},
-      shot_clock{0} {
+      shot_clock{0},
+      exploding{false} {
   std::vector<Frame> frames = {{0, 2}, {1, 2}, {2, 2}};
   animation = std::make_unique<Animation>(Spritesheet(texture, 16, 16), 5, frames);
 
   std::vector<Frame> muzzle_flash_frames = {{3, 2}, {4, 2}};
   muzzle_flash_animation = std::make_unique<OnceAnimation>(Spritesheet(texture, 16, 16), 10, muzzle_flash_frames);
+
+  std::vector<Frame> explosion_frames = {{0, 3}, {1, 3}, {2, 3}, {1, 3}};
+  explosion_animation = std::make_unique<Animation>(Spritesheet(texture, 16, 16), 6, explosion_frames);
 }
 
 std::string Player::get_type() const {
@@ -81,6 +85,11 @@ std::string Player::get_type() const {
 }
 
 void Player::update(UpdateCtx const &ctx) {
+  if (exploding) {
+    explosion_animation->update();
+    return;
+  }
+
   if (ctx.user_inputs.is_engaged(PlayerInput::LEFT)) {
     x -= SPEED;
     animation->update();
@@ -104,6 +113,12 @@ void Player::update(UpdateCtx const &ctx) {
 
 void Player::draw(SDL_Renderer *renderer) const {
   core::Rect rect = {x, y, DRAW_WIDTH, DRAW_HEIGHT};
+
+  if (exploding) {
+    explosion_animation->draw(renderer, rect);
+    return;
+  }
+
   animation->draw(renderer, rect);
   muzzle_flash_animation->draw(renderer, rect);
 
@@ -122,6 +137,12 @@ core::Rect Player::get_hitbox() const {
       .width = DRAW_WIDTH - 2,
       .height = DRAW_HEIGHT - 38,
   };
+}
+
+void Player::collide_with([[maybe_unused]] CollideCtx const &ctx, Collidable &other) {
+  if (other.get_type() == entityType::ALIEN_PROJECTILE) {
+    exploding = true;
+  }
 }
 
 std::optional<std::reference_wrapper<Collidable>> Player::as_collidable() {
