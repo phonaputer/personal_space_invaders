@@ -1,4 +1,4 @@
-#include "invader_entities.hpp"
+#include "invaders.hpp"
 #include "engine/scene.hpp"
 #include "engine/sprites.hpp"
 #include "invasion_constants.hpp"
@@ -9,7 +9,9 @@
 #include <vector>
 
 AlienProjectile::AlienProjectile(std::shared_ptr<SDL_Texture> texture, core::Point starting_position)
-    : x{starting_position.x}, y{starting_position.y}, deleted{false} {
+    : x{starting_position.x},
+      y{starting_position.y},
+      deleted{false} {
   std::vector<Frame> frames = {{5, 2}, {6, 2}};
   animation = std::make_unique<Animation>(Spritesheet(texture, 16, 16), 10, frames);
 }
@@ -73,7 +75,9 @@ std::optional<std::reference_wrapper<Updateable>> AlienProjectile::as_updateable
 }
 
 AlienExplosion::AlienExplosion(std::shared_ptr<SDL_Texture> texture, core::Point position)
-    : tick_counter{0}, x{position.x}, y{position.y} {
+    : tick_counter{0},
+      x{position.x},
+      y{position.y} {
   std::vector<Frame> frames = {{3, 1}, {4, 1}, {5, 1}, {6, 1}};
   animation = std::make_unique<Animation>(Spritesheet(texture, 16, 16), 5, frames);
 }
@@ -103,7 +107,9 @@ std::optional<std::reference_wrapper<Updateable>> AlienExplosion::as_updateable(
   return std::ref<Updateable>(*this);
 }
 
-AlienFactory::AlienFactory(SceneCtx ctx, std::shared_ptr<SDL_Texture> texture) : ctx{ctx}, texture{texture} {
+AlienFactory::AlienFactory(SceneCtx ctx, std::shared_ptr<SDL_Texture> texture)
+    : ctx{ctx},
+      texture{texture} {
 }
 
 std::shared_ptr<Alien> AlienFactory::new_jellyfish(core::Point starting_position) {
@@ -251,7 +257,8 @@ std::optional<std::reference_wrapper<Collidable>> Alien::as_collidable() {
   return std::ref<Collidable>(*this);
 }
 
-AlienOrchestrator::AlienOrchestrator() : tick_counter{0} {
+AlienOrchestrator::AlienOrchestrator()
+    : tick_counter{0} {
 }
 
 std::string AlienOrchestrator::get_type() const {

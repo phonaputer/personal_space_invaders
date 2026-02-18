@@ -1,8 +1,8 @@
 #pragma once
 
 #include "engine/scene.hpp"
-#include "invader_entities.hpp"
-#include "player_entity.hpp"
+#include "invaders.hpp"
+#include "player.hpp"
 #include <memory>
 #include <vector>
 

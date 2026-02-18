@@ -1,9 +1,9 @@
 #include "invasion_scene.hpp"
 #include "engine/core.hpp"
 #include "engine/scene.hpp"
-#include "invader_entities.hpp"
+#include "invaders.hpp"
 #include "invasion_constants.hpp"
-#include "player_entity.hpp"
+#include "player.hpp"
 #include <memory>
 
 void InvasionScene::preload_assets(PreloadAssetsCtx const &ctx) {

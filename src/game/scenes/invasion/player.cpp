@@ -1,15 +1,18 @@
-#include "player_entity.hpp"
+#include "player.hpp"
 #include "engine/core.hpp"
+#include "engine/input.hpp"
 #include "engine/scene.hpp"
 #include "engine/sprites.hpp"
-#include "invader_entities.hpp"
 #include "invasion_constants.hpp"
 #include <SDL3/SDL.h>
 #include <memory>
 #include <vector>
 
 PlayerProjectile::PlayerProjectile(std::shared_ptr<SDL_Texture> texture, core::Point starting_position)
-    : spritesheet(texture, 16, 16), x{starting_position.x}, y{starting_position.y}, deleted{false} {
+    : spritesheet(texture, 16, 16),
+      x{starting_position.x},
+      y{starting_position.y},
+      deleted{false} {
 }
 
 std::string PlayerProjectile::get_type() const {
@@ -63,7 +66,9 @@ std::optional<std::reference_wrapper<Updateable>> PlayerProjectile::as_updateabl
 }
 
 Player::Player(std::shared_ptr<SDL_Texture> texture, core::Point starting_position)
-    : x{starting_position.x}, y{starting_position.y}, shot_clock{0} {
+    : x{starting_position.x},
+      y{starting_position.y},
+      shot_clock{0} {
   std::vector<Frame> frames = {{0, 2}, {1, 2}, {2, 2}};
   animation = std::make_unique<Animation>(Spritesheet(texture, 16, 16), 5, frames);
 
