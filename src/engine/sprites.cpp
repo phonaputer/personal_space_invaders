@@ -5,7 +5,9 @@
 #include <vector>
 
 Spritesheet::Spritesheet(std::shared_ptr<SDL_Texture> src, float src_frame_width, float src_frame_height)
-    : src{src}, src_frame_width{src_frame_width}, src_frame_height{src_frame_height} {
+    : src{src},
+      src_frame_width{src_frame_width},
+      src_frame_height{src_frame_height} {
 }
 
 void Spritesheet::draw_frame(SDL_Renderer *renderer, const Frame &frame, const core::Rect &draw_rect) const {
@@ -26,7 +28,9 @@ void Spritesheet::draw_frame(SDL_Renderer *renderer, const Frame &frame, const c
 }
 
 Animation::Animation(Spritesheet spritesheet, int ticks_per_frame, std::vector<Frame> frames)
-    : spritesheet{spritesheet}, ticks_per_frame{ticks_per_frame}, frames{frames} {
+    : spritesheet{spritesheet},
+      ticks_per_frame{ticks_per_frame},
+      frames{frames} {
   tick_counter = 0;
   cur_frame = 0;
 }
@@ -62,6 +66,11 @@ void Animation::next_frame() {
   if (cur_frame >= frames.size()) {
     cur_frame = 0;
   }
+}
+
+void Animation::rewind() {
+  cur_frame = 0;
+  tick_counter = 0;
 }
 
 void Animation::draw(SDL_Renderer *renderer, const core::Rect &draw_rect) const {

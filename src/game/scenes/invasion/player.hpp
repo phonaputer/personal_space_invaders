@@ -38,8 +38,10 @@ class Player : public Entity, public Collidable, public Updateable, public Drawa
     static constexpr float DRAW_WIDTH = 60;
     static constexpr float DRAW_HEIGHT = 60;
     static constexpr float SPEED = 4;
-    static constexpr const int TICKS_PER_SHOT = 35;
+    static constexpr int TICKS_PER_SHOT = 35;
+    static constexpr int EXPLOSION_TICKS = 100;
 
+    core::Point starting_position;
     std::unique_ptr<Animation> animation;
     std::unique_ptr<OnceAnimation> muzzle_flash_animation;
     std::unique_ptr<Animation> explosion_animation;
@@ -47,6 +49,9 @@ class Player : public Entity, public Collidable, public Updateable, public Drawa
     float y;
     int shot_clock;
     bool exploding;
+    int explosion_clock;
+
+    void rerack();
 
   public:
     Player(std::shared_ptr<SDL_Texture> texture, core::Point starting_position);

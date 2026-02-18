@@ -20,8 +20,10 @@
 // X * Reset board upon destroying all bad guys
 // X * Track score
 // X * Have bad guy lazers damage player
-// * Have game reset after player blows up
-// * Have a system of "lives" for the player
+// * Pause enemies while player is blowing up
+// * Have a system of "lives" for the player, displaying in the UI
+// * Game over when all lives are lost
+// * Can reset game after game over
 // * Sound effects
 // * BGM (space invaders style where it speeds up along with the aliens)
 // * Start menu

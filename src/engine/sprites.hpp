@@ -35,6 +35,7 @@ class Animation {
     void update();
     void update_backwards();
     void next_frame();
+    void rewind();
     void draw(SDL_Renderer *renderer, const core::Rect &draw_rect) const;
 };
 

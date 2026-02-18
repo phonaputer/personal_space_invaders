@@ -66,10 +66,12 @@ std::optional<std::reference_wrapper<Updateable>> PlayerProjectile::as_updateabl
 }
 
 Player::Player(std::shared_ptr<SDL_Texture> texture, core::Point starting_position)
-    : x{starting_position.x},
+    : starting_position{starting_position},
+      x{starting_position.x},
       y{starting_position.y},
       shot_clock{0},
-      exploding{false} {
+      exploding{false},
+      explosion_clock{0} {
   std::vector<Frame> frames = {{0, 2}, {1, 2}, {2, 2}};
   animation = std::make_unique<Animation>(Spritesheet(texture, 16, 16), 5, frames);
 
@@ -84,8 +86,22 @@ std::string Player::get_type() const {
   return entityType::PLAYER;
 }
 
+void Player::rerack() {
+  exploding = false;
+  x = starting_position.x;
+  y = starting_position.y;
+  animation->rewind();
+  explosion_animation->rewind();
+}
+
 void Player::update(UpdateCtx const &ctx) {
   if (exploding) {
+    if (explosion_clock >= EXPLOSION_TICKS) {
+      explosion_clock = 0;
+      rerack();
+      return;
+    }
+    explosion_clock++;
     explosion_animation->update();
     return;
   }
