@@ -20,7 +20,7 @@
 // X * Reset board upon destroying all bad guys
 // X * Track score
 // X * Have bad guy lazers damage player
-// * Pause enemies while player is blowing up
+// X * Pause enemies while player is blowing up
 // * Have a system of "lives" for the player, displaying in the UI
 // * Game over when all lives are lost
 // * Can reset game after game over

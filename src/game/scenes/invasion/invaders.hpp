@@ -4,6 +4,7 @@
 #include "engine/entity.hpp"
 #include "engine/scene.hpp"
 #include "engine/sprites.hpp"
+#include "player.hpp"
 #include <SDL3/SDL.h>
 #include <functional>
 #include <memory>
@@ -110,9 +111,10 @@ class AlienOrchestrator : public Entity, Updateable {
 
     int tick_counter;
     std::vector<std::shared_ptr<Alien>> aliens;
+    std::shared_ptr<Player> player;
 
   public:
-    AlienOrchestrator();
+    AlienOrchestrator(std::shared_ptr<Player> player);
     std::string get_type() const override;
     void add_alien(std::shared_ptr<Alien> alien);
 

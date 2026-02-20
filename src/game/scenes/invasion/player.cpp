@@ -86,6 +86,10 @@ std::string Player::get_type() const {
   return entityType::PLAYER;
 }
 
+bool Player::is_exploding() const {
+  return exploding;
+}
+
 void Player::rerack() {
   exploding = false;
   x = starting_position.x;

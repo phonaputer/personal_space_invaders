@@ -9,5 +9,5 @@
 class InvasionScene : public Scene {
   public:
     void preload_assets(PreloadAssetsCtx const &ctx) override;
-    void initialize(SceneCtx ctx) override;
+    void initialize(SceneCtx const &ctx) override;
 };

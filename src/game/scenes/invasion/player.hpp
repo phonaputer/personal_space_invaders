@@ -56,6 +56,7 @@ class Player : public Entity, public Collidable, public Updateable, public Drawa
   public:
     Player(std::shared_ptr<SDL_Texture> texture, core::Point starting_position);
     std::string get_type() const override;
+    bool is_exploding() const;
 
     std::optional<std::reference_wrapper<Collidable>> as_collidable() override;
     core::Rect get_hitbox() const override;

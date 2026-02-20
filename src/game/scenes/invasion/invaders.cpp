@@ -271,8 +271,9 @@ std::optional<std::reference_wrapper<Collidable>> Alien::as_collidable() {
   return std::ref<Collidable>(*this);
 }
 
-AlienOrchestrator::AlienOrchestrator()
-    : tick_counter{0} {
+AlienOrchestrator::AlienOrchestrator(std::shared_ptr<Player> player)
+    : tick_counter{0},
+      player{player} {
 }
 
 std::string AlienOrchestrator::get_type() const {
@@ -284,6 +285,10 @@ void AlienOrchestrator::add_alien(std::shared_ptr<Alien> alien) {
 }
 
 void AlienOrchestrator::update([[maybe_unused]] UpdateCtx const &ctx) {
+  if (player->is_exploding()) {
+    return;
+  }
+
   tick_counter++;
   if (tick_counter < TICKS_PER_MOVE) {
     return;
