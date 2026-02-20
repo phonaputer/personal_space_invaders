@@ -42,7 +42,10 @@ Scoreboard::Scoreboard(std::shared_ptr<SDL_Texture> texture, core::Point positio
     : text_renderer(texture),
       x{position.x},
       y{position.y},
-      current_score{0} {
+      high_score{0},
+      current_score{0},
+      current_lives{0},
+      player_is_dead{false} {
 }
 
 std::string Scoreboard::get_type() const {
@@ -51,6 +54,23 @@ std::string Scoreboard::get_type() const {
 
 void Scoreboard::notify_player_scored(unsigned int amount) {
   current_score += amount;
+  if (current_score > high_score) {
+    high_score = current_score;
+  }
+}
+
+void Scoreboard::notify_player_died(int remaining_lives) {
+  current_lives = remaining_lives;
+  player_is_dead = true;
+}
+
+void Scoreboard::notify_player_rerack(int remaining_lives) {
+  if (current_lives < 1) {
+    current_score = 0;
+  }
+
+  current_lives = remaining_lives;
+  player_is_dead = false;
 }
 
 std::optional<std::reference_wrapper<Drawable>> Scoreboard::as_drawable() {
@@ -59,4 +79,10 @@ std::optional<std::reference_wrapper<Drawable>> Scoreboard::as_drawable() {
 
 void Scoreboard::draw(SDL_Renderer *renderer) const {
   text_renderer.render_text(renderer, {x, y}, std::format("score:{}", current_score));
+  text_renderer.render_text(renderer, {core::WINDOW_WIDTH / 2 - 110, y}, std::format("hi-score:{}", high_score));
+  text_renderer.render_text(renderer, {core::WINDOW_WIDTH - 165, y}, std::format("lives:{}", current_lives));
+
+  if (player_is_dead && current_lives < 1) {
+    text_renderer.render_text(renderer, {core::WINDOW_WIDTH / 2 - 100, core::WINDOW_HEIGHT / 2}, "game over");
+  }
 }

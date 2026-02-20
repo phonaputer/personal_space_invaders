@@ -21,17 +21,22 @@ class TextRenderer {
     void render_text(SDL_Renderer *renderer, core::Point location, std::string text) const;
 };
 
-class Scoreboard : public Entity, public Drawable, public ScoreNotifier {
+class Scoreboard : public Entity, public Drawable, public ScoreNotifier, public PlayerStatusNotifier {
   private:
     TextRenderer text_renderer;
     const float x;
     const float y;
+    unsigned int high_score;
     unsigned int current_score;
+    int current_lives;
+    bool player_is_dead;
 
   public:
     Scoreboard(std::shared_ptr<SDL_Texture> texture, core::Point position);
     std::string get_type() const override;
     void notify_player_scored(unsigned int amount) override;
+    void notify_player_died(int remaining_lives) override;
+    void notify_player_rerack(int remaining_lives) override;
 
     std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
     void draw(SDL_Renderer *renderer) const override;

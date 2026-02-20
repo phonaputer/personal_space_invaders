@@ -15,14 +15,17 @@ void InvasionScene::preload_assets(PreloadAssetsCtx const &ctx) {
 void InvasionScene::initialize(SceneCtx const &ctx) {
   auto spritesheet_texture = ctx.assets.get_texture(asset::PRIMARY_SPRITESHEET);
 
-  auto player = std::make_shared<Player>(spritesheet_texture, core::Point{500, 700});
-  ctx.entities.add(player);
-
   auto scoreboard = std::make_shared<Scoreboard>(spritesheet_texture, core::Point{10, 10});
   ctx.entities.add(scoreboard);
 
-  auto alien_orchestrator = std::make_shared<AlienOrchestrator>(player);
+  auto alien_orchestrator = std::make_shared<AlienOrchestrator>();
   ctx.entities.add(alien_orchestrator);
+
+  auto player = std::make_shared<Player>(spritesheet_texture, core::Point{500, 700});
+  ctx.entities.add(player);
+  player->add_notifier(scoreboard);
+  player->add_notifier(alien_orchestrator);
+  player->rerack();
 
   auto alien_factory = AlienFactory(ctx, spritesheet_texture, scoreboard);
 

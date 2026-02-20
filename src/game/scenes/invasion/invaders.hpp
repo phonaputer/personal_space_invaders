@@ -104,19 +104,23 @@ class Alien : public Entity, public Drawable, public Collidable {
     void collide_with(CollideCtx const &ctx, Collidable &other) override;
 };
 
-class AlienOrchestrator : public Entity, Updateable {
+class AlienOrchestrator : public Entity, public Updateable, public PlayerStatusNotifier {
   private:
     static constexpr int TICKS_PER_MOVE = 30;
     static constexpr int ALIEN_SHOOT_CHANCE = 5; // The chance is the reciprocal of this number
 
     int tick_counter;
     std::vector<std::shared_ptr<Alien>> aliens;
-    std::shared_ptr<Player> player;
+    bool is_player_dead;
+    int player_lives;
 
   public:
-    AlienOrchestrator(std::shared_ptr<Player> player);
+    AlienOrchestrator();
     std::string get_type() const override;
     void add_alien(std::shared_ptr<Alien> alien);
+
+    void notify_player_died(int remaining_lives) override;
+    void notify_player_rerack(int remaining_lives) override;
 
     std::optional<std::reference_wrapper<Updateable>> as_updateable() override;
     void update(UpdateCtx const &ctx) override;

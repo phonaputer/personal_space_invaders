@@ -8,6 +8,12 @@
 #include <functional>
 #include <memory>
 
+class PlayerStatusNotifier {
+  public:
+    virtual void notify_player_died(int remaining_lives) = 0;
+    virtual void notify_player_rerack(int remaining_lives) = 0;
+};
+
 class PlayerProjectile : public Entity, public Collidable, public Updateable, public Drawable {
   private:
     static constexpr float DRAW_WIDTH = 60;
@@ -40,6 +46,7 @@ class Player : public Entity, public Collidable, public Updateable, public Drawa
     static constexpr float SPEED = 4;
     static constexpr int TICKS_PER_SHOT = 35;
     static constexpr int EXPLOSION_TICKS = 100;
+    static constexpr int MAX_LIVES = 3;
 
     core::Point starting_position;
     std::unique_ptr<Animation> animation;
@@ -50,13 +57,14 @@ class Player : public Entity, public Collidable, public Updateable, public Drawa
     int shot_clock;
     bool exploding;
     int explosion_clock;
-
-    void rerack();
+    std::vector<std::shared_ptr<PlayerStatusNotifier>> status_notifiers;
+    int lives;
 
   public:
     Player(std::shared_ptr<SDL_Texture> texture, core::Point starting_position);
     std::string get_type() const override;
-    bool is_exploding() const;
+    void rerack();
+    void add_notifier(std::shared_ptr<PlayerStatusNotifier> notifier);
 
     std::optional<std::reference_wrapper<Collidable>> as_collidable() override;
     core::Rect get_hitbox() const override;

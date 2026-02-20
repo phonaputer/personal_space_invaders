@@ -71,7 +71,8 @@ Player::Player(std::shared_ptr<SDL_Texture> texture, core::Point starting_positi
       y{starting_position.y},
       shot_clock{0},
       exploding{false},
-      explosion_clock{0} {
+      explosion_clock{0},
+      lives{MAX_LIVES} {
   std::vector<Frame> frames = {{0, 2}, {1, 2}, {2, 2}};
   animation = std::make_unique<Animation>(Spritesheet(texture, 16, 16), 5, frames);
 
@@ -86,8 +87,8 @@ std::string Player::get_type() const {
   return entityType::PLAYER;
 }
 
-bool Player::is_exploding() const {
-  return exploding;
+void Player::add_notifier(std::shared_ptr<PlayerStatusNotifier> notifier) {
+  status_notifiers.push_back(notifier);
 }
 
 void Player::rerack() {
@@ -96,17 +97,27 @@ void Player::rerack() {
   y = starting_position.y;
   animation->rewind();
   explosion_animation->rewind();
+
+  for (const auto &notifier : status_notifiers) {
+    notifier->notify_player_rerack(lives);
+  }
 }
 
 void Player::update(UpdateCtx const &ctx) {
   if (exploding) {
-    if (explosion_clock >= EXPLOSION_TICKS) {
+    explosion_animation->update();
+
+    if (lives > 0 && explosion_clock >= EXPLOSION_TICKS) {
       explosion_clock = 0;
       rerack();
-      return;
+    } else if (explosion_clock >= EXPLOSION_TICKS * 2.5) {
+      explosion_clock = 0;
+      lives = MAX_LIVES;
+      rerack();
+    } else {
+      explosion_clock++;
     }
-    explosion_clock++;
-    explosion_animation->update();
+
     return;
   }
 
@@ -162,6 +173,11 @@ core::Rect Player::get_hitbox() const {
 void Player::collide_with([[maybe_unused]] CollideCtx const &ctx, Collidable &other) {
   if (other.get_type() == entityType::ALIEN_PROJECTILE) {
     exploding = true;
+    lives--;
+
+    for (const auto &notifier : status_notifiers) {
+      notifier->notify_player_died(lives);
+    }
   }
 }
 

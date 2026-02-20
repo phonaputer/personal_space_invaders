@@ -21,9 +21,10 @@
 // X * Track score
 // X * Have bad guy lazers damage player
 // X * Pause enemies while player is blowing up
-// * Have a system of "lives" for the player, displaying in the UI
-// * Game over when all lives are lost
-// * Can reset game after game over
+// X * Have a system of "lives" for the player, displaying in the UI
+// X * Game over when all lives are lost
+// ? * Can reset game after game over
+// * aliens get faster when less are remaining
 // * Sound effects
 // * BGM (space invaders style where it speeds up along with the aliens)
 // * Start menu
