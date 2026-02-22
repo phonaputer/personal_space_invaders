@@ -57,8 +57,9 @@ void AlienProjectile::collide_with([[maybe_unused]] CollideCtx const &ctx, Colli
   if (other.get_type() == entityType::PLAYER_PROJECTILE) {
     deleted = true;
     ctx.entities.add(
-        std::make_shared<AlienExplosion>(ctx.assets.get_texture(asset::PRIMARY_SPRITESHEET), core::Point{x, y})
+        std::make_shared<AlienExplosion>(ctx.assets.get_texture(image::PRIMARY_SPRITESHEET), core::Point{x, y})
     );
+    ctx.assets.play_audio(sound::ALIEN_EXPLOSION);
   }
 }
 
@@ -244,8 +245,9 @@ void Alien::collide_with(CollideCtx const &ctx, Collidable &other) {
   if (other.get_type() == entityType::PLAYER_PROJECTILE) {
     deactivated = true;
     ctx.entities.add(
-        std::make_shared<AlienExplosion>(ctx.assets.get_texture(asset::PRIMARY_SPRITESHEET), core::Point{x, y})
+        std::make_shared<AlienExplosion>(ctx.assets.get_texture(image::PRIMARY_SPRITESHEET), core::Point{x, y})
     );
+    ctx.assets.play_audio(sound::ALIEN_EXPLOSION);
     score_notifier->notify_player_scored(score);
   }
 }
@@ -343,9 +345,10 @@ void AlienOrchestrator::update([[maybe_unused]] UpdateCtx const &ctx) {
     auto position = active_aliens.at(selected_alien)->get_position();
     ctx.entities.add(
         std::make_shared<AlienProjectile>(
-            ctx.assets.get_texture(asset::PRIMARY_SPRITESHEET), core::Point{position.x, position.y + 30}
+            ctx.assets.get_texture(image::PRIMARY_SPRITESHEET), core::Point{position.x, position.y + 30}
         )
     );
+    ctx.assets.play_audio(sound::ALIEN_SHOT);
   }
 }
 

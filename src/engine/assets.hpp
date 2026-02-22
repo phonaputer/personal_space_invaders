@@ -14,9 +14,7 @@ class Assets {
     std::unordered_map<std::string, std::shared_ptr<SDL_Texture>> textures;
 
     std::shared_ptr<MIX_Mixer> mixer;
-    std::unique_ptr<MIX_Track, SDLDeleter> bgm_track;
-    std::unique_ptr<MIX_Track, SDLDeleter> sfx_track;
-    std::unordered_map<std::string, std::shared_ptr<MIX_Audio>> audios;
+    std::unordered_map<std::string, std::shared_ptr<MIX_Track>> audio_tracks;
 
   public:
     Assets(SDL_Renderer *renderer, std::shared_ptr<MIX_Mixer> mixer);
@@ -25,6 +23,6 @@ class Assets {
     std::shared_ptr<SDL_Texture> get_texture(std::string name) const;
 
     void load_audio(std::string name, std::string path);
-    void play_sfx(std::string audio_name);
-    void play_bgm(std::string audio_name);
+    void play_audio(std::string audio_name) const;
+    void stop_audio(std::string audio_name) const;
 };

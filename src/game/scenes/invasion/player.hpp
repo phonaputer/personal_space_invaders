@@ -45,7 +45,7 @@ class Player : public Entity, public Collidable, public Updateable, public Drawa
     static constexpr float DRAW_HEIGHT = 60;
     static constexpr float SPEED = 4;
     static constexpr int TICKS_PER_SHOT = 35;
-    static constexpr int EXPLOSION_TICKS = 100;
+    static constexpr int EXPLOSION_TICKS = 150;
     static constexpr int MAX_LIVES = 3;
 
     core::Point starting_position;

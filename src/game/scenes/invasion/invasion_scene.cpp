@@ -9,11 +9,20 @@
 
 void InvasionScene::preload_assets(PreloadAssetsCtx const &ctx) {
   // TODO this could just go in the initialize function...
-  ctx.assets.load_png_texture(asset::PRIMARY_SPRITESHEET, "./assets/space_invaders.png");
+  ctx.assets.load_png_texture(image::PRIMARY_SPRITESHEET, "./assets/space_invaders.png");
+
+  ctx.assets.load_audio(sound::ALIEN_EXPLOSION, "./assets/alien_explosion.wav");
+  ctx.assets.load_audio(sound::ALIEN_SHOT, "./assets/alien_shot.wav");
+  ctx.assets.load_audio(sound::PLAYER_EXPLOSION, "./assets/player_explosion.wav");
+  ctx.assets.load_audio(sound::PLAYER_SHOT, "./assets/player_shot.wav");
+  ctx.assets.load_audio(sound::ARP_1, "./assets/arp1.wav");
+  ctx.assets.load_audio(sound::ARP_2, "./assets/arp2.wav");
+  ctx.assets.load_audio(sound::ARP_3, "./assets/arp3.wav");
+  ctx.assets.load_audio(sound::ARP_4, "./assets/arp4.wav");
 }
 
 void InvasionScene::initialize(SceneCtx const &ctx) {
-  auto spritesheet_texture = ctx.assets.get_texture(asset::PRIMARY_SPRITESHEET);
+  auto spritesheet_texture = ctx.assets.get_texture(image::PRIMARY_SPRITESHEET);
 
   auto scoreboard = std::make_shared<Scoreboard>(spritesheet_texture, core::Point{10, 10});
   ctx.entities.add(scoreboard);

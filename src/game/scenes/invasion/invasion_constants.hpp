@@ -16,8 +16,22 @@ const std::string SCOREBOARD = "scoreboard";
 
 }; // namespace entityType
 
-namespace asset {
+namespace image {
 
 const std::string PRIMARY_SPRITESHEET = "primary-spritesheet";
 
 };
+
+namespace sound {
+
+const std::string ALIEN_EXPLOSION = "alien-explosion";
+const std::string ALIEN_SHOT = "alien-shot";
+const std::string PLAYER_EXPLOSION = "player-explosion";
+const std::string PLAYER_SHOT = "player-shot";
+
+const std::string ARP_1 = "arp-1";
+const std::string ARP_2 = "arp-2";
+const std::string ARP_3 = "arp-3";
+const std::string ARP_4 = "arp-4";
+
+} // namespace sound

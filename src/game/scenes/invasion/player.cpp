@@ -110,10 +110,12 @@ void Player::update(UpdateCtx const &ctx) {
     if (lives > 0 && explosion_clock >= EXPLOSION_TICKS) {
       explosion_clock = 0;
       rerack();
-    } else if (explosion_clock >= EXPLOSION_TICKS * 2.5) {
+      ctx.assets.stop_audio(sound::PLAYER_EXPLOSION);
+    } else if (explosion_clock >= EXPLOSION_TICKS * 2) {
       explosion_clock = 0;
       lives = MAX_LIVES;
       rerack();
+      ctx.assets.stop_audio(sound::PLAYER_EXPLOSION);
     } else {
       explosion_clock++;
     }
@@ -135,9 +137,10 @@ void Player::update(UpdateCtx const &ctx) {
     muzzle_flash_animation->play();
     ctx.entities.add(
         std::make_unique<PlayerProjectile>(
-            ctx.assets.get_texture(asset::PRIMARY_SPRITESHEET), core::Point{x - 7, y - 20}
+            ctx.assets.get_texture(image::PRIMARY_SPRITESHEET), core::Point{x - 7, y - 20}
         )
     );
+    ctx.assets.play_audio(sound::PLAYER_SHOT);
   }
   muzzle_flash_animation->update();
 }
@@ -174,6 +177,7 @@ void Player::collide_with([[maybe_unused]] CollideCtx const &ctx, Collidable &ot
   if (other.get_type() == entityType::ALIEN_PROJECTILE) {
     exploding = true;
     lives--;
+    ctx.assets.play_audio(sound::PLAYER_EXPLOSION);
 
     for (const auto &notifier : status_notifiers) {
       notifier->notify_player_died(lives);

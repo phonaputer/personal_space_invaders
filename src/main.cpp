@@ -24,14 +24,17 @@
 // X * Have a system of "lives" for the player, displaying in the UI
 // X * Game over when all lives are lost
 // ? * Can reset game after game over
-// * aliens get faster when less are remaining
-// * Sound effects
+// X * Sound effects
+// * different sound when two bullets collide
 // * BGM (space invaders style where it speeds up along with the aliens)
+// * increate rate of bullet firing from aliens
+// * Don't forget to seed standard library rand so aliens don't shoot the same each game
+// * aliens get faster when less are remaining
+// * clear bullets from screen when player dies
 // * Start menu
 // * Escape menu
 // * Throw in the mystery ship for bonus points
 // * Maybe some powerups?
-// * Don't forget to seed standard library rand
 
 SDL_AppResult SDL_AppInit(void **appstate, [[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
 
