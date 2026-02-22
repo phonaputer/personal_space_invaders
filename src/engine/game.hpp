@@ -4,8 +4,10 @@
 #include "entity.hpp"
 #include "input.hpp"
 #include "scene.hpp"
+#include "sdl_util.hpp"
 #include "sprites.hpp"
 #include <SDL3/SDL.h>
+#include <SDL3_mixer/SDL_mixer.h>
 #include <memory>
 #include <optional>
 
@@ -20,6 +22,8 @@ class Game {
     // Window and Renderer aren't unique ptrs since SDL cleans them up automatically on aplication exit.
     SDL_Window *window;
     SDL_Renderer *renderer;
+
+    std::shared_ptr<MIX_Mixer> mixer;
 
     std::unique_ptr<UserInputs> user_inputs;
     std::optional<SceneHarness> active_scene;

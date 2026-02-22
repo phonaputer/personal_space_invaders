@@ -2,8 +2,10 @@
 #include "assets.hpp"
 #include "core.hpp"
 #include "input.hpp"
+#include "sdl_util.hpp"
 #include "sprites.hpp"
 #include <SDL3/SDL.h>
+#include <SDL3_mixer/SDL_mixer.h>
 #include <format>
 #include <memory>
 #include <stdexcept>
@@ -12,7 +14,7 @@
 const Uint64 MS_PER_UPDATE = 17;
 
 Game::Game() {
-  if (!SDL_Init(SDL_INIT_VIDEO)) {
+  if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
     throw std::runtime_error(std::format("Failed to initialize SDL: {}", SDL_GetError()));
   }
 
@@ -25,6 +27,16 @@ Game::Game() {
   if (!renderer) {
     throw std::runtime_error(std::format("Couldn't create renderer: {}", SDL_GetError()));
   }
+
+  if (!MIX_Init()) {
+    throw std::runtime_error(std::format("Couldn't initialize sound mixer: {}", SDL_GetError()));
+  }
+
+  auto mixerP = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, nullptr);
+  if (!mixerP) {
+    throw std::runtime_error(std::format("Couldn't initialize mixer device: {}", SDL_GetError()));
+  }
+  mixer = std::shared_ptr<MIX_Mixer>(mixerP, SDLDeleter());
 
   previous_now_ms = SDL_GetTicks();
   unprocessed_ms = 0;
@@ -68,7 +80,7 @@ void Game::draw() {
 }
 
 void Game::set_scene(std::unique_ptr<Scene> scene) {
-  auto assets = std::make_unique<Assets>(renderer);
+  auto assets = std::make_unique<Assets>(renderer, mixer);
   auto entities = std::make_unique<Entities>();
 
   scene->preload_assets(PreloadAssetsCtx{.assets = *assets});

@@ -28,6 +28,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 SDL3_mixer::SDL3_mixer)
 target_include_directories(
   ${PROJECT_NAME} 
   PRIVATE 
+  ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/engine
   ${CMAKE_CURRENT_SOURCE_DIR}/game/scenes/invasion
 )
