@@ -4,6 +4,7 @@
 #include "game/scenes/invasion/invasion_scene.hpp"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include <SDL3_mixer/SDL_mixer.h>
 #include <memory>
 #include <vector>
 
@@ -31,6 +32,7 @@
 // * Escape menu
 // * Throw in the mystery ship for bonus points
 // * Maybe some powerups?
+// * Don't forget to seed standard library rand
 
 SDL_AppResult SDL_AppInit(void **appstate, [[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
 
