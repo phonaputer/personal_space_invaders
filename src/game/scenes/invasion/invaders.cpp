@@ -401,16 +401,18 @@ void AlienOrchestrator::update(SceneCtx ctx) {
 
   tick_counter = 0;
 
-  for (auto &alien : aliens) {
-    if (alien->is_active() && alien->has_reached_edge()) {
-      for (auto &alien : aliens) {
-        alien->descend_and_turn(60);
-      }
+  bool descend_and_turn = false;
+  for (auto &active_alien : active_aliens) {
+    if (active_alien->has_reached_edge()) {
+      descend_and_turn = true;
       break;
     }
   }
 
   for (auto &alien : aliens) {
+    if (descend_and_turn) {
+      alien->descend_and_turn(60);
+    }
     alien->move(15);
   }
 
