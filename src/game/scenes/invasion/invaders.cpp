@@ -343,6 +343,7 @@ void BGMOrchestrator::reset() {
 AlienOrchestrator::AlienOrchestrator(std::shared_ptr<AlienExplosionOrchestrator> explosions)
     : explosions{explosions},
       tick_counter{0},
+      shot_tick_counter{0},
       is_player_dead{false},
       player_lives{1000} {
 }
@@ -368,6 +369,8 @@ void AlienOrchestrator::notify_player_rerack(int remaining_lives) {
       alien->rerack();
     }
     bgm.reset();
+    tick_counter = 0;
+    shot_tick_counter = 0;
   }
   player_lives = remaining_lives;
 }
@@ -381,8 +384,38 @@ void AlienOrchestrator::update(SceneCtx const &ctx) {
 
   projectiles.update();
 
+  std::vector<std::shared_ptr<Alien>> active_aliens;
+  for (const auto &a : aliens) {
+    if (a->is_active()) {
+      active_aliens.push_back(a);
+    }
+  }
+
+  if (active_aliens.size() < 1) {
+    for (auto &alien : aliens) {
+      alien->rerack();
+    }
+    return;
+  }
+
+  shot_tick_counter++;
+  if (shot_tick_counter >= TICKS_PER_SHOOT_CHANCE) {
+    shot_tick_counter = 0;
+    if (active_aliens.size() > 0 && rand() % ALIEN_SHOOT_CHANCE == 0) {
+      size_t selected_alien = rand() % active_aliens.size();
+      auto position = active_aliens.at(selected_alien)->get_position();
+      auto projectile = std::make_shared<AlienProjectile>(
+          ctx.assets.get_texture(image::PRIMARY_SPRITESHEET), core::Point{position.x, position.y + 30}, explosions
+      );
+      ctx.entities.add(projectile);
+      projectiles.add(projectile);
+      ctx.assets.play_audio(sound::ALIEN_SHOT);
+    }
+  }
+
+  int adjusted_ticks_per_move = TICKS_PER_MOVE - (aliens.size() - active_aliens.size());
   tick_counter++;
-  if (tick_counter < TICKS_PER_MOVE) {
+  if (tick_counter < adjusted_ticks_per_move) {
     return;
   }
 
@@ -402,28 +435,4 @@ void AlienOrchestrator::update(SceneCtx const &ctx) {
   }
 
   bgm.play(ctx);
-
-  std::vector<std::shared_ptr<Alien>> active_aliens;
-  for (const auto &a : aliens) {
-    if (a->is_active()) {
-      active_aliens.push_back(a);
-    }
-  }
-
-  if (active_aliens.size() < 1) {
-    for (auto &alien : aliens) {
-      alien->rerack();
-    }
-  }
-
-  if (active_aliens.size() > 0 && rand() % ALIEN_SHOOT_CHANCE == 0) {
-    size_t selected_alien = rand() % active_aliens.size();
-    auto position = active_aliens.at(selected_alien)->get_position();
-    auto projectile = std::make_shared<AlienProjectile>(
-        ctx.assets.get_texture(image::PRIMARY_SPRITESHEET), core::Point{position.x, position.y + 30}, explosions
-    );
-    ctx.entities.add(projectile);
-    projectiles.add(projectile);
-    ctx.assets.play_audio(sound::ALIEN_SHOT);
-  }
 }

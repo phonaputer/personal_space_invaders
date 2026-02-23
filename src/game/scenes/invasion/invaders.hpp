@@ -142,7 +142,8 @@ class BGMOrchestrator {
 
 class AlienOrchestrator : public Entity, public PlayerStatusNotifier {
   private:
-    static constexpr int TICKS_PER_MOVE = 30;
+    static constexpr int TICKS_PER_MOVE = 58;
+    static constexpr int TICKS_PER_SHOOT_CHANCE = 30;
     static constexpr int ALIEN_SHOOT_CHANCE = 3; // The chance is the reciprocal of this number
 
     AlienProjectileOrchestrator projectiles;
@@ -150,6 +151,7 @@ class AlienOrchestrator : public Entity, public PlayerStatusNotifier {
     BGMOrchestrator bgm;
 
     int tick_counter;
+    int shot_tick_counter;
     std::vector<std::shared_ptr<Alien>> aliens;
     bool is_player_dead;
     int player_lives;
