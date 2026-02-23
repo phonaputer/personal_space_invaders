@@ -12,7 +12,7 @@ const std::string ALIEN_PROJECTILE = "alien-projectile";
 const std::string ALIEN_EXPLOSION = "alien-explosion";
 const std::string ALIEN_ORCHESTRATOR = "alien-orchestrator";
 
-const std::string SCOREBOARD = "scoreboard";
+const std::string HUD = "hud";
 
 }; // namespace entityType
 

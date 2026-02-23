@@ -4,7 +4,7 @@
 #include "engine/entity.hpp"
 #include "engine/scene.hpp"
 #include "engine/sprites.hpp"
-#include "player.hpp"
+#include "game_state.hpp"
 #include <SDL3/SDL.h>
 #include <functional>
 #include <memory>
@@ -62,11 +62,6 @@ class AlienExplosion : public Entity, public Drawable {
     void draw(SDL_Renderer *renderer) const override;
 };
 
-class ScoreNotifier {
-  public:
-    virtual void notify_player_scored(unsigned int amount) = 0;
-};
-
 class AlienOrchestrator;
 
 struct AlienParams {
@@ -74,7 +69,7 @@ struct AlienParams {
     core::Point starting_position;
     std::vector<Frame> frames;
     core::Rect hitbox;
-    std::shared_ptr<ScoreNotifier> score_notifier;
+    std::weak_ptr<ScoreNotifier> score_notifier;
     unsigned int score;
     std::shared_ptr<AlienExplosionOrchestrator> explosions;
 };
@@ -91,7 +86,7 @@ class Alien : public Entity, public Drawable, public Collidable {
     bool move_right;
     const core::Rect hitbox;
     bool deactivated;
-    std::shared_ptr<ScoreNotifier> score_notifier;
+    std::weak_ptr<ScoreNotifier> score_notifier;
     const unsigned int score;
     std::shared_ptr<AlienExplosionOrchestrator> explosions;
 
@@ -140,7 +135,7 @@ class BGMOrchestrator {
     void reset();
 };
 
-class AlienOrchestrator : public Entity, public PlayerStatusNotifier {
+class AlienOrchestrator : public Entity, public GameStateNotifier {
   private:
     static constexpr int TICKS_PER_MOVE = 58;
     static constexpr int TICKS_PER_SHOOT_CHANCE = 30;
@@ -154,30 +149,30 @@ class AlienOrchestrator : public Entity, public PlayerStatusNotifier {
     int shot_tick_counter;
     std::vector<std::shared_ptr<Alien>> aliens;
     bool is_player_dead;
-    int player_lives;
 
   public:
     AlienOrchestrator(std::shared_ptr<AlienExplosionOrchestrator> explosions);
     std::string get_type() const override;
     void add_alien(std::shared_ptr<Alien> alien);
-    void update(SceneCtx const &ctx);
+    void update(SceneCtx ctx);
 
-    void notify_player_died(int remaining_lives) override;
-    void notify_player_rerack(int remaining_lives) override;
+    void notify_player_died() override;
+    void notify_player_rerack() override;
+    void notify_game_start() override;
 };
 
 class AlienFactory {
   private:
     SceneCtx ctx;
     std::shared_ptr<SDL_Texture> texture;
-    std::shared_ptr<ScoreNotifier> score_notifier;
+    std::weak_ptr<ScoreNotifier> score_notifier;
     std::shared_ptr<AlienExplosionOrchestrator> explosions;
 
   public:
     AlienFactory(
         SceneCtx ctx,
         std::shared_ptr<SDL_Texture> texture,
-        std::shared_ptr<ScoreNotifier> score_notifier,
+        std::weak_ptr<ScoreNotifier> score_notifier,
         std::shared_ptr<AlienExplosionOrchestrator> explosions
     );
     std::shared_ptr<Alien> new_jellyfish(core::Point starting_position);

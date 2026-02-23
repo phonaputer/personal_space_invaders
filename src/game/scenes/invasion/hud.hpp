@@ -3,6 +3,7 @@
 #include "engine/core.hpp"
 #include "engine/entity.hpp"
 #include "engine/sprites.hpp"
+#include "game_state.hpp"
 #include "invaders.hpp"
 #include <SDL3/SDL.h>
 #include <memory>
@@ -21,7 +22,7 @@ class TextRenderer {
     void render_text(SDL_Renderer *renderer, core::Point location, std::string text) const;
 };
 
-class Scoreboard : public Entity, public Drawable, public ScoreNotifier, public PlayerStatusNotifier {
+class HUD : public Entity, public Drawable, public GameStateNotifier {
   private:
     TextRenderer text_renderer;
     const float x;
@@ -29,14 +30,15 @@ class Scoreboard : public Entity, public Drawable, public ScoreNotifier, public 
     unsigned int high_score;
     unsigned int current_score;
     int current_lives;
-    bool player_is_dead;
+    bool game_is_over;
 
   public:
-    Scoreboard(std::shared_ptr<SDL_Texture> texture, core::Point position);
+    HUD(std::shared_ptr<SDL_Texture> texture, core::Point position);
     std::string get_type() const override;
-    void notify_player_scored(unsigned int amount) override;
-    void notify_player_died(int remaining_lives) override;
-    void notify_player_rerack(int remaining_lives) override;
+    void notify_score_change(int new_current_score, int new_high_score) override;
+    void notify_player_lives_change(int new_current_lives) override;
+    void notify_game_start() override;
+    void notify_game_over() override;
 
     std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
     void draw(SDL_Renderer *renderer) const override;

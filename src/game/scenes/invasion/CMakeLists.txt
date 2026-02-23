@@ -4,5 +4,6 @@ target_sources(
   invasion_scene.cpp
   invaders.cpp
   player.cpp
-  scoreboard.cpp
+  hud.cpp
+  game_state.cpp
 )

@@ -17,8 +17,8 @@ struct PreloadAssetsCtx {
 
 class Scene {
   public:
-    virtual void preload_assets(PreloadAssetsCtx const &ctx) = 0;
-    virtual void initialize(SceneCtx const &ctx) = 0;
-    virtual void update(SceneCtx const &ctx) = 0;
+    virtual void preload_assets(PreloadAssetsCtx ctx) = 0;
+    virtual void initialize(SceneCtx ctx) = 0;
+    virtual void update(SceneCtx ctx) = 0;
     virtual ~Scene() = default;
 };

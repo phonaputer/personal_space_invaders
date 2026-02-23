@@ -1,4 +1,4 @@
-#include "scoreboard.hpp"
+#include "hud.hpp"
 #include "engine/core.hpp"
 #include "engine/sprites.hpp"
 #include "invasion_constants.hpp"
@@ -38,51 +38,47 @@ void TextRenderer::render_text(SDL_Renderer *renderer, core::Point location, std
   }
 }
 
-Scoreboard::Scoreboard(std::shared_ptr<SDL_Texture> texture, core::Point position)
+HUD::HUD(std::shared_ptr<SDL_Texture> texture, core::Point position)
     : text_renderer(texture),
       x{position.x},
       y{position.y},
       high_score{0},
       current_score{0},
       current_lives{0},
-      player_is_dead{false} {
+      game_is_over{false} {
 }
 
-std::string Scoreboard::get_type() const {
-  return entityType::SCOREBOARD;
+std::string HUD::get_type() const {
+  return entityType::HUD;
 }
 
-void Scoreboard::notify_player_scored(unsigned int amount) {
-  current_score += amount;
-  if (current_score > high_score) {
-    high_score = current_score;
-  }
+void HUD::notify_score_change(int new_current_score, int new_high_score) {
+  current_score = new_current_score;
+  high_score = new_high_score;
 }
 
-void Scoreboard::notify_player_died(int remaining_lives) {
-  current_lives = remaining_lives;
-  player_is_dead = true;
+void HUD::notify_player_lives_change(int new_current_lives) {
+  current_lives = new_current_lives;
 }
 
-void Scoreboard::notify_player_rerack(int remaining_lives) {
-  if (current_lives < 1) {
-    current_score = 0;
-  }
-
-  current_lives = remaining_lives;
-  player_is_dead = false;
+void HUD::notify_game_start() {
+  game_is_over = false;
 }
 
-std::optional<std::reference_wrapper<Drawable>> Scoreboard::as_drawable() {
+void HUD::notify_game_over() {
+  game_is_over = true;
+}
+
+std::optional<std::reference_wrapper<Drawable>> HUD::as_drawable() {
   return *this;
 }
 
-void Scoreboard::draw(SDL_Renderer *renderer) const {
+void HUD::draw(SDL_Renderer *renderer) const {
   text_renderer.render_text(renderer, {x, y}, std::format("score:{}", current_score));
   text_renderer.render_text(renderer, {core::WINDOW_WIDTH / 2 - 110, y}, std::format("hi-score:{}", high_score));
   text_renderer.render_text(renderer, {core::WINDOW_WIDTH - 165, y}, std::format("lives:{}", current_lives));
 
-  if (player_is_dead && current_lives < 1) {
+  if (game_is_over) {
     text_renderer.render_text(renderer, {core::WINDOW_WIDTH / 2 - 100, core::WINDOW_HEIGHT / 2}, "game over");
   }
 }

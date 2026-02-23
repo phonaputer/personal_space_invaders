@@ -1,13 +1,13 @@
 #include "invasion_scene.hpp"
 #include "engine/core.hpp"
 #include "engine/scene.hpp"
+#include "hud.hpp"
 #include "invaders.hpp"
 #include "invasion_constants.hpp"
 #include "player.hpp"
-#include "scoreboard.hpp"
 #include <memory>
 
-void InvasionScene::preload_assets(PreloadAssetsCtx const &ctx) {
+void InvasionScene::preload_assets(PreloadAssetsCtx ctx) {
   // TODO this could just go in the initialize function...
   ctx.assets.load_png_texture(image::PRIMARY_SPRITESHEET, "./assets/space_invaders.png");
 
@@ -21,24 +21,27 @@ void InvasionScene::preload_assets(PreloadAssetsCtx const &ctx) {
   ctx.assets.load_audio(sound::ARP_4, "./assets/arp4.wav");
 }
 
-void InvasionScene::initialize(SceneCtx const &ctx) {
+void InvasionScene::initialize(SceneCtx ctx) {
+  game_state = std::make_shared<GameStateOrchestrator>();
+
   auto spritesheet_texture = ctx.assets.get_texture(image::PRIMARY_SPRITESHEET);
 
-  auto scoreboard = std::make_shared<Scoreboard>(spritesheet_texture, core::Point{10, 10});
-  ctx.entities.add(scoreboard);
+  auto hud = std::make_shared<HUD>(spritesheet_texture, core::Point{10, 10});
+  ctx.entities.add(hud);
+  game_state->add_notifier(hud);
 
   auto explosions = std::make_shared<AlienExplosionOrchestrator>();
 
   alien_orchestrator = std::make_shared<AlienOrchestrator>(explosions);
   ctx.entities.add(alien_orchestrator);
+  game_state->add_notifier(alien_orchestrator);
 
-  player = std::make_shared<Player>(spritesheet_texture, core::Point{500, 700});
+  player = std::make_shared<Player>(spritesheet_texture, core::Point{500, 700}, ctx);
   ctx.entities.add(player);
-  player->add_notifier(scoreboard);
-  player->add_notifier(alien_orchestrator);
-  player->rerack();
+  player->add_notifier(game_state);
+  game_state->add_notifier(player);
 
-  auto alien_factory = AlienFactory(ctx, spritesheet_texture, scoreboard, explosions);
+  auto alien_factory = AlienFactory(ctx, spritesheet_texture, game_state, explosions);
 
   const float starting_x_pos = 200;
   float x_pos = starting_x_pos;
@@ -80,9 +83,12 @@ void InvasionScene::initialize(SceneCtx const &ctx) {
     alien_orchestrator->add_alien(alien_factory.new_tadpole({x_pos, y_pos}));
     x_pos += alien_width + col_spacing;
   }
+
+  game_state->restart_game();
 }
 
-void InvasionScene::update(SceneCtx const &ctx) {
+void InvasionScene::update(SceneCtx ctx) {
+  game_state->update();
   alien_orchestrator->update(ctx);
-  player->update(ctx);
+  player->update();
 }

@@ -1,19 +1,20 @@
 #pragma once
 
 #include "engine/scene.hpp"
+#include "game_state.hpp"
 #include "invaders.hpp"
 #include "player.hpp"
-#include "scoreboard.hpp"
 #include <memory>
 #include <vector>
 
 class InvasionScene : public Scene {
   private:
+    std::shared_ptr<GameStateOrchestrator> game_state;
     std::shared_ptr<AlienOrchestrator> alien_orchestrator;
     std::shared_ptr<Player> player;
 
   public:
-    void preload_assets(PreloadAssetsCtx const &ctx) override;
-    void initialize(SceneCtx const &ctx) override;
-    void update(SceneCtx const &ctx) override;
+    void preload_assets(PreloadAssetsCtx ctx) override;
+    void initialize(SceneCtx ctx) override;
+    void update(SceneCtx ctx) override;
 };

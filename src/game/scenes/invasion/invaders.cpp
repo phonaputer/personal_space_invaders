@@ -113,7 +113,7 @@ void AlienExplosion::update() {
 AlienFactory::AlienFactory(
     SceneCtx ctx,
     std::shared_ptr<SDL_Texture> texture,
-    std::shared_ptr<ScoreNotifier> score_notifier,
+    std::weak_ptr<ScoreNotifier> score_notifier,
     std::shared_ptr<AlienExplosionOrchestrator> explosions
 )
     : ctx{ctx},
@@ -260,7 +260,7 @@ void Alien::collide_with(CollideCtx const &ctx, Collidable &other) {
     ctx.entities.add(explosion);
     explosions->add(explosion);
     ctx.assets.play_audio(sound::ALIEN_EXPLOSION);
-    score_notifier->notify_player_scored(score);
+    score_notifier.lock()->notify_scored(score);
   }
 }
 
@@ -344,8 +344,7 @@ AlienOrchestrator::AlienOrchestrator(std::shared_ptr<AlienExplosionOrchestrator>
     : explosions{explosions},
       tick_counter{0},
       shot_tick_counter{0},
-      is_player_dead{false},
-      player_lives{1000} {
+      is_player_dead{false} {
 }
 
 std::string AlienOrchestrator::get_type() const {
@@ -356,26 +355,7 @@ void AlienOrchestrator::add_alien(std::shared_ptr<Alien> alien) {
   aliens.push_back(alien);
 }
 
-void AlienOrchestrator::notify_player_died(int remaining_lives) {
-  is_player_dead = true;
-  player_lives = remaining_lives;
-  projectiles.delete_all();
-}
-
-void AlienOrchestrator::notify_player_rerack(int remaining_lives) {
-  is_player_dead = false;
-  if (remaining_lives > player_lives) {
-    for (auto &alien : aliens) {
-      alien->rerack();
-    }
-    bgm.reset();
-    tick_counter = 0;
-    shot_tick_counter = 0;
-  }
-  player_lives = remaining_lives;
-}
-
-void AlienOrchestrator::update(SceneCtx const &ctx) {
+void AlienOrchestrator::update(SceneCtx ctx) {
   explosions->update();
 
   if (is_player_dead) {
@@ -435,4 +415,22 @@ void AlienOrchestrator::update(SceneCtx const &ctx) {
   }
 
   bgm.play(ctx);
+}
+
+void AlienOrchestrator::notify_player_died() {
+  is_player_dead = true;
+  projectiles.delete_all();
+}
+
+void AlienOrchestrator::notify_player_rerack() {
+  is_player_dead = false;
+}
+
+void AlienOrchestrator::notify_game_start() {
+  for (auto &alien : aliens) {
+    alien->rerack();
+  }
+  bgm.reset();
+  tick_counter = 0;
+  shot_tick_counter = 0;
 }

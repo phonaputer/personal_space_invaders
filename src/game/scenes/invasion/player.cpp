@@ -83,14 +83,12 @@ void PlayerProjectileOrchestrator::delete_all() {
   }
 }
 
-Player::Player(std::shared_ptr<SDL_Texture> texture, core::Point starting_position)
-    : starting_position{starting_position},
+Player::Player(std::shared_ptr<SDL_Texture> texture, core::Point starting_position, SceneCtx scene)
+    : scene{scene},
+      starting_position{starting_position},
       x{starting_position.x},
       y{starting_position.y},
-      shot_clock{0},
-      exploding{false},
-      explosion_clock{0},
-      lives{MAX_LIVES} {
+      shot_clock{0} {
   std::vector<Frame> frames = {{0, 2}, {1, 2}, {2, 2}};
   animation = std::make_unique<Animation>(Spritesheet(texture, 16, 16), 5, frames);
 
@@ -105,70 +103,53 @@ std::string Player::get_type() const {
   return entityType::PLAYER;
 }
 
-void Player::add_notifier(std::shared_ptr<PlayerStatusNotifier> notifier) {
+void Player::add_notifier(std::weak_ptr<PlayerDeathNotifier> notifier) {
   status_notifiers.push_back(notifier);
 }
 
-void Player::rerack() {
-  exploding = false;
-  x = starting_position.x;
-  y = starting_position.y;
-  animation->rewind();
-  explosion_animation->rewind();
-
-  for (const auto &notifier : status_notifiers) {
-    notifier->notify_player_rerack(lives);
-  }
-}
-
-void Player::update(SceneCtx const &ctx) {
-  if (exploding) {
+void Player::update() {
+  if (am_dead) {
     explosion_animation->update();
-
-    if (lives > 0 && explosion_clock >= EXPLOSION_TICKS) {
-      explosion_clock = 0;
-      rerack();
-      ctx.assets.stop_audio(sound::PLAYER_EXPLOSION);
-    } else if (explosion_clock >= EXPLOSION_TICKS * 2) {
-      explosion_clock = 0;
-      lives = MAX_LIVES;
-      rerack();
-      ctx.assets.stop_audio(sound::PLAYER_EXPLOSION);
-    } else {
-      explosion_clock++;
-    }
-
     return;
   }
 
   projectiles.update();
 
-  if (ctx.user_inputs.is_engaged(PlayerInput::LEFT)) {
+  if (scene.user_inputs.is_engaged(PlayerInput::LEFT)) {
     x -= SPEED;
     animation->update();
-  } else if (ctx.user_inputs.is_engaged(PlayerInput::RIGHT)) {
+  } else if (scene.user_inputs.is_engaged(PlayerInput::RIGHT)) {
     x += SPEED;
     animation->update_backwards();
   }
 
   shot_clock++;
-  if (ctx.user_inputs.is_engaged(PlayerInput::FIRE) && shot_clock >= TICKS_PER_SHOT) {
+  if (scene.user_inputs.is_engaged(PlayerInput::FIRE) && shot_clock >= TICKS_PER_SHOT) {
     shot_clock = 0;
     muzzle_flash_animation->play();
     auto projectile = std::make_shared<PlayerProjectile>(
-        ctx.assets.get_texture(image::PRIMARY_SPRITESHEET), core::Point{x - 7, y - 20}
+        scene.assets.get_texture(image::PRIMARY_SPRITESHEET), core::Point{x - 7, y - 20}
     );
-    ctx.entities.add(projectile);
+    scene.entities.add(projectile);
     projectiles.add(projectile);
-    ctx.assets.play_audio(sound::PLAYER_SHOT);
+    scene.assets.play_audio(sound::PLAYER_SHOT);
   }
   muzzle_flash_animation->update();
+}
+
+void Player::notify_player_rerack() {
+  am_dead = false;
+  x = starting_position.x;
+  y = starting_position.y;
+  animation->rewind();
+  explosion_animation->rewind();
+  scene.assets.stop_audio(sound::PLAYER_EXPLOSION);
 }
 
 void Player::draw(SDL_Renderer *renderer) const {
   core::Rect rect = {x, y, DRAW_WIDTH, DRAW_HEIGHT};
 
-  if (exploding) {
+  if (am_dead) {
     explosion_animation->draw(renderer, rect);
     return;
   }
@@ -195,13 +176,12 @@ core::Rect Player::get_hitbox() const {
 
 void Player::collide_with([[maybe_unused]] CollideCtx const &ctx, Collidable &other) {
   if (other.get_type() == entityType::ALIEN_PROJECTILE) {
-    exploding = true;
-    lives--;
+    am_dead = true;
     ctx.assets.play_audio(sound::PLAYER_EXPLOSION);
     muzzle_flash_animation->stop();
 
     for (const auto &notifier : status_notifiers) {
-      notifier->notify_player_died(lives);
+      notifier.lock()->notify_player_died();
       projectiles.delete_all();
     }
   }

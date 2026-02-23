@@ -4,15 +4,10 @@
 #include "engine/input.hpp"
 #include "engine/scene.hpp"
 #include "engine/sprites.hpp"
+#include "game_state.hpp"
 #include <SDL3/SDL.h>
 #include <functional>
 #include <memory>
-
-class PlayerStatusNotifier {
-  public:
-    virtual void notify_player_died(int remaining_lives) = 0;
-    virtual void notify_player_rerack(int remaining_lives) = 0;
-};
 
 class PlayerProjectile : public Entity, public Collidable, public Drawable {
   private:
@@ -49,15 +44,14 @@ class PlayerProjectileOrchestrator {
     void delete_all();
 };
 
-class Player : public Entity, public Collidable, public Drawable {
+class Player : public Entity, public Collidable, public Drawable, public GameStateNotifier {
   private:
     static constexpr float DRAW_WIDTH = 60;
     static constexpr float DRAW_HEIGHT = 60;
     static constexpr float SPEED = 4;
     static constexpr int TICKS_PER_SHOT = 35;
-    static constexpr int EXPLOSION_TICKS = 150;
-    static constexpr int MAX_LIVES = 3;
 
+    SceneCtx scene;
     core::Point starting_position;
     std::unique_ptr<Animation> animation;
     std::unique_ptr<OnceAnimation> muzzle_flash_animation;
@@ -65,18 +59,17 @@ class Player : public Entity, public Collidable, public Drawable {
     float x;
     float y;
     int shot_clock;
-    bool exploding;
-    int explosion_clock;
-    std::vector<std::shared_ptr<PlayerStatusNotifier>> status_notifiers;
-    int lives;
+    bool am_dead;
+    std::vector<std::weak_ptr<PlayerDeathNotifier>> status_notifiers;
     PlayerProjectileOrchestrator projectiles;
 
   public:
-    Player(std::shared_ptr<SDL_Texture> texture, core::Point starting_position);
+    Player(std::shared_ptr<SDL_Texture> texture, core::Point starting_position, SceneCtx scene);
     std::string get_type() const override;
-    void rerack();
-    void add_notifier(std::shared_ptr<PlayerStatusNotifier> notifier);
-    void update(SceneCtx const &ctx);
+    void add_notifier(std::weak_ptr<PlayerDeathNotifier> notifier);
+    void update();
+
+    void notify_player_rerack() override;
 
     std::optional<std::reference_wrapper<Collidable>> as_collidable() override;
     core::Rect get_hitbox() const override;
