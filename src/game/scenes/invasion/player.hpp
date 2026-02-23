@@ -14,7 +14,7 @@ class PlayerStatusNotifier {
     virtual void notify_player_rerack(int remaining_lives) = 0;
 };
 
-class PlayerProjectile : public Entity, public Collidable, public Updateable, public Drawable {
+class PlayerProjectile : public Entity, public Collidable, public Drawable {
   private:
     static constexpr float DRAW_WIDTH = 60;
     static constexpr float DRAW_HEIGHT = 60;
@@ -29,17 +29,27 @@ class PlayerProjectile : public Entity, public Collidable, public Updateable, pu
     PlayerProjectile(std::shared_ptr<SDL_Texture> texture, core::Point starting_position);
     std::string get_type() const override;
     bool is_deleted() const override;
+    void mark_deleted();
+    void update();
 
     std::optional<std::reference_wrapper<Collidable>> as_collidable() override;
     core::Rect get_hitbox() const override;
     void collide_with(CollideCtx const &ctx, Collidable &other) override;
     std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
     void draw(SDL_Renderer *renderer) const override;
-    std::optional<std::reference_wrapper<Updateable>> as_updateable() override;
-    void update(UpdateCtx const &ctx) override;
 };
 
-class Player : public Entity, public Collidable, public Updateable, public Drawable {
+class PlayerProjectileOrchestrator {
+  private:
+    std::vector<std::shared_ptr<PlayerProjectile>> projectiles;
+
+  public:
+    void add(std::shared_ptr<PlayerProjectile> projectile);
+    void update();
+    void delete_all();
+};
+
+class Player : public Entity, public Collidable, public Drawable {
   private:
     static constexpr float DRAW_WIDTH = 60;
     static constexpr float DRAW_HEIGHT = 60;
@@ -59,18 +69,18 @@ class Player : public Entity, public Collidable, public Updateable, public Drawa
     int explosion_clock;
     std::vector<std::shared_ptr<PlayerStatusNotifier>> status_notifiers;
     int lives;
+    PlayerProjectileOrchestrator projectiles;
 
   public:
     Player(std::shared_ptr<SDL_Texture> texture, core::Point starting_position);
     std::string get_type() const override;
     void rerack();
     void add_notifier(std::shared_ptr<PlayerStatusNotifier> notifier);
+    void update(SceneCtx const &ctx);
 
     std::optional<std::reference_wrapper<Collidable>> as_collidable() override;
     core::Rect get_hitbox() const override;
     void collide_with(CollideCtx const &ctx, Collidable &other) override;
     std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
     void draw(SDL_Renderer *renderer) const override;
-    std::optional<std::reference_wrapper<Updateable>> as_updateable() override;
-    void update(UpdateCtx const &ctx) override;
 };

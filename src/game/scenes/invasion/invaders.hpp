@@ -10,7 +10,9 @@
 #include <memory>
 #include <vector>
 
-class AlienProjectile : public Entity, public Collidable, public Updateable, public Drawable {
+class AlienExplosionOrchestrator;
+
+class AlienProjectile : public Entity, public Collidable, public Drawable {
   private:
     static constexpr float DRAW_WIDTH = 60;
     static constexpr float DRAW_HEIGHT = 60;
@@ -20,22 +22,27 @@ class AlienProjectile : public Entity, public Collidable, public Updateable, pub
     float x;
     float y;
     bool deleted;
+    std::shared_ptr<AlienExplosionOrchestrator> explosions;
 
   public:
-    AlienProjectile(std::shared_ptr<SDL_Texture> texture, core::Point starting_position);
+    AlienProjectile(
+        std::shared_ptr<SDL_Texture> texture,
+        core::Point starting_position,
+        std::shared_ptr<AlienExplosionOrchestrator> explosions
+    );
     std::string get_type() const override;
     bool is_deleted() const override;
+    void mark_deleted();
+    void update();
 
     std::optional<std::reference_wrapper<Collidable>> as_collidable() override;
     core::Rect get_hitbox() const override;
     void collide_with(CollideCtx const &ctx, Collidable &other) override;
     std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
     void draw(SDL_Renderer *renderer) const override;
-    std::optional<std::reference_wrapper<Updateable>> as_updateable() override;
-    void update(UpdateCtx const &ctx) override;
 };
 
-class AlienExplosion : public Entity, public Drawable, public Updateable {
+class AlienExplosion : public Entity, public Drawable {
   private:
     static constexpr int LIFETIME_TICKS = 20;
     static constexpr float DRAW_WIDTH = 60;
@@ -49,11 +56,10 @@ class AlienExplosion : public Entity, public Drawable, public Updateable {
     AlienExplosion(std::shared_ptr<SDL_Texture> texture, core::Point position);
     std::string get_type() const override;
     bool is_deleted() const override;
+    void update();
 
     std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
     void draw(SDL_Renderer *renderer) const override;
-    std::optional<std::reference_wrapper<Updateable>> as_updateable() override;
-    void update(UpdateCtx const &ctx) override;
 };
 
 class ScoreNotifier {
@@ -70,6 +76,7 @@ struct AlienParams {
     core::Rect hitbox;
     std::shared_ptr<ScoreNotifier> score_notifier;
     unsigned int score;
+    std::shared_ptr<AlienExplosionOrchestrator> explosions;
 };
 
 class Alien : public Entity, public Drawable, public Collidable {
@@ -86,6 +93,7 @@ class Alien : public Entity, public Drawable, public Collidable {
     bool deactivated;
     std::shared_ptr<ScoreNotifier> score_notifier;
     const unsigned int score;
+    std::shared_ptr<AlienExplosionOrchestrator> explosions;
 
   public:
     Alien(AlienParams params);
@@ -104,26 +112,45 @@ class Alien : public Entity, public Drawable, public Collidable {
     void collide_with(CollideCtx const &ctx, Collidable &other) override;
 };
 
-class AlienOrchestrator : public Entity, public Updateable, public PlayerStatusNotifier {
+class AlienProjectileOrchestrator {
+  private:
+    std::vector<std::shared_ptr<AlienProjectile>> projectiles;
+
+  public:
+    void add(std::shared_ptr<AlienProjectile> projectile);
+    void update();
+    void delete_all();
+};
+
+class AlienExplosionOrchestrator {
+  private:
+    std::vector<std::shared_ptr<AlienExplosion>> explosions;
+
+  public:
+    void add(std::shared_ptr<AlienExplosion> explosion);
+    void update();
+};
+
+class AlienOrchestrator : public Entity, public PlayerStatusNotifier {
   private:
     static constexpr int TICKS_PER_MOVE = 30;
     static constexpr int ALIEN_SHOOT_CHANCE = 5; // The chance is the reciprocal of this number
 
     int tick_counter;
     std::vector<std::shared_ptr<Alien>> aliens;
+    AlienProjectileOrchestrator projectiles;
     bool is_player_dead;
     int player_lives;
+    std::shared_ptr<AlienExplosionOrchestrator> explosions;
 
   public:
-    AlienOrchestrator();
+    AlienOrchestrator(std::shared_ptr<AlienExplosionOrchestrator> explosions);
     std::string get_type() const override;
     void add_alien(std::shared_ptr<Alien> alien);
+    void update(SceneCtx const &ctx);
 
     void notify_player_died(int remaining_lives) override;
     void notify_player_rerack(int remaining_lives) override;
-
-    std::optional<std::reference_wrapper<Updateable>> as_updateable() override;
-    void update(UpdateCtx const &ctx) override;
 };
 
 class AlienFactory {
@@ -131,9 +158,15 @@ class AlienFactory {
     SceneCtx ctx;
     std::shared_ptr<SDL_Texture> texture;
     std::shared_ptr<ScoreNotifier> score_notifier;
+    std::shared_ptr<AlienExplosionOrchestrator> explosions;
 
   public:
-    AlienFactory(SceneCtx ctx, std::shared_ptr<SDL_Texture> texture, std::shared_ptr<ScoreNotifier> score_notifier);
+    AlienFactory(
+        SceneCtx ctx,
+        std::shared_ptr<SDL_Texture> texture,
+        std::shared_ptr<ScoreNotifier> score_notifier,
+        std::shared_ptr<AlienExplosionOrchestrator> explosions
+    );
     std::shared_ptr<Alien> new_jellyfish(core::Point starting_position);
     std::shared_ptr<Alien> new_tadpole(core::Point starting_position);
     std::shared_ptr<Alien> new_octopus(core::Point starting_position);

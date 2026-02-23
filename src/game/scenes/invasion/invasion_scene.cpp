@@ -27,16 +27,18 @@ void InvasionScene::initialize(SceneCtx const &ctx) {
   auto scoreboard = std::make_shared<Scoreboard>(spritesheet_texture, core::Point{10, 10});
   ctx.entities.add(scoreboard);
 
-  auto alien_orchestrator = std::make_shared<AlienOrchestrator>();
+  auto explosions = std::make_shared<AlienExplosionOrchestrator>();
+
+  alien_orchestrator = std::make_shared<AlienOrchestrator>(explosions);
   ctx.entities.add(alien_orchestrator);
 
-  auto player = std::make_shared<Player>(spritesheet_texture, core::Point{500, 700});
+  player = std::make_shared<Player>(spritesheet_texture, core::Point{500, 700});
   ctx.entities.add(player);
   player->add_notifier(scoreboard);
   player->add_notifier(alien_orchestrator);
   player->rerack();
 
-  auto alien_factory = AlienFactory(ctx, spritesheet_texture, scoreboard);
+  auto alien_factory = AlienFactory(ctx, spritesheet_texture, scoreboard, explosions);
 
   const float starting_x_pos = 200;
   float x_pos = starting_x_pos;
@@ -78,4 +80,9 @@ void InvasionScene::initialize(SceneCtx const &ctx) {
     alien_orchestrator->add_alien(alien_factory.new_tadpole({x_pos, y_pos}));
     x_pos += alien_width + col_spacing;
   }
+}
+
+void InvasionScene::update(SceneCtx const &ctx) {
+  alien_orchestrator->update(ctx);
+  player->update(ctx);
 }

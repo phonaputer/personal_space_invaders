@@ -8,10 +8,15 @@
 #include <string>
 #include <vector>
 
-AlienProjectile::AlienProjectile(std::shared_ptr<SDL_Texture> texture, core::Point starting_position)
+AlienProjectile::AlienProjectile(
+    std::shared_ptr<SDL_Texture> texture,
+    core::Point starting_position,
+    std::shared_ptr<AlienExplosionOrchestrator> explosions
+)
     : x{starting_position.x},
       y{starting_position.y},
-      deleted{false} {
+      deleted{false},
+      explosions{explosions} {
   std::vector<Frame> frames = {{5, 2}, {6, 2}};
   animation = std::make_unique<Animation>(Spritesheet(texture, 16, 16), 10, frames);
 }
@@ -20,7 +25,7 @@ std::string AlienProjectile::get_type() const {
   return entityType::ALIEN_PROJECTILE;
 }
 
-void AlienProjectile::update([[maybe_unused]] UpdateCtx const &ctx) {
+void AlienProjectile::update() {
   y += SPEED;
   animation->update();
 }
@@ -40,6 +45,10 @@ bool AlienProjectile::is_deleted() const {
   return deleted == true || y >= core::WINDOW_HEIGHT;
 }
 
+void AlienProjectile::mark_deleted() {
+  deleted = true;
+}
+
 core::Rect AlienProjectile::get_hitbox() const {
   return {
       .x = x + 22,
@@ -56,9 +65,10 @@ void AlienProjectile::collide_with([[maybe_unused]] CollideCtx const &ctx, Colli
 
   if (other.get_type() == entityType::PLAYER_PROJECTILE) {
     deleted = true;
-    ctx.entities.add(
-        std::make_shared<AlienExplosion>(ctx.assets.get_texture(image::PRIMARY_SPRITESHEET), core::Point{x, y})
-    );
+    auto explosion =
+        std::make_shared<AlienExplosion>(ctx.assets.get_texture(image::PRIMARY_SPRITESHEET), core::Point{x, y});
+    ctx.entities.add(explosion);
+    explosions->add(explosion);
     ctx.assets.play_audio(sound::ALIEN_EXPLOSION);
   }
 }
@@ -69,10 +79,6 @@ std::optional<std::reference_wrapper<Collidable>> AlienProjectile::as_collidable
 
 std::optional<std::reference_wrapper<Drawable>> AlienProjectile::as_drawable() {
   return std::ref<Drawable>(*this);
-}
-
-std::optional<std::reference_wrapper<Updateable>> AlienProjectile::as_updateable() {
-  return std::ref<Updateable>(*this);
 }
 
 AlienExplosion::AlienExplosion(std::shared_ptr<SDL_Texture> texture, core::Point position)
@@ -99,21 +105,21 @@ std::optional<std::reference_wrapper<Drawable>> AlienExplosion::as_drawable() {
   return std::ref<Drawable>(*this);
 }
 
-void AlienExplosion::update([[maybe_unused]] UpdateCtx const &ctx) {
+void AlienExplosion::update() {
   tick_counter++;
   animation->update();
 }
 
-std::optional<std::reference_wrapper<Updateable>> AlienExplosion::as_updateable() {
-  return std::ref<Updateable>(*this);
-}
-
 AlienFactory::AlienFactory(
-    SceneCtx ctx, std::shared_ptr<SDL_Texture> texture, std::shared_ptr<ScoreNotifier> score_notifier
+    SceneCtx ctx,
+    std::shared_ptr<SDL_Texture> texture,
+    std::shared_ptr<ScoreNotifier> score_notifier,
+    std::shared_ptr<AlienExplosionOrchestrator> explosions
 )
     : ctx{ctx},
       texture{texture},
-      score_notifier{score_notifier} {
+      score_notifier{score_notifier},
+      explosions{explosions} {
 }
 
 std::shared_ptr<Alien> AlienFactory::new_jellyfish(core::Point starting_position) {
@@ -124,6 +130,7 @@ std::shared_ptr<Alien> AlienFactory::new_jellyfish(core::Point starting_position
       .hitbox = {5, 12, 50, 35},
       .score_notifier = score_notifier,
       .score = 30,
+      .explosions = explosions,
   });
 
   ctx.entities.add(entity);
@@ -139,6 +146,7 @@ std::shared_ptr<Alien> AlienFactory::new_tadpole(core::Point starting_position) 
       .hitbox = {17, 11, 23, 35},
       .score_notifier = score_notifier,
       .score = 10,
+      .explosions = explosions,
   });
 
   ctx.entities.add(entity);
@@ -154,6 +162,7 @@ std::shared_ptr<Alien> AlienFactory::new_octopus(core::Point starting_position) 
       .hitbox = {0, 15, 60, 32},
       .score_notifier = score_notifier,
       .score = 40,
+      .explosions = explosions,
   });
 
   ctx.entities.add(entity);
@@ -169,6 +178,7 @@ std::shared_ptr<Alien> AlienFactory::new_crab(core::Point starting_position) {
       .hitbox = {5, 14, 50, 31},
       .score_notifier = score_notifier,
       .score = 20,
+      .explosions = explosions,
   });
 
   ctx.entities.add(entity);
@@ -184,7 +194,8 @@ Alien::Alien(AlienParams params)
       hitbox{params.hitbox},
       deactivated{false},
       score_notifier{params.score_notifier},
-      score{params.score} {
+      score{params.score},
+      explosions{params.explosions} {
   animation = std::make_unique<Animation>(Spritesheet(params.texture, 16, 16), 17, params.frames);
 }
 
@@ -244,9 +255,10 @@ bool Alien::is_active() const {
 void Alien::collide_with(CollideCtx const &ctx, Collidable &other) {
   if (other.get_type() == entityType::PLAYER_PROJECTILE) {
     deactivated = true;
-    ctx.entities.add(
-        std::make_shared<AlienExplosion>(ctx.assets.get_texture(image::PRIMARY_SPRITESHEET), core::Point{x, y})
-    );
+    auto explosion =
+        std::make_shared<AlienExplosion>(ctx.assets.get_texture(image::PRIMARY_SPRITESHEET), core::Point{x, y});
+    ctx.entities.add(explosion);
+    explosions->add(explosion);
     ctx.assets.play_audio(sound::ALIEN_EXPLOSION);
     score_notifier->notify_player_scored(score);
   }
@@ -273,10 +285,41 @@ std::optional<std::reference_wrapper<Collidable>> Alien::as_collidable() {
   return std::ref<Collidable>(*this);
 }
 
-AlienOrchestrator::AlienOrchestrator()
+void AlienProjectileOrchestrator::add(std::shared_ptr<AlienProjectile> projectile) {
+  projectiles.push_back(projectile);
+}
+
+void AlienProjectileOrchestrator::update() {
+  for (const auto &projectile : projectiles) {
+    projectile->update();
+  }
+
+  std::erase_if(projectiles, [](std::shared_ptr<AlienProjectile> const &p) { return p->is_deleted(); });
+}
+
+void AlienProjectileOrchestrator::delete_all() {
+  for (const auto &projectile : projectiles) {
+    projectile->mark_deleted();
+  }
+}
+
+void AlienExplosionOrchestrator::add(std::shared_ptr<AlienExplosion> explosion) {
+  explosions.push_back(explosion);
+}
+
+void AlienExplosionOrchestrator::update() {
+  for (const auto &explosion : explosions) {
+    explosion->update();
+  }
+
+  std::erase_if(explosions, [](std::shared_ptr<AlienExplosion> const &e) { return e->is_deleted(); });
+}
+
+AlienOrchestrator::AlienOrchestrator(std::shared_ptr<AlienExplosionOrchestrator> explosions)
     : tick_counter{0},
       is_player_dead{false},
-      player_lives{1000} {
+      player_lives{1000},
+      explosions{explosions} {
 }
 
 std::string AlienOrchestrator::get_type() const {
@@ -290,6 +333,7 @@ void AlienOrchestrator::add_alien(std::shared_ptr<Alien> alien) {
 void AlienOrchestrator::notify_player_died(int remaining_lives) {
   is_player_dead = true;
   player_lives = remaining_lives;
+  projectiles.delete_all();
 }
 
 void AlienOrchestrator::notify_player_rerack(int remaining_lives) {
@@ -302,10 +346,14 @@ void AlienOrchestrator::notify_player_rerack(int remaining_lives) {
   player_lives = remaining_lives;
 }
 
-void AlienOrchestrator::update([[maybe_unused]] UpdateCtx const &ctx) {
+void AlienOrchestrator::update(SceneCtx const &ctx) {
+  explosions->update();
+
   if (is_player_dead) {
     return;
   }
+
+  projectiles.update();
 
   tick_counter++;
   if (tick_counter < TICKS_PER_MOVE) {
@@ -343,15 +391,11 @@ void AlienOrchestrator::update([[maybe_unused]] UpdateCtx const &ctx) {
   if (active_aliens.size() > 0 && rand() % ALIEN_SHOOT_CHANCE == 0) {
     size_t selected_alien = rand() % active_aliens.size();
     auto position = active_aliens.at(selected_alien)->get_position();
-    ctx.entities.add(
-        std::make_shared<AlienProjectile>(
-            ctx.assets.get_texture(image::PRIMARY_SPRITESHEET), core::Point{position.x, position.y + 30}
-        )
+    auto projectile = std::make_shared<AlienProjectile>(
+        ctx.assets.get_texture(image::PRIMARY_SPRITESHEET), core::Point{position.x, position.y + 30}, explosions
     );
+    ctx.entities.add(projectile);
+    projectiles.add(projectile);
     ctx.assets.play_audio(sound::ALIEN_SHOT);
   }
-}
-
-std::optional<std::reference_wrapper<Updateable>> AlienOrchestrator::as_updateable() {
-  return std::ref<Updateable>(*this);
 }

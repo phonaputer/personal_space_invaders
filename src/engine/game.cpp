@@ -54,6 +54,13 @@ void Game::update() {
   previous_now_ms = now_ms;
 
   while (unprocessed_ms > MS_PER_UPDATE) {
+    scene.scene->update(
+        SceneCtx{
+            .assets = *scene.assets,
+            .entities = *scene.entities,
+            .user_inputs = *user_inputs,
+        }
+    );
     scene.entities->update(
         UpdateCtx{
             .assets = *scene.assets,

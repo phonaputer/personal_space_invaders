@@ -51,6 +51,7 @@ class OnceAnimation {
   public:
     OnceAnimation(Spritesheet spritesheet, int ticks_per_frame, std::vector<Frame> frames);
     void play();
+    void stop();
     void update();
     void draw(SDL_Renderer *renderer, const core::Rect &draw_rect) const;
 };

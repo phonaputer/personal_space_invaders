@@ -110,6 +110,11 @@ void OnceAnimation::play() {
   cur_frame = 0;
 }
 
+void OnceAnimation::stop() {
+  cur_frame = 0;
+  playing = false;
+}
+
 void OnceAnimation::draw(SDL_Renderer *renderer, const core::Rect &draw_rect) const {
   if (!playing) {
     return;

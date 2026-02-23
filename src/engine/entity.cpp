@@ -1,4 +1,5 @@
 #include "entity.hpp"
+#include "scene.hpp"
 #include <SDL3/SDL.h>
 #include <algorithm>
 #include <functional>
@@ -14,13 +15,6 @@ void Entities::update(UpdateCtx const &ctx) {
     entities.push_back(std::move(entities_to_add.at(i)));
   }
   entities_to_add.clear();
-
-  for (const auto &e : entities) {
-    auto maybe_updateable = e->as_updateable();
-    if (maybe_updateable) {
-      maybe_updateable.value().get().update(ctx);
-    }
-  }
 
   check_collisions({
       .assets = ctx.assets,

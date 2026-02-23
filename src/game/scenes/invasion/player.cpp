@@ -19,7 +19,7 @@ std::string PlayerProjectile::get_type() const {
   return entityType::PLAYER_PROJECTILE;
 }
 
-void PlayerProjectile::update([[maybe_unused]] UpdateCtx const &ctx) {
+void PlayerProjectile::update() {
   y -= SPEED;
 }
 
@@ -36,6 +36,10 @@ void PlayerProjectile::draw(SDL_Renderer *renderer) const {
 
 bool PlayerProjectile::is_deleted() const {
   return deleted == true || y <= 0;
+}
+
+void PlayerProjectile::mark_deleted() {
+  deleted = true;
 }
 
 core::Rect PlayerProjectile::get_hitbox() const {
@@ -61,8 +65,22 @@ std::optional<std::reference_wrapper<Drawable>> PlayerProjectile::as_drawable() 
   return std::ref<Drawable>(*this);
 }
 
-std::optional<std::reference_wrapper<Updateable>> PlayerProjectile::as_updateable() {
-  return std::ref<Updateable>(*this);
+void PlayerProjectileOrchestrator::add(std::shared_ptr<PlayerProjectile> projectile) {
+  projectiles.push_back(projectile);
+}
+
+void PlayerProjectileOrchestrator::update() {
+  for (const auto &projectile : projectiles) {
+    projectile->update();
+  }
+
+  std::erase_if(projectiles, [](std::shared_ptr<PlayerProjectile> const &p) { return p->is_deleted(); });
+}
+
+void PlayerProjectileOrchestrator::delete_all() {
+  for (const auto &projectile : projectiles) {
+    projectile->mark_deleted();
+  }
 }
 
 Player::Player(std::shared_ptr<SDL_Texture> texture, core::Point starting_position)
@@ -103,7 +121,7 @@ void Player::rerack() {
   }
 }
 
-void Player::update(UpdateCtx const &ctx) {
+void Player::update(SceneCtx const &ctx) {
   if (exploding) {
     explosion_animation->update();
 
@@ -123,6 +141,8 @@ void Player::update(UpdateCtx const &ctx) {
     return;
   }
 
+  projectiles.update();
+
   if (ctx.user_inputs.is_engaged(PlayerInput::LEFT)) {
     x -= SPEED;
     animation->update();
@@ -135,11 +155,11 @@ void Player::update(UpdateCtx const &ctx) {
   if (ctx.user_inputs.is_engaged(PlayerInput::FIRE) && shot_clock >= TICKS_PER_SHOT) {
     shot_clock = 0;
     muzzle_flash_animation->play();
-    ctx.entities.add(
-        std::make_unique<PlayerProjectile>(
-            ctx.assets.get_texture(image::PRIMARY_SPRITESHEET), core::Point{x - 7, y - 20}
-        )
+    auto projectile = std::make_shared<PlayerProjectile>(
+        ctx.assets.get_texture(image::PRIMARY_SPRITESHEET), core::Point{x - 7, y - 20}
     );
+    ctx.entities.add(projectile);
+    projectiles.add(projectile);
     ctx.assets.play_audio(sound::PLAYER_SHOT);
   }
   muzzle_flash_animation->update();
@@ -178,9 +198,11 @@ void Player::collide_with([[maybe_unused]] CollideCtx const &ctx, Collidable &ot
     exploding = true;
     lives--;
     ctx.assets.play_audio(sound::PLAYER_EXPLOSION);
+    muzzle_flash_animation->stop();
 
     for (const auto &notifier : status_notifiers) {
       notifier->notify_player_died(lives);
+      projectiles.delete_all();
     }
   }
 }
@@ -191,8 +213,4 @@ std::optional<std::reference_wrapper<Collidable>> Player::as_collidable() {
 
 std::optional<std::reference_wrapper<Drawable>> Player::as_drawable() {
   return std::ref<Drawable>(*this);
-}
-
-std::optional<std::reference_wrapper<Updateable>> Player::as_updateable() {
-  return std::ref<Updateable>(*this);
 }

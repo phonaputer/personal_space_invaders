@@ -29,17 +29,6 @@ class Drawable {
     virtual void draw(SDL_Renderer *renderer) const = 0;
 };
 
-struct UpdateCtx {
-    Assets const &assets;
-    Entities &entities;
-    UserInputs const &user_inputs;
-};
-
-class Updateable {
-  public:
-    virtual void update(UpdateCtx const &ctx) = 0;
-};
-
 class Entity {
   public:
     virtual ~Entity() = default;
@@ -54,10 +43,6 @@ class Entity {
       return std::nullopt;
     }
 
-    virtual std::optional<std::reference_wrapper<Updateable>> as_updateable() {
-      return std::nullopt;
-    }
-
     virtual bool is_deleted() const {
       return false;
     }
@@ -67,6 +52,12 @@ class EntityAdder {
   public:
     virtual ~EntityAdder() = default;
     virtual void add(std::shared_ptr<Entity> entity) = 0;
+};
+
+struct UpdateCtx {
+    Assets const &assets;
+    Entities &entities;
+    UserInputs const &user_inputs;
 };
 
 class Entities : public EntityAdder {
