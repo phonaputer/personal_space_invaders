@@ -4,6 +4,8 @@
 #include "game/scenes/invasion/invasion_scene.hpp"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include <cstdlib>
+#include <ctime>
 #include <memory>
 #include <vector>
 
@@ -25,18 +27,19 @@
 // X * Game over when all lives are lost
 // ? * Can reset game after game over
 // X * Sound effects
+// X * clear bullets from screen when player dies
+// X * increate rate of bullet firing from aliens
+// X * Don't forget to seed standard library rand so aliens don't shoot the same each game
 // * different sound when two bullets collide
 // * BGM (space invaders style where it speeds up along with the aliens)
-// * increate rate of bullet firing from aliens
-// * Don't forget to seed standard library rand so aliens don't shoot the same each game
 // * aliens get faster when less are remaining
-// * clear bullets from screen when player dies
 // * Start menu
 // * Escape menu
 // * Throw in the mystery ship for bonus points
 // * Maybe some powerups?
 
 SDL_AppResult SDL_AppInit(void **appstate, [[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
+  std::srand(std::time(0));
 
   Game *game = nullptr;
   try {

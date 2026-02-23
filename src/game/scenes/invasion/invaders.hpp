@@ -134,7 +134,7 @@ class AlienExplosionOrchestrator {
 class AlienOrchestrator : public Entity, public PlayerStatusNotifier {
   private:
     static constexpr int TICKS_PER_MOVE = 30;
-    static constexpr int ALIEN_SHOOT_CHANCE = 5; // The chance is the reciprocal of this number
+    static constexpr int ALIEN_SHOOT_CHANCE = 3; // The chance is the reciprocal of this number
 
     int tick_counter;
     std::vector<std::shared_ptr<Alien>> aliens;
