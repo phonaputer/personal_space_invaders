@@ -131,17 +131,28 @@ class AlienExplosionOrchestrator {
     void update();
 };
 
+class BGMOrchestrator {
+  private:
+    int cur_arp_idx = 0;
+
+  public:
+    void play(SceneCtx const &ctx);
+    void reset();
+};
+
 class AlienOrchestrator : public Entity, public PlayerStatusNotifier {
   private:
     static constexpr int TICKS_PER_MOVE = 30;
     static constexpr int ALIEN_SHOOT_CHANCE = 3; // The chance is the reciprocal of this number
 
+    AlienProjectileOrchestrator projectiles;
+    std::shared_ptr<AlienExplosionOrchestrator> explosions;
+    BGMOrchestrator bgm;
+
     int tick_counter;
     std::vector<std::shared_ptr<Alien>> aliens;
-    AlienProjectileOrchestrator projectiles;
     bool is_player_dead;
     int player_lives;
-    std::shared_ptr<AlienExplosionOrchestrator> explosions;
 
   public:
     AlienOrchestrator(std::shared_ptr<AlienExplosionOrchestrator> explosions);

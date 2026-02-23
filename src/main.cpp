@@ -30,9 +30,9 @@
 // X * clear bullets from screen when player dies
 // X * increate rate of bullet firing from aliens
 // X * Don't forget to seed standard library rand so aliens don't shoot the same each game
-// * different sound when two bullets collide
-// * BGM (space invaders style where it speeds up along with the aliens)
+// X * BGM (space invaders style where it speeds up along with the aliens)
 // * aliens get faster when less are remaining
+// * different sound when two bullets collide
 // * Start menu
 // * Escape menu
 // * Throw in the mystery ship for bonus points

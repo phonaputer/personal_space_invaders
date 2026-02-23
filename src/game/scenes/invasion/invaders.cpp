@@ -315,11 +315,36 @@ void AlienExplosionOrchestrator::update() {
   std::erase_if(explosions, [](std::shared_ptr<AlienExplosion> const &e) { return e->is_deleted(); });
 }
 
+void BGMOrchestrator::play(SceneCtx const &ctx) {
+  switch (cur_arp_idx) {
+    case 0:
+      ctx.assets.play_audio(sound::ARP_1);
+      cur_arp_idx++;
+      break;
+    case 1:
+      ctx.assets.play_audio(sound::ARP_2);
+      cur_arp_idx++;
+      break;
+    case 2:
+      ctx.assets.play_audio(sound::ARP_3);
+      cur_arp_idx++;
+      break;
+    default:
+      ctx.assets.play_audio(sound::ARP_4);
+      cur_arp_idx = 0;
+      break;
+  }
+}
+
+void BGMOrchestrator::reset() {
+  cur_arp_idx = 0;
+}
+
 AlienOrchestrator::AlienOrchestrator(std::shared_ptr<AlienExplosionOrchestrator> explosions)
-    : tick_counter{0},
+    : explosions{explosions},
+      tick_counter{0},
       is_player_dead{false},
-      player_lives{1000},
-      explosions{explosions} {
+      player_lives{1000} {
 }
 
 std::string AlienOrchestrator::get_type() const {
@@ -342,6 +367,7 @@ void AlienOrchestrator::notify_player_rerack(int remaining_lives) {
     for (auto &alien : aliens) {
       alien->rerack();
     }
+    bgm.reset();
   }
   player_lives = remaining_lives;
 }
@@ -374,6 +400,8 @@ void AlienOrchestrator::update(SceneCtx const &ctx) {
   for (auto &alien : aliens) {
     alien->move(15);
   }
+
+  bgm.play(ctx);
 
   std::vector<std::shared_ptr<Alien>> active_aliens;
   for (const auto &a : aliens) {
