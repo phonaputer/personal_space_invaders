@@ -57,14 +57,6 @@ void PlayerProjectile::collide_with([[maybe_unused]] CollideCtx const &ctx, Coll
   }
 }
 
-std::optional<std::reference_wrapper<Collidable>> PlayerProjectile::as_collidable() {
-  return std::ref<Collidable>(*this);
-}
-
-std::optional<std::reference_wrapper<Drawable>> PlayerProjectile::as_drawable() {
-  return std::ref<Drawable>(*this);
-}
-
 void PlayerProjectileOrchestrator::add(std::shared_ptr<PlayerProjectile> projectile) {
   projectiles.push_back(projectile);
 }
@@ -130,7 +122,8 @@ void Player::update() {
     auto projectile = std::make_shared<PlayerProjectile>(
         scene.assets.get_texture(image::PRIMARY_SPRITESHEET), core::Point{x - 7, y - 20}
     );
-    scene.entities.add(projectile);
+    scene.entities.add_drawable(projectile);
+    scene.entities.add_collidable(projectile);
     projectiles.add(projectile);
     scene.assets.play_audio(sound::PLAYER_SHOT);
   }
@@ -144,6 +137,10 @@ void Player::notify_player_rerack() {
   animation->rewind();
   explosion_animation->rewind();
   scene.assets.stop_audio(sound::PLAYER_EXPLOSION);
+}
+
+bool Player::is_deleted() const {
+  return false;
 }
 
 void Player::draw(SDL_Renderer *renderer) const {
@@ -185,12 +182,4 @@ void Player::collide_with([[maybe_unused]] CollideCtx const &ctx, Collidable &ot
       projectiles.delete_all();
     }
   }
-}
-
-std::optional<std::reference_wrapper<Collidable>> Player::as_collidable() {
-  return std::ref<Collidable>(*this);
-}
-
-std::optional<std::reference_wrapper<Drawable>> Player::as_drawable() {
-  return std::ref<Drawable>(*this);
 }

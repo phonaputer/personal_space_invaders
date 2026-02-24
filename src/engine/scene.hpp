@@ -7,7 +7,7 @@
 
 struct SceneCtx {
     Assets const &assets;
-    Entities &entities;
+    EntityAdder &entities;
     UserInputs const &user_inputs;
 };
 

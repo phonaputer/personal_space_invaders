@@ -9,7 +9,7 @@
 #include <functional>
 #include <memory>
 
-class PlayerProjectile : public Entity, public Collidable, public Drawable {
+class PlayerProjectile : public Collidable, public Drawable {
   private:
     static constexpr float DRAW_WIDTH = 60;
     static constexpr float DRAW_HEIGHT = 60;
@@ -26,11 +26,8 @@ class PlayerProjectile : public Entity, public Collidable, public Drawable {
     bool is_deleted() const override;
     void mark_deleted();
     void update();
-
-    std::optional<std::reference_wrapper<Collidable>> as_collidable() override;
     core::Rect get_hitbox() const override;
     void collide_with(CollideCtx const &ctx, Collidable &other) override;
-    std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
     void draw(SDL_Renderer *renderer) const override;
 };
 
@@ -44,7 +41,7 @@ class PlayerProjectileOrchestrator {
     void delete_all();
 };
 
-class Player : public Entity, public Collidable, public Drawable, public GameStateNotifier {
+class Player : public Collidable, public Drawable, public GameStateNotifier {
   private:
     static constexpr float DRAW_WIDTH = 60;
     static constexpr float DRAW_HEIGHT = 60;
@@ -68,12 +65,9 @@ class Player : public Entity, public Collidable, public Drawable, public GameSta
     std::string get_type() const override;
     void add_notifier(std::weak_ptr<PlayerDeathNotifier> notifier);
     void update();
-
     void notify_player_rerack() override;
-
-    std::optional<std::reference_wrapper<Collidable>> as_collidable() override;
+    bool is_deleted() const override;
     core::Rect get_hitbox() const override;
     void collide_with(CollideCtx const &ctx, Collidable &other) override;
-    std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
     void draw(SDL_Renderer *renderer) const override;
 };

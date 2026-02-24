@@ -27,21 +27,21 @@ void InvasionScene::initialize(SceneCtx ctx) {
   auto spritesheet_texture = ctx.assets.get_texture(image::PRIMARY_SPRITESHEET);
 
   auto hud = std::make_shared<HUD>(spritesheet_texture, core::Point{10, 10});
-  ctx.entities.add(hud);
+  ctx.entities.add_drawable(hud);
   game_state->add_notifier(hud);
 
   auto explosions = std::make_shared<AlienExplosionOrchestrator>();
 
   alien_orchestrator = std::make_shared<AlienOrchestrator>(explosions);
-  ctx.entities.add(alien_orchestrator);
   game_state->add_notifier(alien_orchestrator);
 
   player = std::make_shared<Player>(spritesheet_texture, core::Point{500, 700}, ctx);
-  ctx.entities.add(player);
+  ctx.entities.add_drawable(player);
+  ctx.entities.add_collidable(player);
   player->add_notifier(game_state);
   game_state->add_notifier(player);
 
-  auto alien_factory = AlienFactory(ctx, spritesheet_texture, game_state, explosions);
+  auto alien_factory = AlienFactory(ctx, game_state, explosions);
 
   const float starting_x_pos = 200;
   float x_pos = starting_x_pos;

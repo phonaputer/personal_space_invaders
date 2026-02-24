@@ -48,10 +48,6 @@ HUD::HUD(std::shared_ptr<SDL_Texture> texture, core::Point position)
       game_is_over{false} {
 }
 
-std::string HUD::get_type() const {
-  return entityType::HUD;
-}
-
 void HUD::notify_score_change(int new_current_score, int new_high_score) {
   current_score = new_current_score;
   high_score = new_high_score;
@@ -69,8 +65,8 @@ void HUD::notify_game_over() {
   game_is_over = true;
 }
 
-std::optional<std::reference_wrapper<Drawable>> HUD::as_drawable() {
-  return *this;
+bool HUD::is_deleted() const {
+  return false;
 }
 
 void HUD::draw(SDL_Renderer *renderer) const {

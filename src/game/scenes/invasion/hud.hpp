@@ -22,7 +22,7 @@ class TextRenderer {
     void render_text(SDL_Renderer *renderer, core::Point location, std::string text) const;
 };
 
-class HUD : public Entity, public Drawable, public GameStateNotifier {
+class HUD : public Drawable, public GameStateNotifier {
   private:
     TextRenderer text_renderer;
     const float x;
@@ -34,12 +34,10 @@ class HUD : public Entity, public Drawable, public GameStateNotifier {
 
   public:
     HUD(std::shared_ptr<SDL_Texture> texture, core::Point position);
-    std::string get_type() const override;
     void notify_score_change(int new_current_score, int new_high_score) override;
     void notify_player_lives_change(int new_current_lives) override;
     void notify_game_start() override;
     void notify_game_over() override;
-
-    std::optional<std::reference_wrapper<Drawable>> as_drawable() override;
+    bool is_deleted() const override;
     void draw(SDL_Renderer *renderer) const override;
 };

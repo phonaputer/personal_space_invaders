@@ -58,7 +58,7 @@ core::Rect AlienProjectile::get_hitbox() const {
   };
 }
 
-void AlienProjectile::collide_with([[maybe_unused]] CollideCtx const &ctx, Collidable &other) {
+void AlienProjectile::collide_with(CollideCtx const &ctx, Collidable &other) {
   if (other.get_type() == entityType::PLAYER) {
     deleted = true;
   }
@@ -67,18 +67,10 @@ void AlienProjectile::collide_with([[maybe_unused]] CollideCtx const &ctx, Colli
     deleted = true;
     auto explosion =
         std::make_shared<AlienExplosion>(ctx.assets.get_texture(image::PRIMARY_SPRITESHEET), core::Point{x, y});
-    ctx.entities.add(explosion);
+    ctx.entities.add_drawable(explosion);
     explosions->add(explosion);
     ctx.assets.play_audio(sound::ALIEN_EXPLOSION);
   }
-}
-
-std::optional<std::reference_wrapper<Collidable>> AlienProjectile::as_collidable() {
-  return std::ref<Collidable>(*this);
-}
-
-std::optional<std::reference_wrapper<Drawable>> AlienProjectile::as_drawable() {
-  return std::ref<Drawable>(*this);
 }
 
 AlienExplosion::AlienExplosion(std::shared_ptr<SDL_Texture> texture, core::Point position)
@@ -89,10 +81,6 @@ AlienExplosion::AlienExplosion(std::shared_ptr<SDL_Texture> texture, core::Point
   animation = std::make_unique<Animation>(Spritesheet(texture, 16, 16), 5, frames);
 }
 
-std::string AlienExplosion::get_type() const {
-  return entityType::ALIEN_EXPLOSION;
-}
-
 void AlienExplosion::draw(SDL_Renderer *renderer) const {
   animation->draw(renderer, {x, y, DRAW_WIDTH, DRAW_HEIGHT});
 }
@@ -101,30 +89,22 @@ bool AlienExplosion::is_deleted() const {
   return tick_counter >= LIFETIME_TICKS;
 }
 
-std::optional<std::reference_wrapper<Drawable>> AlienExplosion::as_drawable() {
-  return std::ref<Drawable>(*this);
-}
-
 void AlienExplosion::update() {
   tick_counter++;
   animation->update();
 }
 
 AlienFactory::AlienFactory(
-    SceneCtx ctx,
-    std::shared_ptr<SDL_Texture> texture,
-    std::weak_ptr<ScoreNotifier> score_notifier,
-    std::shared_ptr<AlienExplosionOrchestrator> explosions
+    SceneCtx ctx, std::weak_ptr<ScoreNotifier> score_notifier, std::shared_ptr<AlienExplosionOrchestrator> explosions
 )
     : ctx{ctx},
-      texture{texture},
       score_notifier{score_notifier},
       explosions{explosions} {
 }
 
 std::shared_ptr<Alien> AlienFactory::new_jellyfish(core::Point starting_position) {
   auto entity = std::make_shared<Alien>(AlienParams{
-      .texture = texture,
+      .texture = ctx.assets.get_texture(image::PRIMARY_SPRITESHEET),
       .starting_position = starting_position,
       .frames = {{1, 0}, {0, 0}, {1, 0}, {2, 0}},
       .hitbox = {5, 12, 50, 35},
@@ -133,14 +113,15 @@ std::shared_ptr<Alien> AlienFactory::new_jellyfish(core::Point starting_position
       .explosions = explosions,
   });
 
-  ctx.entities.add(entity);
+  ctx.entities.add_drawable(entity);
+  ctx.entities.add_collidable(entity);
 
   return entity;
 }
 
 std::shared_ptr<Alien> AlienFactory::new_tadpole(core::Point starting_position) {
   auto entity = std::make_shared<Alien>(AlienParams{
-      .texture = texture,
+      .texture = ctx.assets.get_texture(image::PRIMARY_SPRITESHEET),
       .starting_position = starting_position,
       .frames = {{4, 0}, {3, 0}, {4, 0}, {5, 0}},
       .hitbox = {17, 11, 23, 35},
@@ -149,14 +130,15 @@ std::shared_ptr<Alien> AlienFactory::new_tadpole(core::Point starting_position) 
       .explosions = explosions,
   });
 
-  ctx.entities.add(entity);
+  ctx.entities.add_drawable(entity);
+  ctx.entities.add_collidable(entity);
 
   return entity;
 }
 
 std::shared_ptr<Alien> AlienFactory::new_octopus(core::Point starting_position) {
   auto entity = std::make_shared<Alien>(AlienParams{
-      .texture = texture,
+      .texture = ctx.assets.get_texture(image::PRIMARY_SPRITESHEET),
       .starting_position = starting_position,
       .frames = {{6, 0}, {7, 0}},
       .hitbox = {0, 15, 60, 32},
@@ -165,14 +147,15 @@ std::shared_ptr<Alien> AlienFactory::new_octopus(core::Point starting_position) 
       .explosions = explosions,
   });
 
-  ctx.entities.add(entity);
+  ctx.entities.add_drawable(entity);
+  ctx.entities.add_collidable(entity);
 
   return entity;
 }
 
 std::shared_ptr<Alien> AlienFactory::new_crab(core::Point starting_position) {
   auto entity = std::make_shared<Alien>(AlienParams{
-      .texture = texture,
+      .texture = ctx.assets.get_texture(image::PRIMARY_SPRITESHEET),
       .starting_position = starting_position,
       .frames = {{1, 1}, {0, 1}, {1, 1}, {2, 1}},
       .hitbox = {5, 14, 50, 31},
@@ -181,7 +164,8 @@ std::shared_ptr<Alien> AlienFactory::new_crab(core::Point starting_position) {
       .explosions = explosions,
   });
 
-  ctx.entities.add(entity);
+  ctx.entities.add_drawable(entity);
+  ctx.entities.add_collidable(entity);
 
   return entity;
 }
@@ -252,12 +236,16 @@ bool Alien::is_active() const {
   return !deactivated;
 }
 
+bool Alien::is_deleted() const {
+  return false;
+}
+
 void Alien::collide_with(CollideCtx const &ctx, Collidable &other) {
   if (other.get_type() == entityType::PLAYER_PROJECTILE) {
     deactivated = true;
     auto explosion =
         std::make_shared<AlienExplosion>(ctx.assets.get_texture(image::PRIMARY_SPRITESHEET), core::Point{x, y});
-    ctx.entities.add(explosion);
+    ctx.entities.add_drawable(explosion);
     explosions->add(explosion);
     ctx.assets.play_audio(sound::ALIEN_EXPLOSION);
     score_notifier.lock()->notify_scored(score);
@@ -272,18 +260,6 @@ core::Rect Alien::get_hitbox() const {
       .height = hitbox.height,
   };
 };
-
-std::optional<std::reference_wrapper<Drawable>> Alien::as_drawable() {
-  return std::ref<Drawable>(*this);
-}
-
-std::optional<std::reference_wrapper<Collidable>> Alien::as_collidable() {
-  if (deactivated) {
-    return std::nullopt;
-  }
-
-  return std::ref<Collidable>(*this);
-}
 
 void AlienProjectileOrchestrator::add(std::shared_ptr<AlienProjectile> projectile) {
   projectiles.push_back(projectile);
@@ -347,10 +323,6 @@ AlienOrchestrator::AlienOrchestrator(std::shared_ptr<AlienExplosionOrchestrator>
       is_player_dead{false} {
 }
 
-std::string AlienOrchestrator::get_type() const {
-  return entityType::ALIEN_ORCHESTRATOR;
-}
-
 void AlienOrchestrator::add_alien(std::shared_ptr<Alien> alien) {
   aliens.push_back(alien);
 }
@@ -387,7 +359,8 @@ void AlienOrchestrator::update(SceneCtx ctx) {
       auto projectile = std::make_shared<AlienProjectile>(
           ctx.assets.get_texture(image::PRIMARY_SPRITESHEET), core::Point{position.x, position.y + 30}, explosions
       );
-      ctx.entities.add(projectile);
+      ctx.entities.add_drawable(projectile);
+      ctx.entities.add_collidable(projectile);
       projectiles.add(projectile);
       ctx.assets.play_audio(sound::ALIEN_SHOT);
     }
