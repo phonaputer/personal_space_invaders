@@ -20,14 +20,16 @@ class PlayerProjectile : public Collidable, public Drawable {
     float y;
     bool deleted;
 
-  public:
     PlayerProjectile(std::shared_ptr<SDL_Texture> texture, core::Point starting_position);
+
+  public:
+    static std::shared_ptr<PlayerProjectile> create(SceneCtx ctx, core::Point starting_position);
     std::string get_type() const override;
     bool is_deleted() const override;
     void mark_deleted();
     void update();
     core::Rect get_hitbox() const override;
-    void collide_with(CollideCtx const &ctx, Collidable &other) override;
+    void collide_with(CollideCtx ctx, Collidable &other) override;
     void draw(SDL_Renderer *renderer) const override;
 };
 
@@ -48,7 +50,7 @@ class Player : public Collidable, public Drawable, public GameStateNotifier {
     static constexpr float SPEED = 4;
     static constexpr int TICKS_PER_SHOT = 35;
 
-    SceneCtx scene;
+    SceneCtx ctx;
     core::Point starting_position;
     std::unique_ptr<Animation> animation;
     std::unique_ptr<OnceAnimation> muzzle_flash_animation;
@@ -60,14 +62,16 @@ class Player : public Collidable, public Drawable, public GameStateNotifier {
     std::vector<std::weak_ptr<PlayerDeathNotifier>> status_notifiers;
     PlayerProjectileOrchestrator projectiles;
 
+    Player(SceneCtx ctx, core::Point starting_position);
+
   public:
-    Player(std::shared_ptr<SDL_Texture> texture, core::Point starting_position, SceneCtx scene);
+    static std::shared_ptr<Player> create(SceneCtx ctx, core::Point starting_position);
     std::string get_type() const override;
     void add_notifier(std::weak_ptr<PlayerDeathNotifier> notifier);
     void update();
     void notify_player_rerack() override;
     bool is_deleted() const override;
     core::Rect get_hitbox() const override;
-    void collide_with(CollideCtx const &ctx, Collidable &other) override;
+    void collide_with(CollideCtx ctx, Collidable &other) override;
     void draw(SDL_Renderer *renderer) const override;
 };

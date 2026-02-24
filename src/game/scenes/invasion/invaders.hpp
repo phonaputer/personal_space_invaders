@@ -24,18 +24,22 @@ class AlienProjectile : public Collidable, public Drawable {
     bool deleted;
     std::shared_ptr<AlienExplosionOrchestrator> explosions;
 
-  public:
     AlienProjectile(
         std::shared_ptr<SDL_Texture> texture,
         core::Point starting_position,
         std::shared_ptr<AlienExplosionOrchestrator> explosions
     );
+
+  public:
+    static std::shared_ptr<AlienProjectile>
+    create(SceneCtx ctx, core::Point starting_position, std::shared_ptr<AlienExplosionOrchestrator> explosions);
+
     std::string get_type() const override;
     bool is_deleted() const override;
     void mark_deleted();
     void update();
     core::Rect get_hitbox() const override;
-    void collide_with(CollideCtx const &ctx, Collidable &other) override;
+    void collide_with(CollideCtx ctx, Collidable &other) override;
     void draw(SDL_Renderer *renderer) const override;
 };
 
@@ -49,8 +53,10 @@ class AlienExplosion : public Drawable {
     float x;
     float y;
 
-  public:
     AlienExplosion(std::shared_ptr<SDL_Texture> texture, core::Point position);
+
+  public:
+    static std::shared_ptr<AlienExplosion> create(Assets const &assets, EntityAdder &entities, core::Point position);
     bool is_deleted() const override;
     void update();
     void draw(SDL_Renderer *renderer) const override;
@@ -96,7 +102,7 @@ class Alien : public Drawable, public Collidable {
     bool is_deleted() const override;
     void draw(SDL_Renderer *renderer) const override;
     core::Rect get_hitbox() const override;
-    void collide_with(CollideCtx const &ctx, Collidable &other) override;
+    void collide_with(CollideCtx ctx, Collidable &other) override;
 };
 
 class AlienProjectileOrchestrator {

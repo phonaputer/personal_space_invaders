@@ -22,7 +22,7 @@ class Collidable {
     virtual ~Collidable() = default;
     virtual std::string get_type() const = 0;
     virtual core::Rect get_hitbox() const = 0;
-    virtual void collide_with([[maybe_unused]] CollideCtx const &ctx, [[maybe_unused]] Collidable &other) {};
+    virtual void collide_with([[maybe_unused]] CollideCtx ctx, [[maybe_unused]] Collidable &other) {};
     virtual bool is_deleted() const = 0;
     virtual bool is_active() const {
       return true;

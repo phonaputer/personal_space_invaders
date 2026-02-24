@@ -24,10 +24,7 @@ void InvasionScene::preload_assets(PreloadAssetsCtx ctx) {
 void InvasionScene::initialize(SceneCtx ctx) {
   game_state = std::make_shared<GameStateOrchestrator>();
 
-  auto spritesheet_texture = ctx.assets.get_texture(image::PRIMARY_SPRITESHEET);
-
-  auto hud = std::make_shared<HUD>(spritesheet_texture, core::Point{10, 10});
-  ctx.entities.add_drawable(hud);
+  auto hud = HUD::create(ctx);
   game_state->add_notifier(hud);
 
   auto explosions = std::make_shared<AlienExplosionOrchestrator>();
@@ -35,9 +32,7 @@ void InvasionScene::initialize(SceneCtx ctx) {
   alien_orchestrator = std::make_shared<AlienOrchestrator>(explosions);
   game_state->add_notifier(alien_orchestrator);
 
-  player = std::make_shared<Player>(spritesheet_texture, core::Point{500, 700}, ctx);
-  ctx.entities.add_drawable(player);
-  ctx.entities.add_collidable(player);
+  player = Player::create(ctx, {500, 700});
   player->add_notifier(game_state);
   game_state->add_notifier(player);
 
