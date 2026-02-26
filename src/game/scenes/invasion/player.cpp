@@ -8,17 +8,13 @@
 #include <memory>
 #include <vector>
 
-PlayerProjectile::PlayerProjectile(std::shared_ptr<SDL_Texture> texture, core::Point starting_position)
-    : spritesheet(texture, 16, 16),
-      x{starting_position.x},
-      y{starting_position.y},
-      deleted{false} {
+PlayerProjectile::PlayerProjectile(std::shared_ptr<SDL_Texture> texture)
+    : spritesheet(texture, 16, 16) {
 }
 
-std::shared_ptr<PlayerProjectile> PlayerProjectile::create(SceneCtx ctx, core::Point starting_position) {
-  auto result = std::shared_ptr<PlayerProjectile>(
-      new PlayerProjectile(ctx.assets.get_texture(image::PRIMARY_SPRITESHEET), starting_position)
-  );
+std::shared_ptr<PlayerProjectile> PlayerProjectile::create(SceneCtx ctx) {
+  auto result =
+      std::shared_ptr<PlayerProjectile>(new PlayerProjectile(ctx.assets.get_texture(image::PRIMARY_SPRITESHEET)));
 
   ctx.entities.add_collidable(result);
   ctx.entities.add_drawable(result);
@@ -26,12 +22,38 @@ std::shared_ptr<PlayerProjectile> PlayerProjectile::create(SceneCtx ctx, core::P
   return result;
 }
 
+void PlayerProjectile::shoot_from(core::Point position) {
+  active = true;
+  x = position.x;
+  y = position.y;
+}
+
+bool PlayerProjectile::is_active() const {
+  return active;
+}
+
+void PlayerProjectile::deactivate() {
+  active = false;
+}
+
+bool PlayerProjectile::is_deleted() const {
+  return false;
+}
+
 std::string PlayerProjectile::get_type() const {
   return entityType::PLAYER_PROJECTILE;
 }
 
 void PlayerProjectile::update() {
+  if (!is_active()) {
+    return;
+  }
+
   y -= SPEED;
+
+  if (y <= 0) {
+    active = false;
+  }
 }
 
 void PlayerProjectile::draw(SDL_Renderer *renderer) const {
@@ -43,14 +65,6 @@ void PlayerProjectile::draw(SDL_Renderer *renderer) const {
   SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
   SDL_RenderRect(renderer, &sdl_hitbox);
 #endif
-}
-
-bool PlayerProjectile::is_deleted() const {
-  return deleted == true || y <= 0;
-}
-
-void PlayerProjectile::mark_deleted() {
-  deleted = true;
 }
 
 core::Rect PlayerProjectile::get_hitbox() const {
@@ -65,25 +79,7 @@ core::Rect PlayerProjectile::get_hitbox() const {
 void PlayerProjectile::collide_with([[maybe_unused]] CollideCtx ctx, Collidable &other) {
   if (other.get_type() == entityType::ALIEN || other.get_type() == entityType::ALIEN_PROJECTILE ||
       other.get_type() == entityType::FORTRESS_TILE) {
-    deleted = true;
-  }
-}
-
-void PlayerProjectileOrchestrator::add(std::shared_ptr<PlayerProjectile> projectile) {
-  projectiles.push_back(projectile);
-}
-
-void PlayerProjectileOrchestrator::update() {
-  for (const auto &projectile : projectiles) {
-    projectile->update();
-  }
-
-  std::erase_if(projectiles, [](std::shared_ptr<PlayerProjectile> const &p) { return p->is_deleted(); });
-}
-
-void PlayerProjectileOrchestrator::delete_all() {
-  for (const auto &projectile : projectiles) {
-    projectile->mark_deleted();
+    active = false;
   }
 }
 
@@ -91,8 +87,7 @@ Player::Player(SceneCtx ctx, core::Point starting_position)
     : ctx{ctx},
       starting_position{starting_position},
       x{starting_position.x},
-      y{starting_position.y},
-      shot_clock{0} {
+      y{starting_position.y} {
   auto texture = ctx.assets.get_texture(image::PRIMARY_SPRITESHEET);
 
   std::vector<Frame> frames = {{0, 2}, {1, 2}, {2, 2}};
@@ -103,6 +98,8 @@ Player::Player(SceneCtx ctx, core::Point starting_position)
 
   std::vector<Frame> explosion_frames = {{0, 3}, {1, 3}, {2, 3}, {1, 3}};
   explosion_animation = std::make_unique<Animation>(Spritesheet(texture, 16, 16), 6, explosion_frames);
+
+  projectile = PlayerProjectile::create(ctx);
 }
 
 std::shared_ptr<Player> Player::create(SceneCtx ctx, core::Point starting_position) {
@@ -128,7 +125,7 @@ void Player::update() {
     return;
   }
 
-  projectiles.update();
+  projectile->update();
 
   if (ctx.user_inputs.is_engaged(PlayerInput::LEFT)) {
     x -= SPEED;
@@ -139,10 +136,10 @@ void Player::update() {
   }
 
   shot_clock++;
-  if (ctx.user_inputs.is_engaged(PlayerInput::FIRE) && shot_clock >= TICKS_PER_SHOT) {
+  if (ctx.user_inputs.is_engaged(PlayerInput::FIRE) && !projectile->is_active() && shot_clock >= TICKS_PER_SHOT) {
     shot_clock = 0;
     muzzle_flash_animation->play();
-    projectiles.add(PlayerProjectile::create(ctx, {x - 7, y - 20}));
+    projectile->shoot_from({x - 7, y - 20});
     ctx.assets.play_audio(sound::PLAYER_SHOT);
   }
   muzzle_flash_animation->update();
@@ -197,7 +194,7 @@ void Player::collide_with([[maybe_unused]] CollideCtx ctx, Collidable &other) {
 
     for (const auto &notifier : status_notifiers) {
       notifier.lock()->notify_player_died();
-      projectiles.delete_all();
+      projectile->deactivate();
     }
   }
 }

@@ -16,31 +16,23 @@ class PlayerProjectile : public Collidable, public Drawable {
     static constexpr float SPEED = 10;
 
     Spritesheet spritesheet;
-    float x;
-    float y;
-    bool deleted;
+    float x = 0;
+    float y = 0;
+    bool active = false;
 
-    PlayerProjectile(std::shared_ptr<SDL_Texture> texture, core::Point starting_position);
+    PlayerProjectile(std::shared_ptr<SDL_Texture> texture);
 
   public:
-    static std::shared_ptr<PlayerProjectile> create(SceneCtx ctx, core::Point starting_position);
-    std::string get_type() const override;
+    static std::shared_ptr<PlayerProjectile> create(SceneCtx ctx);
+    void shoot_from(core::Point position);
+    bool is_active() const override;
+    void deactivate();
     bool is_deleted() const override;
-    void mark_deleted();
+    std::string get_type() const override;
     void update();
     core::Rect get_hitbox() const override;
     void collide_with(CollideCtx ctx, Collidable &other) override;
     void draw(SDL_Renderer *renderer) const override;
-};
-
-class PlayerProjectileOrchestrator {
-  private:
-    std::vector<std::shared_ptr<PlayerProjectile>> projectiles;
-
-  public:
-    void add(std::shared_ptr<PlayerProjectile> projectile);
-    void update();
-    void delete_all();
 };
 
 class Player : public Collidable, public Drawable, public GameStateNotifier {
@@ -48,7 +40,7 @@ class Player : public Collidable, public Drawable, public GameStateNotifier {
     static constexpr float DRAW_WIDTH = 60;
     static constexpr float DRAW_HEIGHT = 60;
     static constexpr float SPEED = 4;
-    static constexpr int TICKS_PER_SHOT = 35;
+    static constexpr int TICKS_PER_SHOT = 4;
 
     SceneCtx ctx;
     core::Point starting_position;
@@ -57,10 +49,10 @@ class Player : public Collidable, public Drawable, public GameStateNotifier {
     std::unique_ptr<Animation> explosion_animation;
     float x;
     float y;
-    int shot_clock;
     bool am_dead;
     std::vector<std::weak_ptr<PlayerDeathNotifier>> status_notifiers;
-    PlayerProjectileOrchestrator projectiles;
+    std::shared_ptr<PlayerProjectile> projectile;
+    int shot_clock = 0;
 
     Player(SceneCtx ctx, core::Point starting_position);
 
