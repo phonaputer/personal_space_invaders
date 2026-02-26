@@ -34,6 +34,9 @@ class Drawable {
     virtual ~Drawable() = default;
     virtual void draw(SDL_Renderer *renderer) const = 0;
     virtual bool is_deleted() const = 0;
+    virtual bool is_active() const {
+      return true;
+    }
 };
 
 class EntityAdder {

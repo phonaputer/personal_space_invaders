@@ -32,12 +32,12 @@
 // X * Don't forget to seed standard library rand so aliens don't shoot the same each game
 // X * BGM (space invaders style where it speeds up along with the aliens)
 // X * aliens get faster when less are remaining
+// X * You have fortresses
+// * you can have exactly 1 bullet on screen at a time
 // * You lose the game when an alien makes it to the earth
 // * Add Z-index when drawing stuff
 // * Remove scene ctx from update calls
 // * Remove Entity type since it's not really needed
-// * You have fortresses
-// * You shoot faster under a fortress
 // * different sound when two bullets collide
 // * Throw in the mystery ship for bonus points
 // * Start menu

@@ -63,7 +63,8 @@ core::Rect PlayerProjectile::get_hitbox() const {
 }
 
 void PlayerProjectile::collide_with([[maybe_unused]] CollideCtx ctx, Collidable &other) {
-  if (other.get_type() == entityType::ALIEN || other.get_type() == entityType::ALIEN_PROJECTILE) {
+  if (other.get_type() == entityType::ALIEN || other.get_type() == entityType::ALIEN_PROJECTILE ||
+      other.get_type() == entityType::FORTRESS_TILE) {
     deleted = true;
   }
 }

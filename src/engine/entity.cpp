@@ -35,7 +35,9 @@ void Entities::update(UpdateCtx const &ctx) {
 
 void Entities::draw(SDL_Renderer *renderer) {
   for (const auto &e : drawables) {
-    e->draw(renderer);
+    if (e->is_active()) {
+      e->draw(renderer);
+    }
   }
 }
 

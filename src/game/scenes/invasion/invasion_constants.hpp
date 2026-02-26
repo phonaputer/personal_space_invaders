@@ -14,6 +14,8 @@ const std::string ALIEN_ORCHESTRATOR = "alien-orchestrator";
 
 const std::string HUD = "hud";
 
+const std::string FORTRESS_TILE = "fortress-tile";
+
 }; // namespace entityType
 
 namespace image {

@@ -79,6 +79,18 @@ void InvasionScene::initialize(SceneCtx ctx) {
     x_pos += alien_width + col_spacing;
   }
 
+  float fort_x_pos = 200;
+  const float fort_y_pos = core::WINDOW_HEIGHT - 175;
+  const float fort_x_spacing = 200;
+
+  for (int i = 0; i < 4; i++) {
+    auto fort = Fortress::create(ctx, {fort_x_pos, fort_y_pos});
+    fortresses.push_back(fort);
+    game_state->add_notifier(fort);
+
+    fort_x_pos += fort_x_spacing;
+  }
+
   game_state->restart_game();
 }
 

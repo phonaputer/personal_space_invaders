@@ -81,6 +81,10 @@ void AlienProjectile::collide_with(CollideCtx ctx, Collidable &other) {
     explosions->add(AlienExplosion::create(ctx.assets, ctx.entities, {x, y}));
     ctx.assets.play_audio(sound::ALIEN_EXPLOSION);
   }
+
+  if (other.get_type() == entityType::FORTRESS_TILE) {
+    deleted = true;
+  }
 }
 
 AlienExplosion::AlienExplosion(std::shared_ptr<SDL_Texture> texture, core::Point position)

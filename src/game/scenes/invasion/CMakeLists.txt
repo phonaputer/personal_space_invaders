@@ -6,4 +6,5 @@ target_sources(
   player.cpp
   hud.cpp
   game_state.cpp
+  fortress.cpp
 )
