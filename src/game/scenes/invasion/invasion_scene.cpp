@@ -31,8 +31,9 @@ void InvasionScene::initialize(SceneCtx ctx) {
 
   alien_orchestrator = std::make_shared<AlienOrchestrator>(explosions);
   game_state->add_notifier(alien_orchestrator);
+  alien_orchestrator->add_overrun_notifier(game_state);
 
-  player = Player::create(ctx, {500, 700});
+  player = Player::create(ctx, {500, GROUND_Y - 45});
   player->add_notifier(game_state);
   game_state->add_notifier(player);
 
@@ -40,7 +41,7 @@ void InvasionScene::initialize(SceneCtx ctx) {
 
   const float starting_x_pos = 200;
   float x_pos = starting_x_pos;
-  float y_pos = 100;
+  float y_pos = 50;
   const float alien_width = 60;
   const float alien_height = 60;
   const float col_spacing = 5;
@@ -90,6 +91,8 @@ void InvasionScene::initialize(SceneCtx ctx) {
 
     fort_x_pos += fort_x_spacing;
   }
+
+  ground = Ground::create(ctx);
 
   game_state->restart_game();
 }

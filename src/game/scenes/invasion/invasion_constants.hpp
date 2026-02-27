@@ -47,5 +47,8 @@ const unsigned int ALIEN_PROJECTILE = 30;
 const unsigned int ALIEN = 22;
 const unsigned int PLAYER = 21;
 const unsigned int FORTRESS = 20;
+const unsigned int GROUND = 1;
 
 } // namespace zindex
+
+const float GROUND_Y = 745;

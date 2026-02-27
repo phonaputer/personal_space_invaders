@@ -129,6 +129,10 @@ void Player::update() {
     return;
   }
 
+  if (paused) {
+    return;
+  }
+
   projectile->update();
 
   if (ctx.user_inputs.is_engaged(PlayerInput::LEFT)) {
@@ -156,6 +160,14 @@ void Player::notify_player_rerack() {
   animation->rewind();
   explosion_animation->rewind();
   ctx.assets.stop_audio(sound::PLAYER_EXPLOSION);
+}
+
+void Player::notify_game_over() {
+  paused = true;
+}
+
+void Player::notify_game_start() {
+  paused = false;
 }
 
 bool Player::is_deleted() const {

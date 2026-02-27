@@ -98,6 +98,7 @@ class Alien : public Drawable, public Collidable {
     void move(float speed);
     void descend_and_turn(float descend_speed);
     bool has_reached_edge() const;
+    bool has_reached_ground() const;
     core::Point get_position() const;
     void rerack();
     bool is_active() const override;
@@ -141,6 +142,8 @@ class AlienOrchestrator : public GameStateNotifier {
     static constexpr int TICKS_PER_MOVE = 58;
     static constexpr int TICKS_PER_SHOOT_CHANCE = 30;
     static constexpr int ALIEN_SHOOT_CHANCE = 3; // The chance is the reciprocal of this number
+    static constexpr float X_SPEED = 20;
+    static constexpr float Y_SPEED = 45;
 
     AlienProjectileOrchestrator projectiles;
     std::shared_ptr<AlienExplosionOrchestrator> explosions;
@@ -149,15 +152,18 @@ class AlienOrchestrator : public GameStateNotifier {
     int tick_counter;
     int shot_tick_counter;
     std::vector<std::shared_ptr<Alien>> aliens;
-    bool is_player_dead;
+    bool paused;
+    std::vector<std::weak_ptr<AlienOverrunNotifier>> overrun_notifiers;
 
   public:
     AlienOrchestrator(std::shared_ptr<AlienExplosionOrchestrator> explosions);
     void add_alien(std::shared_ptr<Alien> alien);
     void update(SceneCtx ctx);
+    void add_overrun_notifier(std::weak_ptr<AlienOverrunNotifier> notifier);
 
     void notify_player_died() override;
     void notify_player_rerack() override;
+    void notify_game_over() override;
     void notify_game_start() override;
 };
 

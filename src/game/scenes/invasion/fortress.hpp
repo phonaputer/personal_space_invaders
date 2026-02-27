@@ -45,3 +45,11 @@ class Fortress : public GameStateNotifier {
     static std::shared_ptr<Fortress> create(SceneCtx ctx, core::Point position);
     void notify_game_start();
 };
+
+class Ground : public Drawable {
+  public:
+    static std::shared_ptr<Ground> create(SceneCtx ctx);
+    unsigned int get_z() const override;
+    void draw(SDL_Renderer *renderer) const override;
+    bool is_deleted() const override;
+};

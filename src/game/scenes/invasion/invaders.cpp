@@ -59,7 +59,7 @@ void AlienProjectile::draw(SDL_Renderer *renderer) const {
 }
 
 bool AlienProjectile::is_deleted() const {
-  return deleted == true || y >= core::WINDOW_HEIGHT;
+  return deleted == true || y + 40 >= GROUND_Y;
 }
 
 void AlienProjectile::mark_deleted() {
@@ -254,7 +254,11 @@ void Alien::descend_and_turn(float descend_speed) {
 }
 
 bool Alien::has_reached_edge() const {
-  return x <= 60 || x + DRAW_WIDTH >= core::WINDOW_WIDTH - 60;
+  return x <= 30 || x + DRAW_WIDTH >= core::WINDOW_WIDTH - 30;
+}
+
+bool Alien::has_reached_ground() const {
+  return !deactivated && y + DRAW_HEIGHT >= GROUND_Y;
 }
 
 void Alien::rerack() {
@@ -353,7 +357,7 @@ AlienOrchestrator::AlienOrchestrator(std::shared_ptr<AlienExplosionOrchestrator>
     : explosions{explosions},
       tick_counter{0},
       shot_tick_counter{0},
-      is_player_dead{false} {
+      paused{false} {
 }
 
 void AlienOrchestrator::add_alien(std::shared_ptr<Alien> alien) {
@@ -363,7 +367,7 @@ void AlienOrchestrator::add_alien(std::shared_ptr<Alien> alien) {
 void AlienOrchestrator::update(SceneCtx ctx) {
   explosions->update();
 
-  if (is_player_dead) {
+  if (paused) {
     return;
   }
 
@@ -412,21 +416,39 @@ void AlienOrchestrator::update(SceneCtx ctx) {
 
   for (auto &alien : aliens) {
     if (descend_and_turn) {
-      alien->descend_and_turn(60);
+      alien->descend_and_turn(Y_SPEED);
     }
-    alien->move(15);
+    alien->move(X_SPEED);
   }
 
   bgm.play(ctx);
+
+  for (auto &alien : active_aliens) {
+    if (alien->has_reached_ground()) {
+      for (const auto &notifier : overrun_notifiers) {
+        notifier.lock()->notify_aliens_overran_earth();
+      }
+      break;
+    }
+  }
+}
+
+void AlienOrchestrator::add_overrun_notifier(std::weak_ptr<AlienOverrunNotifier> notifier) {
+  overrun_notifiers.push_back(notifier);
 }
 
 void AlienOrchestrator::notify_player_died() {
-  is_player_dead = true;
+  paused = true;
   projectiles.delete_all();
 }
 
 void AlienOrchestrator::notify_player_rerack() {
-  is_player_dead = false;
+  paused = false;
+}
+
+void AlienOrchestrator::notify_game_over() {
+  paused = true;
+  projectiles.delete_all();
 }
 
 void AlienOrchestrator::notify_game_start() {

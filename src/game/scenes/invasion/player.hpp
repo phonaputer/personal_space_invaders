@@ -54,18 +54,22 @@ class Player : public Collidable, public Drawable, public GameStateNotifier {
     std::vector<std::weak_ptr<PlayerDeathNotifier>> status_notifiers;
     std::shared_ptr<PlayerProjectile> projectile;
     int shot_clock = 0;
+    bool paused = false;
 
     Player(SceneCtx ctx, core::Point starting_position);
 
   public:
     static std::shared_ptr<Player> create(SceneCtx ctx, core::Point starting_position);
-    std::string get_type() const override;
     void add_notifier(std::weak_ptr<PlayerDeathNotifier> notifier);
     void update();
-    void notify_player_rerack() override;
+
+    std::string get_type() const override;
     bool is_deleted() const override;
     core::Rect get_hitbox() const override;
     void collide_with(CollideCtx ctx, Collidable &other) override;
     unsigned int get_z() const override;
     void draw(SDL_Renderer *renderer) const override;
+    void notify_player_rerack() override;
+    void notify_game_over() override;
+    void notify_game_start() override;
 };

@@ -117,3 +117,24 @@ void Fortress::notify_game_start() {
     tile->rerack();
   }
 }
+
+std::shared_ptr<Ground> Ground::create(SceneCtx ctx) {
+  auto result = std::make_shared<Ground>();
+
+  ctx.entities.add_drawable(result);
+
+  return result;
+}
+
+unsigned int Ground::get_z() const {
+  return zindex::GROUND;
+}
+
+void Ground::draw(SDL_Renderer *renderer) const {
+  SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+  SDL_RenderLine(renderer, 0, GROUND_Y, core::WINDOW_WIDTH, GROUND_Y);
+}
+
+bool Ground::is_deleted() const {
+  return false;
+}

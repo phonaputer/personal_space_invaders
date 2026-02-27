@@ -14,6 +14,7 @@ class InvasionScene : public Scene {
     std::shared_ptr<AlienOrchestrator> alien_orchestrator;
     std::shared_ptr<Player> player;
     std::vector<std::shared_ptr<Fortress>> fortresses;
+    std::shared_ptr<Ground> ground;
 
   public:
     void preload_assets(PreloadAssetsCtx ctx) override;
