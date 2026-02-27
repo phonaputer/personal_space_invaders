@@ -43,6 +43,10 @@ void FortressTile::collide_with([[maybe_unused]] CollideCtx ctx, [[maybe_unused]
   }
 }
 
+unsigned int FortressTile::get_z() const {
+  return zindex::FORTRESS;
+}
+
 void FortressTile::draw(SDL_Renderer *renderer) const {
   if (health < 1) {
     return;

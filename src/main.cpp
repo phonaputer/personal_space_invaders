@@ -33,7 +33,7 @@
 // X * BGM (space invaders style where it speeds up along with the aliens)
 // X * aliens get faster when less are remaining
 // X * You have fortresses
-// * you can have exactly 1 bullet on screen at a time
+// X * you can have exactly 1 bullet on screen at a time
 // * truncate the player shot noise since you don't really hear the bass part anyways
 // * You lose the game when an alien makes it to the earth
 // * Add Z-index when drawing stuff

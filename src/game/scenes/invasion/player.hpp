@@ -32,6 +32,7 @@ class PlayerProjectile : public Collidable, public Drawable {
     void update();
     core::Rect get_hitbox() const override;
     void collide_with(CollideCtx ctx, Collidable &other) override;
+    unsigned int get_z() const override;
     void draw(SDL_Renderer *renderer) const override;
 };
 
@@ -65,5 +66,6 @@ class Player : public Collidable, public Drawable, public GameStateNotifier {
     bool is_deleted() const override;
     core::Rect get_hitbox() const override;
     void collide_with(CollideCtx ctx, Collidable &other) override;
+    unsigned int get_z() const override;
     void draw(SDL_Renderer *renderer) const override;
 };

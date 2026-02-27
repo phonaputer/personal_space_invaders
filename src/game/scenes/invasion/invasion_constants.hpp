@@ -37,3 +37,15 @@ const std::string ARP_3 = "arp-3";
 const std::string ARP_4 = "arp-4";
 
 } // namespace sound
+
+namespace zindex {
+
+const unsigned int HUD = 100;
+const unsigned int ALIEN_EXPLOSION = 50;
+const unsigned int PLAYER_PROJECTILE = 31;
+const unsigned int ALIEN_PROJECTILE = 30;
+const unsigned int ALIEN = 22;
+const unsigned int PLAYER = 21;
+const unsigned int FORTRESS = 20;
+
+} // namespace zindex

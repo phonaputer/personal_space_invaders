@@ -33,6 +33,7 @@ class Drawable {
   public:
     virtual ~Drawable() = default;
     virtual void draw(SDL_Renderer *renderer) const = 0;
+    virtual unsigned int get_z() const = 0;
     virtual bool is_deleted() const = 0;
     virtual bool is_active() const {
       return true;

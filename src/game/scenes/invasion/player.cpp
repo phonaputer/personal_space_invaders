@@ -56,6 +56,10 @@ void PlayerProjectile::update() {
   }
 }
 
+unsigned int PlayerProjectile::get_z() const {
+  return zindex::PLAYER_PROJECTILE;
+}
+
 void PlayerProjectile::draw(SDL_Renderer *renderer) const {
   spritesheet.draw_frame(renderer, {7, 1}, {x, y, DRAW_WIDTH, DRAW_HEIGHT});
 
@@ -156,6 +160,10 @@ void Player::notify_player_rerack() {
 
 bool Player::is_deleted() const {
   return false;
+}
+
+unsigned int Player::get_z() const {
+  return zindex::PLAYER;
 }
 
 void Player::draw(SDL_Renderer *renderer) const {

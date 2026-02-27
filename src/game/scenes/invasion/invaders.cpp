@@ -43,6 +43,10 @@ void AlienProjectile::update() {
   animation->update();
 }
 
+unsigned int AlienProjectile::get_z() const {
+  return zindex::ALIEN_PROJECTILE;
+}
+
 void AlienProjectile::draw(SDL_Renderer *renderer) const {
   animation->draw(renderer, {x, y, DRAW_WIDTH, DRAW_HEIGHT});
 
@@ -103,6 +107,10 @@ AlienExplosion::create(Assets const &assets, EntityAdder &entities, core::Point 
   entities.add_drawable(result);
 
   return result;
+}
+
+unsigned int AlienExplosion::get_z() const {
+  return zindex::ALIEN_EXPLOSION;
 }
 
 void AlienExplosion::draw(SDL_Renderer *renderer) const {
@@ -219,6 +227,10 @@ void Alien::move(float speed) {
   } else {
     x -= speed;
   }
+}
+
+unsigned int Alien::get_z() const {
+  return zindex::ALIEN;
 }
 
 void Alien::draw(SDL_Renderer *renderer) const {

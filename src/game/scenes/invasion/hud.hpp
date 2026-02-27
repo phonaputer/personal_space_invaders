@@ -39,5 +39,6 @@ class HUD : public Drawable, public GameStateNotifier {
     void notify_game_start() override;
     void notify_game_over() override;
     bool is_deleted() const override;
+    unsigned int get_z() const override;
     void draw(SDL_Renderer *renderer) const override;
 };

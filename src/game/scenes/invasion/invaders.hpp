@@ -40,6 +40,7 @@ class AlienProjectile : public Collidable, public Drawable {
     void update();
     core::Rect get_hitbox() const override;
     void collide_with(CollideCtx ctx, Collidable &other) override;
+    unsigned int get_z() const override;
     void draw(SDL_Renderer *renderer) const override;
 };
 
@@ -59,6 +60,7 @@ class AlienExplosion : public Drawable {
     static std::shared_ptr<AlienExplosion> create(Assets const &assets, EntityAdder &entities, core::Point position);
     bool is_deleted() const override;
     void update();
+    unsigned int get_z() const override;
     void draw(SDL_Renderer *renderer) const override;
 };
 
@@ -100,6 +102,7 @@ class Alien : public Drawable, public Collidable {
     void rerack();
     bool is_active() const override;
     bool is_deleted() const override;
+    unsigned int get_z() const override;
     void draw(SDL_Renderer *renderer) const override;
     core::Rect get_hitbox() const override;
     void collide_with(CollideCtx ctx, Collidable &other) override;

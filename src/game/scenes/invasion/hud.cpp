@@ -75,6 +75,10 @@ bool HUD::is_deleted() const {
   return false;
 }
 
+unsigned int HUD::get_z() const {
+  return zindex::HUD;
+}
+
 void HUD::draw(SDL_Renderer *renderer) const {
   text_renderer.render_text(renderer, {10, 10}, std::format("score:{}", current_score));
   text_renderer.render_text(renderer, {core::WINDOW_WIDTH / 2 - 110, 10}, std::format("hi-score:{}", high_score));

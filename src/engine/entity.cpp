@@ -14,10 +14,19 @@ void Entities::add_collidable(std::shared_ptr<Collidable> entity) {
 }
 
 void Entities::update(UpdateCtx const &ctx) {
+  bool added_drawables = !drawables_to_add.empty();
   for (size_t i = 0; i < drawables_to_add.size(); i++) {
     drawables.push_back(drawables_to_add.at(i));
   }
   drawables_to_add.clear();
+
+  if (added_drawables) {
+    std::sort(
+        drawables.begin(), drawables.end(), [](const std::shared_ptr<Drawable> &a, const std::shared_ptr<Drawable> &b) {
+          return a->get_z() < b->get_z();
+        }
+    );
+  }
 
   for (size_t i = 0; i < collidables_to_add.size(); i++) {
     collidables.push_back(collidables_to_add.at(i));
