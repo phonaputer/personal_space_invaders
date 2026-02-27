@@ -258,7 +258,7 @@ bool Alien::has_reached_edge() const {
 }
 
 bool Alien::has_reached_ground() const {
-  return !deactivated && y + DRAW_HEIGHT >= GROUND_Y;
+  return !deactivated && y + get_hitbox().height >= GROUND_Y;
 }
 
 void Alien::rerack() {
