@@ -81,6 +81,15 @@ SDL_AppResult SDL_AppEvent([[maybe_unused]] void *appstate, SDL_Event *event) {
         case SDL_SCANCODE_SPACE:
           game->get_user_inputs().engage(PlayerInput::FIRE);
           break;
+        case SDL_SCANCODE_W:
+          game->get_user_inputs().engage(PlayerInput::UP);
+          break;
+        case SDL_SCANCODE_S:
+          game->get_user_inputs().engage(PlayerInput::DOWN);
+          break;
+        case SDL_SCANCODE_ESCAPE:
+          game->get_user_inputs().engage(PlayerInput::PAUSE);
+          break;
         default:
           // do nothing
       }
@@ -96,6 +105,15 @@ SDL_AppResult SDL_AppEvent([[maybe_unused]] void *appstate, SDL_Event *event) {
           break;
         case SDL_SCANCODE_SPACE:
           game->get_user_inputs().disengage(PlayerInput::FIRE);
+          break;
+        case SDL_SCANCODE_W:
+          game->get_user_inputs().disengage(PlayerInput::UP);
+          break;
+        case SDL_SCANCODE_S:
+          game->get_user_inputs().disengage(PlayerInput::DOWN);
+          break;
+        case SDL_SCANCODE_ESCAPE:
+          game->get_user_inputs().disengage(PlayerInput::PAUSE);
           break;
         default:
           // do nothing

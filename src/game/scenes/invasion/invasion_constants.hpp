@@ -36,10 +36,13 @@ const std::string ARP_2 = "arp-2";
 const std::string ARP_3 = "arp-3";
 const std::string ARP_4 = "arp-4";
 
+const std::string MENU_SELECT = "menu-select";
+
 } // namespace sound
 
 namespace zindex {
 
+const unsigned int PAUSE_MENU = 101;
 const unsigned int HUD = 100;
 const unsigned int ALIEN_EXPLOSION = 50;
 const unsigned int PLAYER_PROJECTILE = 31;

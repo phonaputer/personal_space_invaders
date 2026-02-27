@@ -4,6 +4,7 @@
 #include "fortress.hpp"
 #include "game_state.hpp"
 #include "invaders.hpp"
+#include "pause_menu.hpp"
 #include "player.hpp"
 #include <memory>
 #include <vector>
@@ -15,6 +16,7 @@ class InvasionScene : public Scene {
     std::shared_ptr<Player> player;
     std::vector<std::shared_ptr<Fortress>> fortresses;
     std::shared_ptr<Ground> ground;
+    std::shared_ptr<PauseMenu> pause_menu;
 
   public:
     void preload_assets(PreloadAssetsCtx ctx) override;

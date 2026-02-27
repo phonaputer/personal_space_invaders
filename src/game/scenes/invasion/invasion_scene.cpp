@@ -4,6 +4,7 @@
 #include "hud.hpp"
 #include "invaders.hpp"
 #include "invasion_constants.hpp"
+#include "pause_menu.hpp"
 #include "player.hpp"
 #include <memory>
 
@@ -19,6 +20,7 @@ void InvasionScene::preload_assets(PreloadAssetsCtx ctx) {
   ctx.assets.load_audio(sound::ARP_2, "./assets/arp2.wav");
   ctx.assets.load_audio(sound::ARP_3, "./assets/arp3.wav");
   ctx.assets.load_audio(sound::ARP_4, "./assets/arp4.wav");
+  ctx.assets.load_audio(sound::MENU_SELECT, "./assets/menu_select.wav");
 }
 
 void InvasionScene::initialize(SceneCtx ctx) {
@@ -93,11 +95,22 @@ void InvasionScene::initialize(SceneCtx ctx) {
   }
 
   ground = Ground::create(ctx);
+  pause_menu = PauseMenu::create(ctx);
 
   game_state->restart_game();
 }
 
 void InvasionScene::update(SceneCtx ctx) {
+  if (pause_menu->is_active()) {
+    pause_menu->update();
+    return;
+  }
+
+  if (ctx.user_inputs.is_initiated(PlayerInput::PAUSE)) {
+    pause_menu->activate();
+    return;
+  }
+
   game_state->update();
   alien_orchestrator->update(ctx);
   player->update();
