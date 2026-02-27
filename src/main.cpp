@@ -34,11 +34,11 @@
 // X * aliens get faster when less are remaining
 // X * You have fortresses
 // X * you can have exactly 1 bullet on screen at a time
-// * truncate the player shot noise since you don't really hear the bass part anyways
-// * You lose the game when an alien makes it to the earth
-// * Add Z-index when drawing stuff
+// X * truncate the player shot noise since you don't really hear the bass part anyways
+// X * You lose the game when an alien makes it to the earth
+// X * Remove Entity type since it's not really needed
+// X * Add Z-index when drawing stuff
 // * Remove scene ctx from update calls
-// * Remove Entity type since it's not really needed
 // * different sound when two bullets collide
 // * Throw in the mystery ship for bonus points
 // * Start menu
