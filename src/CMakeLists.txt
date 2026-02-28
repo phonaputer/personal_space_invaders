@@ -21,6 +21,10 @@ add_executable(
   main.cpp
 )
 
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+)
+
 add_subdirectory(engine)
 add_subdirectory(game)
 
@@ -31,4 +35,5 @@ target_include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/engine
   ${CMAKE_CURRENT_SOURCE_DIR}/game/scenes/invasion
+  ${CMAKE_CURRENT_SOURCE_DIR}/game/scenes/main_menu
 )

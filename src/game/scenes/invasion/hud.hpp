@@ -2,8 +2,8 @@
 
 #include "engine/entity.hpp"
 #include "engine/scene.hpp"
+#include "engine/text_renderer.hpp"
 #include "game_state.hpp"
-#include "text_renderer.hpp"
 #include <SDL3/SDL.h>
 #include <memory>
 

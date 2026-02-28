@@ -7,6 +7,5 @@ target_sources(
   hud.cpp
   game_state.cpp
   fortress.cpp
-  text_renderer.cpp
   pause_menu.cpp
 )

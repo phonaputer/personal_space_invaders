@@ -64,6 +64,10 @@ void Entities::check_collisions(CollideCtx const &ctx) {
 
   size_t num_collidables = active_collidables.size();
 
+  if (num_collidables < 1) {
+    return;
+  }
+
   for (size_t i = 0; i < num_collidables - 1; i++) {
     const auto &a = active_collidables.at(i);
 

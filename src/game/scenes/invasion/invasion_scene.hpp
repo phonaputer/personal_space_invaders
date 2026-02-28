@@ -7,6 +7,7 @@
 #include "pause_menu.hpp"
 #include "player.hpp"
 #include <memory>
+#include <optional>
 #include <vector>
 
 class InvasionScene : public Scene {
@@ -21,5 +22,5 @@ class InvasionScene : public Scene {
   public:
     void preload_assets(PreloadAssetsCtx ctx) override;
     void initialize(SceneCtx ctx) override;
-    void update(SceneCtx ctx) override;
+    std::optional<std::unique_ptr<Scene>> update(SceneCtx ctx) override;
 };

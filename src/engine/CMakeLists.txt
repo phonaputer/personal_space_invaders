@@ -6,4 +6,5 @@ target_sources(
   entity.cpp
   sprites.cpp
   input.cpp
+  text_renderer.cpp
 )

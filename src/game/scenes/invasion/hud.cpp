@@ -1,7 +1,7 @@
 #include "hud.hpp"
 #include "engine/core.hpp"
+#include "engine/text_renderer.hpp"
 #include "invasion_constants.hpp"
-#include "text_renderer.hpp"
 #include <SDL3/SDL.h>
 #include <format>
 #include <memory>

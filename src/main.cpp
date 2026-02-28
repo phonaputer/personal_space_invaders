@@ -1,7 +1,7 @@
 #define SDL_MAIN_USE_CALLBACKS
 
 #include "engine/game.hpp"
-#include "game/scenes/invasion/invasion_scene.hpp"
+#include "game/scenes/main_menu/main_menu_scene.hpp"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <cstdlib>
@@ -56,7 +56,7 @@ SDL_AppResult SDL_AppInit(void **appstate, [[maybe_unused]] int argc, [[maybe_un
     return SDL_APP_FAILURE;
   }
 
-  game->set_scene(std::make_unique<InvasionScene>());
+  game->set_scene(std::make_unique<MainMenuScene>());
 
   SDL_Log("Setup complete...");
 

@@ -7,6 +7,7 @@
 #include "pause_menu.hpp"
 #include "player.hpp"
 #include <memory>
+#include <optional>
 
 void InvasionScene::preload_assets(PreloadAssetsCtx ctx) {
   // TODO this could just go in the initialize function...
@@ -100,18 +101,20 @@ void InvasionScene::initialize(SceneCtx ctx) {
   game_state->restart_game();
 }
 
-void InvasionScene::update(SceneCtx ctx) {
+std::optional<std::unique_ptr<Scene>> InvasionScene::update(SceneCtx ctx) {
   if (pause_menu->is_active()) {
     pause_menu->update();
-    return;
+    return std::nullopt;
   }
 
   if (ctx.user_inputs.is_initiated(PlayerInput::PAUSE)) {
     pause_menu->activate();
-    return;
+    return std::nullopt;
   }
 
   game_state->update();
   alien_orchestrator->update(ctx);
   player->update();
+
+  return std::nullopt;
 }

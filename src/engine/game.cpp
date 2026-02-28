@@ -55,13 +55,20 @@ void Game::update() {
 
   while (unprocessed_ms > MS_PER_UPDATE) {
     user_inputs->update();
-    scene.scene->update(
+
+    auto maybe_new_scene = scene.scene->update(
         SceneCtx{
             .assets = *scene.assets,
             .entities = *scene.entities,
             .user_inputs = *user_inputs,
         }
     );
+    if (maybe_new_scene.has_value()) {
+      unprocessed_ms = 0;
+      set_scene(std::move(maybe_new_scene.value()));
+      return;
+    }
+
     scene.entities->update(
         UpdateCtx{
             .assets = *scene.assets,
