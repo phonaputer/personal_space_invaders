@@ -14,9 +14,10 @@ PauseMenu::PauseMenu(SceneCtx ctx, std::shared_ptr<SDL_Texture> texture)
 
 void PauseMenu::execute_option() {
   switch (option_idx) {
-    case 1:
-      // restart
+    case MAIN_MENU_IDX:
+      return_to_main_menu = true;
       break;
+
     default:
       active = false;
       break;
@@ -78,33 +79,37 @@ void PauseMenu::update() {
   }
 }
 
+bool PauseMenu::should_return_to_main_menu() {
+  return return_to_main_menu;
+}
+
 void PauseMenu::draw(SDL_Renderer *renderer) const {
-  const float x = (core::WINDOW_WIDTH * 0.5) - 108;
+  const float x = (core::WINDOW_WIDTH * 0.5) - 130;
   const float y = (core::WINDOW_HEIGHT * 0.5) - 75;
 
   SDL_SetRenderDrawColor(renderer, 20, 20, 20, 255);
-  auto rect = SDL_FRect{x, y, 216, 150};
+  auto rect = SDL_FRect{x, y, 260, 150};
   SDL_RenderFillRect(renderer, &rect);
 
   // This is some "janky" stuff...
-  if (option_idx == 0) {
+  if (option_idx == RESUME_IDX) {
     if (option_selected && option_selected_blink) {
-      text_renderer.render_text(renderer, {x + 20, y + 40}, ">RESUME<");
+      text_renderer.render_text(renderer, {x + 40, y + 40}, ">RESUME<");
     } else if (!option_selected) {
-      text_renderer.render_text(renderer, {x + 20, y + 40}, ">RESUME<");
+      text_renderer.render_text(renderer, {x + 40, y + 40}, ">RESUME<");
     }
   } else {
-    text_renderer.render_text(renderer, {x + 42, y + 40}, "RESUME");
+    text_renderer.render_text(renderer, {x + 62, y + 40}, "RESUME");
   }
 
-  if (option_idx == 1) {
+  if (option_idx == MAIN_MENU_IDX) {
     if (option_selected && option_selected_blink) {
-      text_renderer.render_text(renderer, {x + 10, y + 90}, ">RESTART<");
+      text_renderer.render_text(renderer, {x + 10, y + 90}, ">MAIN MENU<");
     } else if (!option_selected) {
-      text_renderer.render_text(renderer, {x + 10, y + 90}, ">RESTART<");
+      text_renderer.render_text(renderer, {x + 10, y + 90}, ">MAIN MENU<");
     }
   } else {
-    text_renderer.render_text(renderer, {x + 32, y + 90}, "RESTART");
+    text_renderer.render_text(renderer, {x + 32, y + 90}, "MAIN MENU");
   }
 }
 

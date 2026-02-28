@@ -1,6 +1,7 @@
 #include "invasion_scene.hpp"
 #include "engine/core.hpp"
 #include "engine/scene.hpp"
+#include "game/scenes/main_menu/main_menu_scene.hpp"
 #include "hud.hpp"
 #include "invaders.hpp"
 #include "invasion_constants.hpp"
@@ -104,6 +105,11 @@ void InvasionScene::initialize(SceneCtx ctx) {
 std::optional<std::unique_ptr<Scene>> InvasionScene::update(SceneCtx ctx) {
   if (pause_menu->is_active()) {
     pause_menu->update();
+
+    if (pause_menu->should_return_to_main_menu()) {
+      return std::make_unique<MainMenuScene>();
+    }
+
     return std::nullopt;
   }
 

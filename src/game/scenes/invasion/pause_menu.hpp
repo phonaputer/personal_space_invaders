@@ -12,6 +12,9 @@ class PauseMenu : public Drawable {
     static constexpr int OPTION_SELECTED_TOTAL_TICKS = 25;
     static constexpr int OPTION_SELECTED_BLINK_TICKS = 3;
 
+    static constexpr int RESUME_IDX = 0;
+    static constexpr int MAIN_MENU_IDX = 1;
+
     SceneCtx ctx;
     TextRenderer text_renderer;
     int option_idx = 0;
@@ -19,6 +22,7 @@ class PauseMenu : public Drawable {
     bool option_selected = false;
     int option_selected_tick_counter = 0;
     bool option_selected_blink = true;
+    bool return_to_main_menu = false;
 
     PauseMenu(SceneCtx ctx, std::shared_ptr<SDL_Texture> texture);
     void execute_option();
@@ -27,6 +31,7 @@ class PauseMenu : public Drawable {
     static std::shared_ptr<PauseMenu> create(SceneCtx ctx);
     void activate();
     void update();
+    bool should_return_to_main_menu();
     void draw(SDL_Renderer *renderer) const override;
     unsigned int get_z() const override;
     bool is_deleted() const override;
