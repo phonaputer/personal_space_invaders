@@ -74,7 +74,7 @@ void Entities::check_collisions(CollideCtx const &ctx) {
     for (size_t j = i + 1; j < num_collidables; j++) {
       const auto &b = active_collidables.at(j);
 
-      if (are_touching(a->get_hitbox(), b->get_hitbox())) {
+      if (a->is_active() && b->is_active() && are_touching(a->get_hitbox(), b->get_hitbox())) {
         a->collide_with(ctx, *b);
         b->collide_with(ctx, *a);
       }
