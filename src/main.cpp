@@ -38,11 +38,12 @@
 // X * You lose the game when an alien makes it to the earth
 // X * Remove Entity type since it's not really needed
 // X * Add Z-index when drawing stuff
-// * Remove scene ctx from update calls
-// * different sound when two bullets collide
+// X * Start menu
+// X * Escape menu
+// (won't do) * Remove scene ctx from update calls
+// (won't do) * different sound when two bullets collide
+// * make it so a bullet can't destroy two things if it collides with two in one tick
 // * Throw in the mystery ship for bonus points
-// * Start menu
-// * Escape menu
 // * Maybe some powerups?
 
 SDL_AppResult SDL_AppInit(void **appstate, [[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
