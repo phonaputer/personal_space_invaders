@@ -34,3 +34,11 @@ void TextRenderer::render_text(SDL_Renderer *renderer, core::Point location, std
     cur_x += CHARACTER_X_SPACING;
   }
 }
+
+void TextRenderer::render_text_centered(SDL_Renderer *renderer, float y, std::string text) const {
+  float text_width_px = text.length() * TextRenderer::CHARACTER_X_SPACING;
+
+  float start_x = core::WINDOW_WIDTH * 0.5 - text_width_px * 0.5;
+
+  render_text(renderer, {start_x, y}, text);
+}

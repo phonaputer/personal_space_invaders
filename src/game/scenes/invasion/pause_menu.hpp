@@ -26,6 +26,7 @@ class PauseMenu : public Drawable {
 
     PauseMenu(SceneCtx ctx, std::shared_ptr<SDL_Texture> texture);
     void execute_option();
+    void draw_option(SDL_Renderer *renderer, int idx, core::Point position, std::string text) const;
 
   public:
     static std::shared_ptr<PauseMenu> create(SceneCtx ctx);

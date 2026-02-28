@@ -4,6 +4,7 @@
 #include "engine/scene.hpp"
 #include "engine/text_renderer.hpp"
 #include <memory>
+#include <string>
 
 class MainMenu : public Drawable {
 

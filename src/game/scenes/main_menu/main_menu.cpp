@@ -34,6 +34,7 @@ void MainMenu::update() {
 
   if (ctx.user_inputs.is_initiated(PlayerInput::FIRE)) {
     game_start_engaged = true;
+    ctx.assets.play_audio(sound::MENU_SELECT);
   }
 }
 
@@ -42,11 +43,29 @@ bool MainMenu::start_game() {
 }
 
 void MainMenu::draw(SDL_Renderer *renderer) const {
-  if (game_start_engaged) {
-    text_renderer.render_text(renderer, {100, 100}, "yeet it");
-  }
+  text_renderer.render_text_centered(renderer, 100, "personal space invaders");
 
-  text_renderer.render_text(renderer, {100, 100}, "beat it");
+  spritesheet.draw_frame(renderer, {4, 0}, {370, 205, 60, 60});
+  text_renderer.render_text_centered(renderer, 225, " - 10 points");
+
+  spritesheet.draw_frame(renderer, {1, 0}, {370, 255, 60, 60});
+  text_renderer.render_text_centered(renderer, 275, " - 20 points");
+
+  spritesheet.draw_frame(renderer, {1, 1}, {370, 305, 60, 60});
+  text_renderer.render_text_centered(renderer, 325, " - 30 points");
+
+  spritesheet.draw_frame(renderer, {7, 0}, {370, 355, 60, 60});
+  text_renderer.render_text_centered(renderer, 375, " - 40 points");
+
+  text_renderer.render_text_centered(renderer, 490, "<a> and <d> to move");
+  text_renderer.render_text_centered(renderer, 530, "<space> to shoot");
+  text_renderer.render_text_centered(renderer, 570, "<esc> to pause");
+
+  if (game_start_engaged && game_start_blink) {
+    text_renderer.render_text_centered(renderer, 700, "press <space> to begin");
+  } else if (!game_start_engaged) {
+    text_renderer.render_text_centered(renderer, 700, "press <space> to begin");
+  }
 }
 
 unsigned int MainMenu::get_z() const {

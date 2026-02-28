@@ -26,6 +26,20 @@ void PauseMenu::execute_option() {
   option_selected = false;
 }
 
+void PauseMenu::draw_option(SDL_Renderer *renderer, int idx, core::Point position, std::string text) const {
+  if (option_idx == idx) {
+    auto selected_text = ">" + text + "<";
+
+    if (option_selected && option_selected_blink) {
+      text_renderer.render_text(renderer, {position.x - 22, position.y}, selected_text);
+    } else if (!option_selected) {
+      text_renderer.render_text(renderer, {position.x - 22, position.y}, selected_text);
+    }
+  } else {
+    text_renderer.render_text(renderer, position, text);
+  }
+}
+
 std::shared_ptr<PauseMenu> PauseMenu::create(SceneCtx ctx) {
   auto result = std::shared_ptr<PauseMenu>(new PauseMenu(ctx, ctx.assets.get_texture(image::PRIMARY_SPRITESHEET)));
 
@@ -84,33 +98,15 @@ bool PauseMenu::should_return_to_main_menu() {
 }
 
 void PauseMenu::draw(SDL_Renderer *renderer) const {
-  const float x = (core::WINDOW_WIDTH * 0.5) - 130;
-  const float y = (core::WINDOW_HEIGHT * 0.5) - 75;
+  const float menu_x = (core::WINDOW_WIDTH * 0.5) - 130;
+  const float menu_y = (core::WINDOW_HEIGHT * 0.5) - 75;
 
   SDL_SetRenderDrawColor(renderer, 20, 20, 20, 255);
-  auto rect = SDL_FRect{x, y, 260, 150};
+  auto rect = SDL_FRect{menu_x, menu_y, 260, 150};
   SDL_RenderFillRect(renderer, &rect);
 
-  // This is some "janky" stuff...
-  if (option_idx == RESUME_IDX) {
-    if (option_selected && option_selected_blink) {
-      text_renderer.render_text(renderer, {x + 40, y + 40}, ">RESUME<");
-    } else if (!option_selected) {
-      text_renderer.render_text(renderer, {x + 40, y + 40}, ">RESUME<");
-    }
-  } else {
-    text_renderer.render_text(renderer, {x + 62, y + 40}, "RESUME");
-  }
-
-  if (option_idx == MAIN_MENU_IDX) {
-    if (option_selected && option_selected_blink) {
-      text_renderer.render_text(renderer, {x + 10, y + 90}, ">MAIN MENU<");
-    } else if (!option_selected) {
-      text_renderer.render_text(renderer, {x + 10, y + 90}, ">MAIN MENU<");
-    }
-  } else {
-    text_renderer.render_text(renderer, {x + 32, y + 90}, "MAIN MENU");
-  }
+  draw_option(renderer, RESUME_IDX, {menu_x + 62, menu_y + 40}, "RESUME");
+  draw_option(renderer, MAIN_MENU_IDX, {menu_x + 32, menu_y + 90}, "MAIN MENU");
 }
 
 unsigned int PauseMenu::get_z() const {
