@@ -54,4 +54,4 @@ const unsigned int GROUND = 1;
 
 } // namespace zindex
 
-const float GROUND_Y = 745;
+const float GROUND_Y = 447;

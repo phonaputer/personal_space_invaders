@@ -31,9 +31,9 @@ void PauseMenu::draw_option(SDL_Renderer *renderer, int idx, core::Point positio
     auto selected_text = ">" + text + "<";
 
     if (option_selected && option_selected_blink) {
-      text_renderer.render_text(renderer, {position.x - 22, position.y}, selected_text);
+      text_renderer.render_text(renderer, {position.x - TextRenderer::CHARACTER_X_SPACING, position.y}, selected_text);
     } else if (!option_selected) {
-      text_renderer.render_text(renderer, {position.x - 22, position.y}, selected_text);
+      text_renderer.render_text(renderer, {position.x - TextRenderer::CHARACTER_X_SPACING, position.y}, selected_text);
     }
   } else {
     text_renderer.render_text(renderer, position, text);
@@ -98,15 +98,15 @@ bool PauseMenu::should_return_to_main_menu() {
 }
 
 void PauseMenu::draw(SDL_Renderer *renderer) const {
-  const float menu_x = (core::WINDOW_WIDTH * 0.5) - 130;
-  const float menu_y = (core::WINDOW_HEIGHT * 0.5) - 75;
+  const float menu_x = (core::WINDOW_WIDTH * 0.5) - 78;
+  const float menu_y = (core::WINDOW_HEIGHT * 0.5) - 45;
 
   SDL_SetRenderDrawColor(renderer, 20, 20, 20, 255);
-  auto rect = SDL_FRect{menu_x, menu_y, 260, 150};
+  auto rect = SDL_FRect{menu_x, menu_y, 156, 90};
   SDL_RenderFillRect(renderer, &rect);
 
-  draw_option(renderer, RESUME_IDX, {menu_x + 62, menu_y + 40}, "RESUME");
-  draw_option(renderer, MAIN_MENU_IDX, {menu_x + 32, menu_y + 90}, "MAIN MENU");
+  draw_option(renderer, RESUME_IDX, {menu_x + 37, menu_y + 24}, "RESUME");
+  draw_option(renderer, MAIN_MENU_IDX, {menu_x + 19, menu_y + 54}, "MAIN MENU");
 }
 
 unsigned int PauseMenu::get_z() const {

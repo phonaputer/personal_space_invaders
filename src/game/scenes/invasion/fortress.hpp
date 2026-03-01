@@ -21,8 +21,8 @@ class FortressTile : public Drawable, public Collidable {
     FortressTile(core::Point position, Spritesheet spritesheet, Frame start_frame, core::Rect hitbox);
 
   public:
-    static constexpr float DRAW_WIDTH = 15;
-    static constexpr float DRAW_HEIGHT = 15;
+    static constexpr float DRAW_WIDTH = 9;
+    static constexpr float DRAW_HEIGHT = 9;
 
     static std::shared_ptr<FortressTile>
     create(SceneCtx ctx, core::Point position, Frame start_frame, core::Rect hitbox);

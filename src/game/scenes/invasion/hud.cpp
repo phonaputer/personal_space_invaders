@@ -48,11 +48,11 @@ unsigned int HUD::get_z() const {
 }
 
 void HUD::draw(SDL_Renderer *renderer) const {
-  text_renderer.render_text(renderer, {10, 10}, std::format("score:{}", current_score));
-  text_renderer.render_text(renderer, {core::WINDOW_WIDTH / 2 - 110, 10}, std::format("hi-score:{}", high_score));
-  text_renderer.render_text(renderer, {core::WINDOW_WIDTH - 165, 10}, std::format("lives:{}", current_lives));
+  text_renderer.render_text(renderer, {6, 6}, std::format("score:{}", current_score));
+  text_renderer.render_text(renderer, {core::WINDOW_WIDTH / 2 - 66, 6}, std::format("hi-score:{}", high_score));
+  text_renderer.render_text(renderer, {core::WINDOW_WIDTH - 99, 6}, std::format("lives:{}", current_lives));
 
   if (game_is_over) {
-    text_renderer.render_text(renderer, {core::WINDOW_WIDTH / 2 - 100, core::WINDOW_HEIGHT / 2}, "game over");
+    text_renderer.render_text(renderer, {core::WINDOW_WIDTH / 2 - 60, core::WINDOW_HEIGHT / 2}, "game over");
   }
 }
