@@ -1,4 +1,4 @@
-<!--Taken from https://thope.xyz/2021/itch-io-wasm.html-->
+<!--Adapted from https://thope.xyz/2021/itch-io-wasm.html-->
 
 <!doctype html>
 <html>
@@ -9,7 +9,7 @@
       * {
         margin: 0;
         padding: 0;
-        background-color: #222;
+        background-color: black;
       }
       canvas {
         border: 0px none;
@@ -21,10 +21,17 @@
         margin-left: auto;
         margin-right: auto;
       }
-      .overlay {
+      .overlay-container {
         position: absolute;
-        top: 10px;
-        left: 10px;
+        top: 0;
+        left: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        width: 100vw;
+      }
+      .overlay {
         z-index: 1;
         font-size: 30px;
         color: white;
@@ -34,7 +41,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
   <body>
-    <span class="overlay" id="overlay-text">Loading...</span>
+    <div class="overlay-container" id="overlay-div">
+      <span class="overlay" id="overlay-text">Loading...</span>
+    </div>
     <script type="text/javascript">
       var Module = {};
       fetch("personal_space_invaders.wasm")
@@ -42,21 +51,20 @@
         .then((buffer) => {
           Module.canvas = document.getElementById("canvas");
           Module.wasmBinary = buffer;
+
           var script = document.createElement("script");
           script.src = "personal_space_invaders.js";
           script.onload = function () {
             console.log("Emscripten boilerplate loaded.");
           };
           document.body.appendChild(script);
-          // When you click outside the canvas on itch.io input stops working, this fixes it
+
           Module.canvas.onclick = function () {
             Module.canvas.focus();
           };
+
+          document.getElementById("overlay-div").remove();
         });
-      Module.setStatus = function (text) {
-        console.log("status:", text);
-        document.getElementById("overlay-text").innerHTML = text;
-      };
     </script>
     <canvas id="canvas" tabindex="0"></canvas>
   </body>
