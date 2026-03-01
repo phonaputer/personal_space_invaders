@@ -13,13 +13,16 @@
 // Roughly 60 updates per second. 1000 / 60 = 16.66 (repeating, of course).
 const Uint64 MS_PER_UPDATE = 17;
 
+const int ACTUAL_WINDOW_WIDTH = 1100;
+const int ACTUAL_WINDOW_HEIGHT = 800;
+
 Game::Game() {
   if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
     throw std::runtime_error(std::format("Failed to initialize SDL: {}", SDL_GetError()));
   }
 
   window = SDL_CreateWindow(
-      "Personal Space Invaders", core::WINDOW_WIDTH, core::WINDOW_HEIGHT, SDL_WINDOW_HIGH_PIXEL_DENSITY
+      "Personal Space Invaders", ACTUAL_WINDOW_WIDTH, ACTUAL_WINDOW_HEIGHT, SDL_WINDOW_HIGH_PIXEL_DENSITY
   );
   if (!window) {
     throw std::runtime_error(std::format("Couldn't create window: {}", SDL_GetError()));
@@ -29,6 +32,10 @@ Game::Game() {
   if (!renderer) {
     throw std::runtime_error(std::format("Couldn't create renderer: {}", SDL_GetError()));
   }
+
+  SDL_SetRenderLogicalPresentation(
+      renderer, core::WINDOW_WIDTH, core::WINDOW_HEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX
+  );
 
   if (!MIX_Init()) {
     throw std::runtime_error(std::format("Couldn't initialize sound mixer: {}", SDL_GetError()));

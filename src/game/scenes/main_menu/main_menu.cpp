@@ -43,28 +43,28 @@ bool MainMenu::start_game() {
 }
 
 void MainMenu::draw(SDL_Renderer *renderer) const {
-  text_renderer.render_text_centered(renderer, 100, "personal space invaders");
+  text_renderer.render_text_centered(renderer, 36, "personal space invaders");
 
-  spritesheet.draw_frame(renderer, {4, 0}, {370, 205, 60, 60});
-  text_renderer.render_text_centered(renderer, 225, " - 10 points");
+  spritesheet.draw_frame(renderer, {4, 0}, {222, 123, 36, 36});
+  text_renderer.render_text_centered(renderer, 135, " - 10 points");
 
-  spritesheet.draw_frame(renderer, {1, 0}, {370, 255, 60, 60});
-  text_renderer.render_text_centered(renderer, 275, " - 20 points");
+  spritesheet.draw_frame(renderer, {1, 0}, {222, 153, 36, 36});
+  text_renderer.render_text_centered(renderer, 165, " - 20 points");
 
-  spritesheet.draw_frame(renderer, {1, 1}, {370, 305, 60, 60});
-  text_renderer.render_text_centered(renderer, 325, " - 30 points");
+  spritesheet.draw_frame(renderer, {1, 1}, {222, 183, 36, 36});
+  text_renderer.render_text_centered(renderer, 195, " - 30 points");
 
-  spritesheet.draw_frame(renderer, {7, 0}, {370, 355, 60, 60});
-  text_renderer.render_text_centered(renderer, 375, " - 40 points");
+  spritesheet.draw_frame(renderer, {7, 0}, {222, 213, 36, 36});
+  text_renderer.render_text_centered(renderer, 225, " - 40 points");
 
-  text_renderer.render_text_centered(renderer, 490, "<a> and <d> to move");
-  text_renderer.render_text_centered(renderer, 530, "<space> to shoot");
-  text_renderer.render_text_centered(renderer, 570, "<esc> to pause");
+  text_renderer.render_text_centered(renderer, 294, "<a> and <d> to move");
+  text_renderer.render_text_centered(renderer, 318, "<space> to shoot");
+  text_renderer.render_text_centered(renderer, 342, "<esc> to pause");
 
   if (game_start_engaged && game_start_blink) {
-    text_renderer.render_text_centered(renderer, 700, "press <space> to begin");
+    text_renderer.render_text_centered(renderer, 420, "press <space> to begin");
   } else if (!game_start_engaged) {
-    text_renderer.render_text_centered(renderer, 700, "press <space> to begin");
+    text_renderer.render_text_centered(renderer, 420, "press <space> to begin");
   }
 }
 

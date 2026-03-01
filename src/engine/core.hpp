@@ -2,8 +2,9 @@
 
 namespace core {
 
-const int WINDOW_WIDTH = 1100;
-const int WINDOW_HEIGHT = 800;
+// TODO cut down by 3/5
+const int WINDOW_WIDTH = 660;
+const int WINDOW_HEIGHT = 480;
 
 struct Rect {
     float x;
