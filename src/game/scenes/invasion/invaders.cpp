@@ -59,7 +59,7 @@ void AlienProjectile::draw(SDL_Renderer *renderer) const {
 }
 
 bool AlienProjectile::is_deleted() const {
-  return deleted == true || y + 40 >= GROUND_Y;
+  return deleted == true || y + 24 >= GROUND_Y;
 }
 
 void AlienProjectile::mark_deleted() {
@@ -68,10 +68,10 @@ void AlienProjectile::mark_deleted() {
 
 core::Rect AlienProjectile::get_hitbox() const {
   return {
-      .x = x + 22,
-      .y = y + 13,
-      .width = 12,
-      .height = 24,
+      .x = x + 13.2f,
+      .y = y + 7.8f,
+      .width = 7.2,
+      .height = 14.4,
   };
 }
 
@@ -139,7 +139,7 @@ std::shared_ptr<Alien> AlienFactory::new_jellyfish(core::Point starting_position
       .texture = ctx.assets.get_texture(image::PRIMARY_SPRITESHEET),
       .starting_position = starting_position,
       .frames = {{1, 0}, {0, 0}, {1, 0}, {2, 0}},
-      .hitbox = {5, 12, 50, 35},
+      .hitbox = {3, 7.2, 30, 21},
       .score_notifier = score_notifier,
       .score = 30,
       .explosions = explosions,
@@ -156,7 +156,7 @@ std::shared_ptr<Alien> AlienFactory::new_tadpole(core::Point starting_position) 
       .texture = ctx.assets.get_texture(image::PRIMARY_SPRITESHEET),
       .starting_position = starting_position,
       .frames = {{4, 0}, {3, 0}, {4, 0}, {5, 0}},
-      .hitbox = {17, 11, 23, 35},
+      .hitbox = {10.2, 6.6, 13.8, 21},
       .score_notifier = score_notifier,
       .score = 10,
       .explosions = explosions,
@@ -173,7 +173,7 @@ std::shared_ptr<Alien> AlienFactory::new_octopus(core::Point starting_position) 
       .texture = ctx.assets.get_texture(image::PRIMARY_SPRITESHEET),
       .starting_position = starting_position,
       .frames = {{6, 0}, {7, 0}},
-      .hitbox = {0, 15, 60, 32},
+      .hitbox = {0, 9, 36, 19.2},
       .score_notifier = score_notifier,
       .score = 40,
       .explosions = explosions,
@@ -190,7 +190,7 @@ std::shared_ptr<Alien> AlienFactory::new_crab(core::Point starting_position) {
       .texture = ctx.assets.get_texture(image::PRIMARY_SPRITESHEET),
       .starting_position = starting_position,
       .frames = {{1, 1}, {0, 1}, {1, 1}, {2, 1}},
-      .hitbox = {5, 14, 50, 31},
+      .hitbox = {3, 8.4, 30, 18.6},
       .score_notifier = score_notifier,
       .score = 20,
       .explosions = explosions,

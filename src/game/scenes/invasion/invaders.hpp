@@ -14,9 +14,9 @@ class AlienExplosionOrchestrator;
 
 class AlienProjectile : public Collidable, public Drawable {
   private:
-    static constexpr float DRAW_WIDTH = 60;
-    static constexpr float DRAW_HEIGHT = 60;
-    static constexpr float SPEED = 3;
+    static constexpr float DRAW_WIDTH = 36;
+    static constexpr float DRAW_HEIGHT = 36;
+    static constexpr float SPEED = 1.8;
 
     std::unique_ptr<Animation> animation;
     float x;
@@ -47,8 +47,8 @@ class AlienProjectile : public Collidable, public Drawable {
 class AlienExplosion : public Drawable {
   private:
     static constexpr int LIFETIME_TICKS = 20;
-    static constexpr float DRAW_WIDTH = 60;
-    static constexpr float DRAW_HEIGHT = 60;
+    static constexpr float DRAW_WIDTH = 36;
+    static constexpr float DRAW_HEIGHT = 36;
     int tick_counter;
     std::unique_ptr<Animation> animation;
     float x;
@@ -78,8 +78,8 @@ struct AlienParams {
 
 class Alien : public Drawable, public Collidable {
   private:
-    static constexpr float DRAW_WIDTH = 60;
-    static constexpr float DRAW_HEIGHT = 60;
+    static constexpr float DRAW_WIDTH = 36;
+    static constexpr float DRAW_HEIGHT = 36;
 
     const core::Point starting_position;
     std::unique_ptr<Animation> animation;
@@ -142,8 +142,8 @@ class AlienOrchestrator : public GameStateNotifier {
     static constexpr int TICKS_PER_MOVE = 58;
     static constexpr int TICKS_PER_SHOOT_CHANCE = 30;
     static constexpr int ALIEN_SHOOT_CHANCE = 3; // The chance is the reciprocal of this number
-    static constexpr float X_SPEED = 20;
-    static constexpr float Y_SPEED = 45;
+    static constexpr float X_SPEED = 12;
+    static constexpr float Y_SPEED = 27;
 
     AlienProjectileOrchestrator projectiles;
     std::shared_ptr<AlienExplosionOrchestrator> explosions;

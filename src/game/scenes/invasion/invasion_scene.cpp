@@ -37,19 +37,19 @@ void InvasionScene::initialize(SceneCtx ctx) {
   game_state->add_notifier(alien_orchestrator);
   alien_orchestrator->add_overrun_notifier(game_state);
 
-  player = Player::create(ctx, {500, GROUND_Y - 45});
+  player = Player::create(ctx, {300, GROUND_Y - 27});
   player->add_notifier(game_state);
   game_state->add_notifier(player);
 
   auto alien_factory = AlienFactory(ctx, game_state, explosions);
 
-  const float starting_x_pos = 200;
+  const float starting_x_pos = 120;
   float x_pos = starting_x_pos;
-  float y_pos = 50;
-  const float alien_width = 60;
-  const float alien_height = 60;
-  const float col_spacing = 5;
-  const float row_spacing = -2;
+  float y_pos = 30;
+  const float alien_width = 36;
+  const float alien_height = 36;
+  const float col_spacing = 3;
+  const float row_spacing = -1.2;
 
   for (int i = 0; i < 11; i++) {
     alien_orchestrator->add_alien(alien_factory.new_octopus({x_pos, y_pos}));
@@ -84,9 +84,9 @@ void InvasionScene::initialize(SceneCtx ctx) {
     x_pos += alien_width + col_spacing;
   }
 
-  float fort_x_pos = 200;
-  const float fort_y_pos = core::WINDOW_HEIGHT - 175;
-  const float fort_x_spacing = 200;
+  float fort_x_pos = 120;
+  const float fort_y_pos = core::WINDOW_HEIGHT - 105;
+  const float fort_x_spacing = 120;
 
   for (int i = 0; i < 4; i++) {
     auto fort = Fortress::create(ctx, {fort_x_pos, fort_y_pos});

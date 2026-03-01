@@ -13,8 +13,8 @@
 // Roughly 60 updates per second. 1000 / 60 = 16.66 (repeating, of course).
 const Uint64 MS_PER_UPDATE = 17;
 
-const int ACTUAL_WINDOW_WIDTH = 1100;
-const int ACTUAL_WINDOW_HEIGHT = 800;
+const int ACTUAL_WINDOW_WIDTH = 880;
+const int ACTUAL_WINDOW_HEIGHT = 640;
 
 Game::Game() {
   if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
@@ -22,7 +22,10 @@ Game::Game() {
   }
 
   window = SDL_CreateWindow(
-      "Personal Space Invaders", ACTUAL_WINDOW_WIDTH, ACTUAL_WINDOW_HEIGHT, SDL_WINDOW_HIGH_PIXEL_DENSITY
+      "Personal Space Invaders",
+      ACTUAL_WINDOW_WIDTH,
+      ACTUAL_WINDOW_HEIGHT,
+      SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_RESIZABLE
   );
   if (!window) {
     throw std::runtime_error(std::format("Couldn't create window: {}", SDL_GetError()));
