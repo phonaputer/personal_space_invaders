@@ -11,9 +11,9 @@
 
 class PlayerProjectile : public Collidable, public Drawable {
   private:
-    static constexpr float DRAW_WIDTH = 60;
-    static constexpr float DRAW_HEIGHT = 60;
-    static constexpr float SPEED = 10;
+    static constexpr float DRAW_WIDTH = 36;
+    static constexpr float DRAW_HEIGHT = 36;
+    static constexpr float SPEED = 6;
 
     Spritesheet spritesheet;
     float x = 0;
@@ -38,9 +38,9 @@ class PlayerProjectile : public Collidable, public Drawable {
 
 class Player : public Collidable, public Drawable, public GameStateNotifier {
   private:
-    static constexpr float DRAW_WIDTH = 60;
-    static constexpr float DRAW_HEIGHT = 60;
-    static constexpr float SPEED = 4;
+    static constexpr float DRAW_WIDTH = 36;
+    static constexpr float DRAW_HEIGHT = 36;
+    static constexpr float SPEED = 2.4;
     static constexpr int TICKS_PER_SHOT = 4;
 
     SceneCtx ctx;

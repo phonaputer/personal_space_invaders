@@ -73,10 +73,10 @@ void PlayerProjectile::draw(SDL_Renderer *renderer) const {
 
 core::Rect PlayerProjectile::get_hitbox() const {
   return {
-      .x = x + 25,
-      .y = y + 25,
-      .width = 6,
-      .height = 12,
+      .x = x + 15,
+      .y = y + 15,
+      .width = 3.6,
+      .height = 7.2,
   };
 }
 
@@ -147,7 +147,7 @@ void Player::update() {
   if (ctx.user_inputs.is_engaged(PlayerInput::FIRE) && !projectile->is_active() && shot_clock >= TICKS_PER_SHOT) {
     shot_clock = 0;
     muzzle_flash_animation->play();
-    projectile->shoot_from({x - 7, y - 20});
+    projectile->shoot_from({x - 4.2f, y - 12});
     ctx.assets.play_audio(sound::PLAYER_SHOT);
   }
   muzzle_flash_animation->update();
@@ -200,9 +200,9 @@ void Player::draw(SDL_Renderer *renderer) const {
 core::Rect Player::get_hitbox() const {
   return {
       .x = x,
-      .y = y + 23,
-      .width = DRAW_WIDTH - 2,
-      .height = DRAW_HEIGHT - 38,
+      .y = y + 13.8f,
+      .width = DRAW_WIDTH - 1.2,
+      .height = DRAW_HEIGHT - 22.8,
   };
 }
 
