@@ -1,0 +1,63 @@
+<!--Taken from https://thope.xyz/2021/itch-io-wasm.html-->
+
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style type="text/css">
+      * {
+        margin: 0;
+        padding: 0;
+        background-color: #222;
+      }
+      canvas {
+        border: 0px none;
+        outline: none;
+        background-color: black;
+        width: 825;
+        height: 600;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .overlay {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 1;
+        font-size: 30px;
+        color: white;
+        background-color: black;
+      }
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <span class="overlay" id="overlay-text">Loading...</span>
+    <script type="text/javascript">
+      var Module = {};
+      fetch("personal_space_invaders.wasm")
+        .then((response) => response.arrayBuffer())
+        .then((buffer) => {
+          Module.canvas = document.getElementById("canvas");
+          Module.wasmBinary = buffer;
+          var script = document.createElement("script");
+          script.src = "personal_space_invaders.js";
+          script.onload = function () {
+            console.log("Emscripten boilerplate loaded.");
+          };
+          document.body.appendChild(script);
+          // When you click outside the canvas on itch.io input stops working, this fixes it
+          Module.canvas.onclick = function () {
+            Module.canvas.focus();
+          };
+        });
+      Module.setStatus = function (text) {
+        console.log("status:", text);
+        document.getElementById("overlay-text").innerHTML = text;
+      };
+    </script>
+    <canvas id="canvas" tabindex="0"></canvas>
+  </body>
+</html>

@@ -18,7 +18,9 @@ Game::Game() {
     throw std::runtime_error(std::format("Failed to initialize SDL: {}", SDL_GetError()));
   }
 
-  window = SDL_CreateWindow("Personal Space Invaders", core::WINDOW_WIDTH, core::WINDOW_HEIGHT, 0);
+  window = SDL_CreateWindow(
+      "Personal Space Invaders", core::WINDOW_WIDTH, core::WINDOW_HEIGHT, SDL_WINDOW_HIGH_PIXEL_DENSITY
+  );
   if (!window) {
     throw std::runtime_error(std::format("Couldn't create window: {}", SDL_GetError()));
   }

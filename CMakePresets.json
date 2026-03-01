@@ -2,7 +2,7 @@
     "version": 8,
     "configurePresets": [
         {
-            "name": "Debug",
+            "name": "debug-clang",
             "displayName": "Debug with Clang",
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "cacheVariables": {
@@ -16,7 +16,7 @@
             }
         },
         {
-            "name": "Release",
+            "name": "release-clang",
             "displayName": "Release with Clang",
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "cacheVariables": {
@@ -27,6 +27,16 @@
                 "CMAKE_CXX_FLAGS_INIT": "-Wall -Wextra -Wpedantic -Werror",
                 "CMAKE_CXX_CLANG_TIDY": "clang-tidy",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            }
+        },
+        {
+            "name": "release-emscripten",
+            "displayName": "Release for web with Emscripten",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "toolchainFile": "$env{EMSDK}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake",
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+                "CMAKE_BUILD_TYPE": "Release"
             }
         }
     ]

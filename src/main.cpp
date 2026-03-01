@@ -43,7 +43,7 @@
 // (won't do) * Remove scene ctx from update calls
 // (won't do) * different sound when two bullets collide
 // X * make it so a bullet can't destroy two things if it collides with two in one tick
-// * compile for web with Emscripten
+// X * compile for web with Emscripten
 // * Throw in the mystery ship for bonus points
 // * Maybe some powerups?
 
