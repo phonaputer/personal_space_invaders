@@ -9,44 +9,6 @@
 #include <memory>
 #include <vector>
 
-// ----[  TODO
-// X * Add bad guys
-// X * Have bad guys move around
-// X * Add player character
-// X * Have player character move in response to WASD
-// X * Have player character shoot with Space
-// X * Have bullets delete bad guys
-// X * Have bad guys explode upon deletion
-// X * Have bad guys shoot lazers
-// X * Have lazers not damage bad guys
-// X * Reset board upon destroying all bad guys
-// X * Track score
-// X * Have bad guy lazers damage player
-// X * Pause enemies while player is blowing up
-// X * Have a system of "lives" for the player, displaying in the UI
-// X * Game over when all lives are lost
-// ? * Can reset game after game over
-// X * Sound effects
-// X * clear bullets from screen when player dies
-// X * increate rate of bullet firing from aliens
-// X * Don't forget to seed standard library rand so aliens don't shoot the same each game
-// X * BGM (space invaders style where it speeds up along with the aliens)
-// X * aliens get faster when less are remaining
-// X * You have fortresses
-// X * you can have exactly 1 bullet on screen at a time
-// X * truncate the player shot noise since you don't really hear the bass part anyways
-// X * You lose the game when an alien makes it to the earth
-// X * Remove Entity type since it's not really needed
-// X * Add Z-index when drawing stuff
-// X * Start menu
-// X * Escape menu
-// (won't do) * Remove scene ctx from update calls
-// (won't do) * different sound when two bullets collide
-// X * make it so a bullet can't destroy two things if it collides with two in one tick
-// X * compile for web with Emscripten
-// * Throw in the mystery ship for bonus points
-// * Maybe some powerups?
-
 SDL_AppResult SDL_AppInit(void **appstate, [[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
   std::srand(std::time(0));
 
