@@ -2,9 +2,9 @@
 
 A reimplementation of the Taito classic as a simple project to learn how games can be made. 
 You could say this is my "personal" implementation of _Space Invaders_. 
-And hopefully a different enough name to avoid lawsuits...
+And hopefully a different enough name to avoid lawsuits.
 
-_Space Invaders_ made sense as a first learning project for a couple reasons.
+_Space Invaders_ made sense as a fun learning project for a couple reasons.
 
 1. It has a small, well-defined feature set which makes developing a viable product a very achievable target.
 2. The art and audio is simple enough that even someone without art skills (such as myself) can create it.
